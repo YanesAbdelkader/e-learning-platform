@@ -14,8 +14,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "E-learning Platform",
-  description: "E-Learning Platform - your best place to learn online",
+  title: "A-Z learning",
+  description: "Your best place to learn online",
 };
 
 export default function RootLayout({
