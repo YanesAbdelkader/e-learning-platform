@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Heart, ShoppingCart, Menu, Search, Moon, Sun } from "lucide-react";
@@ -13,41 +13,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useTheme } from "next-themes";
 
-const isLoggedIn = true;
+const isLoggedIn = !true;
 
 export function Header() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
-
-  useEffect(() => {
-    const darkModePreference =
-      localStorage.getItem("darkMode") === "true" ||
-      (!("darkMode" in localStorage) &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches);
-    setIsDarkMode(darkModePreference);
-  }, []);
-
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-    localStorage.setItem("darkMode", isDarkMode.toString());
-  }, [isDarkMode]);
+  const { setTheme } = useTheme();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Searching for:", searchQuery);
   };
 
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-  };
-
   return (
-    <header className="bg-white dark:bg-black shadow-md">
+    <header className="bg-white dark:bg-black shadow-md static">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
@@ -70,14 +50,17 @@ export function Header() {
             </nav>
           </div>
           <div className="hidden md:flex items-center space-x-4 flex-grow justify-end">
-            <form onSubmit={handleSearch} className="w-full max-w-sm mr-4">
+            <form
+              onSubmit={handleSearch}
+              className="w-full md:pl-10 max-w-sm mr-4"
+            >
               <div className="relative">
                 <Input
                   type="search"
                   placeholder="Search courses..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pr-10 rounded-full"
+                  className="w-full  pr-10 rounded-full"
                 />
                 <Button
                   type="submit"
@@ -132,7 +115,7 @@ export function Header() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="space-x-2">
+              <div className="flex space-x-2">
                 <Button variant="outline" asChild>
                   <Link href="/login">Log in</Link>
                 </Button>
@@ -144,13 +127,23 @@ export function Header() {
                 </Button>
               </div>
             )}
-            <Button variant="ghost" size="icon" onClick={toggleDarkMode}>
-              {isDarkMode ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                  <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                  <span className="sr-only">Toggle theme</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setTheme("light")}>
+                  Light
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("dark")}>
+                  Dark
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           <div className="md:hidden">
             <Sheet>
@@ -232,23 +225,35 @@ export function Header() {
                       <Button variant="outline" className="w-full" asChild>
                         <Link href="/login">Log in</Link>
                       </Button>
-                      <Button className="w-full" asChild>
+                      <Button
+                        className="w-full bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        asChild
+                      >
                         <Link href="/signup">Sign up</Link>
                       </Button>
                     </div>
                   )}
-                  <Button
-                    variant="ghost"
-                    className="justify-start"
-                    onClick={toggleDarkMode}
-                  >
-                    {isDarkMode ? (
-                      <Sun className="h-5 w-5 mr-2" />
-                    ) : (
-                      <Moon className="h-5 w-5 mr-2" />
-                    )}
-                    {isDarkMode ? "Light Mode" : "Dark Mode"}
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="w-full self-center rounded-full"
+                      >
+                        <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                        <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                        <span className="sr-only">Toggle theme</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => setTheme("light")}>
+                        Light
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setTheme("dark")}>
+                        Dark
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </nav>
               </SheetContent>
             </Sheet>
