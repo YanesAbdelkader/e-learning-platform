@@ -33,6 +33,8 @@ import {
 import { Divider } from "@/components/divider";
 import ImageCropper from "@/components/image-cropper";
 import { Github, Facebook, Instagram, Chrome } from "lucide-react";
+import { setCookie } from "typescript-cookie";
+import { useRouter } from "next/navigation";
 
 const schema = z
   .object({
@@ -63,7 +65,8 @@ export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
   const [cropDialogOpen, setCropDialogOpen] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
-
+  const [error, setError] = useState("");
+  const router = useRouter();
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -78,7 +81,27 @@ export default function SignUp() {
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
-    // Implement your registration logic here
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
+      const apiData = await response.json();
+      if (response.ok) {
+        setCookie("token", apiData.token, { expires: 15 });
+        router.push("/");
+      } else {
+        setError(apiData.error || "Login failed");
+      }
+    } catch (error) {
+      setError(`${error}`);
+    }
     console.log(data);
     await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulating API call
     setIsLoading(false);
@@ -201,6 +224,14 @@ export default function SignUp() {
             Step {step + 1} of {steps.length}: {steps[step].title}
           </p>
         </div>
+        {error && (
+          <div
+            onClick={() => setError("")}
+            className="text-center p-3.5 rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {error}
+          </div>
+        )}
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -458,7 +489,7 @@ export default function SignUp() {
                   Next <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               ) : (
-                <Button type="submit" className="ml-auto" disabled={isLoading}>
+                <Button  type="submit" className="ml-auto bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" disabled={isLoading}>
                   {isLoading ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : null}

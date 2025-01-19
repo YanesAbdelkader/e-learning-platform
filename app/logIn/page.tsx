@@ -70,6 +70,7 @@ export default function Login() {
 
   const handleSocialLogin = async (provider: string) => {
     setIsLoading(true);
+    
     window.open(
       `${process.env.NEXT_PUBLIC_API_URL}/auth/redirect/${provider}/web`,"","popup=true"
     );
