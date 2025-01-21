@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import logo from "@/app/assets/image.jpg";
 import { Heart, ShoppingCart, Menu, Search, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,7 +33,7 @@ export function Header() {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0">
-              <Image src="/logo.png" alt="Logo" width={40} height={40} />
+              <Image src={logo} alt="Logo" width={40} height={40} className="rounded-3xl"/>
             </Link>
             <nav className="hidden md:ml-6 md:flex md:space-x-8">
               <Link

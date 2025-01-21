@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/form";
 import { setCookie } from "typescript-cookie";
 import { useRouter } from "next/navigation";
+import { handleAPIcall } from "@/functions/custom";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -47,22 +48,24 @@ export default function Login() {
   async function onSubmit(data: LoginData) {
     setIsLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      const apiData = await response.json();
-      if (response.ok) {
-        setCookie("token", apiData.token ,{ expires: 15 });
+      const { data: response, error } = await handleAPIcall(
+        data,
+        "",
+        "login",
+        "POST"
+      );
+
+      if (error) {
+        setError(error.message || "Login failed");
+      } else if (response.status == 200) {
+        setCookie("token", response.data.token, { expires: 15 });
         router.push("/");
-      } else {
-        setError(apiData.error || "Login failed");
+      } else if (response.status == 201) {
+        console.log(response.data.message);
       }
-    } catch (error) {
-      setError(`${error}`);
+    } catch (err) {
+      console.error("Unexpected Error:", err);
+      setError("Something went wrong. Please try again.");
     }
     await new Promise((resolve) => setTimeout(resolve, 2000));
     setIsLoading(false);
@@ -70,9 +73,11 @@ export default function Login() {
 
   const handleSocialLogin = async (provider: string) => {
     setIsLoading(true);
-    
+
     window.open(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/redirect/${provider}/web`,"","popup=true"
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/redirect/${provider}/web`,
+      "",
+      "popup=true"
     );
     console.log(`Logging in with ${provider}`);
     await new Promise((resolve) => setTimeout(resolve, 2000));
