@@ -7,7 +7,7 @@ export const handleAPIcall = async (
   meth: string
 ) => {
   const endpoint = `${process.env.NEXT_PUBLIC_API_URL}/api/${rout}${
-    param !== null ? `/${param}` : ""
+    param !== null && `/${param}`
   }`;
 
   try {

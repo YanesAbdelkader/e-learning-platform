@@ -1,6 +1,5 @@
 "use client";
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "@/app/assets/image.jpg";
@@ -15,6 +14,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTheme } from "next-themes";
+import { registerServiceWorker } from "@/lib/serviceWorker";
+import { requestNotificationPermission } from "@/lib/notifications";
 
 const isLoggedIn = !true;
 
@@ -27,13 +28,27 @@ export function Header() {
     console.log("Searching for:", searchQuery);
   };
 
+  // useEffect(() => {
+  //   const setupNotifications = async () => {
+  //     await registerServiceWorker();
+  //     await requestNotificationPermission();
+  //   };
+  //   setupNotifications();
+  // }, []);
+
   return (
     <header className="bg-white dark:bg-black shadow-md static">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0">
-              <Image src={logo} alt="Logo" width={40} height={40} className="rounded-3xl"/>
+              <Image
+                src={logo}
+                alt="Logo"
+                width={40}
+                height={40}
+                className="rounded-3xl"
+              />
             </Link>
             <nav className="hidden md:ml-6 md:flex md:space-x-8">
               <Link
