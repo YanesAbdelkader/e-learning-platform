@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "@/app/assets/image.jpg";
@@ -14,27 +14,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTheme } from "next-themes";
-import { registerServiceWorker } from "@/lib/serviceWorker";
-import { requestNotificationPermission } from "@/lib/notifications";
 
 const isLoggedIn = !true;
 
 export function Header() {
   const [searchQuery, setSearchQuery] = useState("");
-  const { setTheme } = useTheme();
-
+  const { theme, setTheme } = useTheme();
+  
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Searching for:", searchQuery);
   };
-
-  // useEffect(() => {
-  //   const setupNotifications = async () => {
-  //     await registerServiceWorker();
-  //     await requestNotificationPermission();
-  //   };
-  //   setupNotifications();
-  // }, []);
 
   return (
     <header className="bg-white dark:bg-black shadow-md static">
@@ -143,23 +133,22 @@ export function Header() {
                 </Button>
               </div>
             )}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                  <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                  <span className="sr-only">Toggle theme</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setTheme("light")}>
-                  Light
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("dark")}>
-                  Dark
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+            >
+              <Sun
+                className={`h-[1.2rem] w-[1.2rem] transition-all ${
+                  theme === "dark" ? "rotate-0 scale-100" : "rotate-90 scale-0"
+                }`}
+              />
+              <Moon
+                className={`absolute h-[1.2rem] w-[1.2rem] transition-all ${
+                  theme === "light" ? "rotate-0 scale-100" : "rotate-90 scale-0"
+                }`}
+              />
+            </Button>
           </div>
           <div className="md:hidden">
             <Sheet>
@@ -230,7 +219,7 @@ export function Header() {
                       </Link>
                       <Button
                         onClick={() => console.log("Logout clicked")}
-                        variant="outline"
+                        variant="destructive"
                         className="w-full"
                       >
                         Logout
@@ -249,27 +238,29 @@ export function Header() {
                       </Button>
                     </div>
                   )}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="w-full self-center rounded-full"
-                      >
-                        <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                        <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                        <span className="sr-only">Toggle theme</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => setTheme("light")}>
-                        Light
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setTheme("dark")}>
-                        Dark
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <Button
+                    variant="outline"
+                    size="default"
+                    onClick={() =>
+                      setTheme(theme === "light" ? "dark" : "light")
+                    }
+                  >
+                    <Sun
+                      className={`h-[1.2rem] w-[1.2rem] transition-all ${
+                        theme === "dark"
+                          ? "rotate-0 scale-100"
+                          : "rotate-90 scale-0"
+                      }`}
+                    />
+                    <Moon
+                      className={`absolute h-[1.2rem] w-[1.2rem] transition-all ${
+                        theme === "light"
+                          ? "rotate-0 scale-100"
+                          : "rotate-90 scale-0"
+                      }`}
+                    />
+                    <span className="sr-only">Toggle theme</span>
+                  </Button>
                 </nav>
               </SheetContent>
             </Sheet>

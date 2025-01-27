@@ -21,6 +21,8 @@ export async function loginAction(prevState: unknown, data: LoginData) {
         setCookie("token", response.data.token, { expires: 15 });
         revalidatePath("/");
       } else {
+        setCookie("email", data.email, { expires: 1 });
+        setCookie("password", data.password, { expires: 1 });
         revalidatePath("/login/otp");
       }
     }
