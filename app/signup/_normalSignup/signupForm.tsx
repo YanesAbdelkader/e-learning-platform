@@ -169,7 +169,7 @@ export default function SignupForm() {
   useEffect(() => {
     if (error) {
       toast({
-        title: "Error login",
+        title: "Error SignUp",
         description: error.error,
         variant: "destructive",
       });
