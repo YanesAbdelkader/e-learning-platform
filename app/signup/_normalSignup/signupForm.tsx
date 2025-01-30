@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-import { useActionState, useCallback, useState } from "react";
+import { useActionState, useCallback, useEffect, useState } from "react";
 import { signupAction } from "../_actions/actions";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -25,6 +25,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import ImageCropper from "@/components/image-cropper";
+import { useToast } from "@/hooks/use-toast";
 
 const schema = z
   .object({
@@ -51,6 +52,7 @@ const steps = [
 ];
 
 export default function SignupForm() {
+  const { toast } = useToast();
   const [error, action, isPending] = useActionState(signupAction, null);
   const [step, setStep] = useState(0);
   const [cropDialogOpen, setCropDialogOpen] = useState(false);
@@ -163,6 +165,17 @@ export default function SignupForm() {
       </Card>
     );
   };
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error login",
+        description: error.error,
+        variant: "destructive",
+      });
+    }
+  }, [error, toast]);
+
   return (
     <>
       <div>
@@ -173,11 +186,6 @@ export default function SignupForm() {
           Step {step + 1} of {steps.length}: {steps[step].title}
         </p>
       </div>
-      {error?.error && (
-        <div className="text-center p-3.5 rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90">
-          {error.error}
-        </div>
-      )}
       <Form {...form}>
         <form onSubmit={(e) => e.preventDefault()} className="mt-8 space-y-6">
           {step === 0 && (

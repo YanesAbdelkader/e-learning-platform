@@ -14,7 +14,8 @@ import { loginAction } from "../_actions/actions";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -24,6 +25,7 @@ const loginSchema = z.object({
 export type LoginData = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
+  const { toast } = useToast();
   const [error, action, isPending] = useActionState(loginAction, null);
   const form = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
@@ -32,17 +34,17 @@ export default function LoginForm() {
       password: "",
     },
   });
-
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error login",
+        description: error.error,
+        variant: "destructive",
+      });
+    }
+  }, [error, toast]);
   return (
     <>
-      {error && (
-        <div
-          
-          className="text-center p-3.5 rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
-        >
-          {error.error}
-        </div>
-      )}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(action)} className="space-y-4">
           <FormField
