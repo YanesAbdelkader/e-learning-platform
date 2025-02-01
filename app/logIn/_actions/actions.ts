@@ -1,9 +1,7 @@
 import { handleAPIcall } from "@/functions/custom";
-import { revalidatePath } from "next/cache";
-import { setCookie } from "typescript-cookie";
 import { LoginData } from "../_form/loginForm";
 
-export async function loginAction(prevState: unknown, data: LoginData) {
+export async function loginAction(_: unknown, data: LoginData) {
   try {
     const { data: response, error } = await handleAPIcall(
       data,
@@ -18,16 +16,18 @@ export async function loginAction(prevState: unknown, data: LoginData) {
 
     if (response?.status === 200 && response?.data) {
       if (response.data.otp !== true) {
-        setCookie("token", response.data.token, { expires: 15 });
-        revalidatePath("/");
+        return { success: true, token: response.data.token };
       } else {
-        setCookie("email", data.email, { expires: 1 });
-        setCookie("password", data.password, { expires: 1 });
-        revalidatePath("/login/otp");
+        return {
+          success: true,
+          email: data.email,
+          password: data.password,
+          redirectTo: "/login/otp",
+        };
       }
     }
 
-    return { error: "Invalid server response" };
+    return { error: "Unexpected response from the server" };
   } catch (err) {
     console.error("Unexpected Error:", err);
     return { error: "Something went wrong. Please try again." };

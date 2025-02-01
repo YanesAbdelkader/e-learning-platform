@@ -18,10 +18,11 @@ export async function otpAction(prevState: unknown, formData: OTPFormData) {
     );
 
     if (response?.status === 200) {
-      console.log("OTP submitted:", formData.otp);
       return {
         title: "OTP Submitted",
         description: `Your OTP ${formData.otp} has been submitted successfully.`,
+        success: true,
+        token: response.data.token,
       };
     } else if (error) {
       return {

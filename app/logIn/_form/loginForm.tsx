@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useActionState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+import { getCookie, setCookie } from "typescript-cookie";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -25,8 +27,9 @@ const loginSchema = z.object({
 export type LoginData = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
+  const router = useRouter();
   const { toast } = useToast();
-  const [error, action, isPending] = useActionState(loginAction, null);
+  const [stats, action, isPending] = useActionState(loginAction, null);
   const form = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -35,14 +38,26 @@ export default function LoginForm() {
     },
   });
   useEffect(() => {
-    if (error) {
+    if (stats?.error) {
       toast({
         title: "Error login",
-        description: error.error,
+        description: stats?.error,
         variant: "destructive",
       });
     }
-  }, [error, toast]);
+    if (stats?.success) {
+      if (stats.redirectTo) {
+        setCookie("email", stats.email, { expires: 1 });
+        setCookie("password", stats.password, { expires: 1 });
+        router.push(stats.redirectTo);
+      } else {
+        setCookie("token", stats.token, { expires: 15 });
+      }
+    }
+    if (getCookie("token")) {
+      window.history.back();
+    }
+  }, [router, stats, toast]);
   return (
     <>
       <Form {...form}>

@@ -14,7 +14,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
 import { useActionState, useCallback, useEffect, useState } from "react";
 import { signupAction } from "../_actions/actions";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,15 +25,16 @@ import {
 } from "@/components/ui/dialog";
 import ImageCropper from "@/components/image-cropper";
 import { useToast } from "@/hooks/use-toast";
+import { getCookie, setCookie } from "typescript-cookie";
 
 const schema = z
   .object({
-    firstName: z.string().min(2, "First name must be at least 2 characters"),
+    name: z.string().min(2, "First name must be at least 2 characters"),
     lastName: z.string().min(2, "Last name must be at least 2 characters"),
     email: z.string().email("Invalid email address"),
     password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string(),
-    profilePicture: z.string().optional(),
+    picture: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -44,28 +44,28 @@ const schema = z
 export type FormData = z.infer<typeof schema>;
 
 const steps = [
-  { title: "Account Details", fields: ["firstName", "lastName"] },
+  { title: "Account Details", fields: ["name", "lastName"] },
   { title: "Email", fields: ["email"] },
   { title: "Password", fields: ["password", "confirmPassword"] },
-  { title: "Profile Picture", fields: ["profilePicture"] },
+  { title: "Profile Picture", fields: ["picture"] },
   { title: "Confirm Details", fields: [] },
 ];
 
 export default function SignupForm() {
   const { toast } = useToast();
-  const [error, action, isPending] = useActionState(signupAction, null);
+  const [stats, action, isPending] = useActionState(signupAction, null);
   const [step, setStep] = useState(0);
   const [cropDialogOpen, setCropDialogOpen] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      firstName: "",
+      name: "",
       lastName: "",
       email: "",
       password: "",
       confirmPassword: "",
-      profilePicture: "",
+      picture: "",
     },
   });
   const nextStep = () => {
@@ -91,7 +91,7 @@ export default function SignupForm() {
 
   const handleCroppedImage = useCallback(
     (croppedImage: string) => {
-      form.setValue("profilePicture", croppedImage);
+      form.setValue("picture", croppedImage);
       setCropDialogOpen(false);
     },
     [form]
@@ -107,13 +107,12 @@ export default function SignupForm() {
               <Avatar className="w-32 h-32">
                 <AvatarImage
                   src={
-                    formData.profilePicture ||
-                    "/placeholder.svg?height=128&width=128"
+                    formData.picture || "/placeholder.svg?height=128&width=128"
                   }
                   alt="Profile picture"
                 />
                 <AvatarFallback>
-                  {formData.firstName.charAt(0)}
+                  {formData.name.charAt(0)}
                   {formData.lastName.charAt(0)}
                 </AvatarFallback>
               </Avatar>
@@ -125,7 +124,7 @@ export default function SignupForm() {
                   <Label className="text-sm text-muted-foreground">
                     First Name
                   </Label>
-                  <p className="text-base font-medium">{formData.firstName}</p>
+                  <p className="text-base font-medium">{formData.name}</p>
                 </div>
                 <div>
                   <Label className="text-sm text-muted-foreground">
@@ -167,14 +166,20 @@ export default function SignupForm() {
   };
 
   useEffect(() => {
-    if (error) {
+    if (stats?.error) {
       toast({
         title: "Error SignUp",
-        description: error.error,
+        description: stats?.error,
         variant: "destructive",
       });
     }
-  }, [error, toast]);
+    if (stats?.success) {
+      setCookie("token", stats.token, { expires: 15 });
+    }
+    if (getCookie("token")) {
+      window.history.back();
+    }
+  }, [stats, toast]);
 
   return (
     <>
@@ -193,7 +198,7 @@ export default function SignupForm() {
               <div className="space-y-4">
                 <FormField
                   control={form.control}
-                  name="firstName"
+                  name="name"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>First Name</FormLabel>
@@ -283,7 +288,7 @@ export default function SignupForm() {
           {step === 3 && (
             <FormField
               control={form.control}
-              name="profilePicture"
+              name="picture"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Profile Picture</FormLabel>
@@ -298,7 +303,7 @@ export default function SignupForm() {
                           alt="Profile picture"
                         />
                         <AvatarFallback>
-                          {form.getValues("firstName").charAt(0)}
+                          {form.getValues("name").charAt(0)}
                           {form.getValues("lastName").charAt(0)}
                         </AvatarFallback>
                       </Avatar>

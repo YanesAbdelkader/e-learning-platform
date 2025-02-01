@@ -1,6 +1,4 @@
 import { handleAPIcall } from "@/functions/custom";
-import { revalidatePath } from "next/cache";
-import { setCookie } from "typescript-cookie";
 import { FormData } from "../_normalSignup/signupForm";
 
 export async function signupAction(prevState: unknown, data: FormData) {
@@ -8,20 +6,17 @@ export async function signupAction(prevState: unknown, data: FormData) {
     const { data: response, error } = await handleAPIcall(
       data,
       "",
-      "signup",
+      "register",
       "POST"
     );
 
     if (error) {
-      return { error: error.message || "Login failed" };
+      return { error: error.message || "SignUp failed" };
     }
 
-    if (response?.status === 200 && response?.data) {
-      setCookie("token", response.data.token, { expires: 15 });
-      revalidatePath("/");
+    if (response?.status === 201 && response?.data) {
+      return { success: true, token: response.data.token };
     }
-
-    return { error: "Invalid server response" };
   } catch (err) {
     console.error("Unexpected Error:", err);
     return { error: "Something went wrong. Please try again." };

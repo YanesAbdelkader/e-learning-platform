@@ -18,6 +18,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { otpAction } from "../_actions/actions";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+import { getCookie, setCookie } from "typescript-cookie";
 
 export type OTPFormData = z.infer<typeof otpSchema>;
 const otpSchema = z.object({
@@ -25,8 +27,9 @@ const otpSchema = z.object({
 });
 
 export default function OtpForm() {
+  const router = useRouter();
   const { toast } = useToast();
-  const [message, action, isPending] = useActionState(otpAction, null);
+  const [stats, action, isPending] = useActionState(otpAction, null);
   const form = useForm<OTPFormData>({
     resolver: zodResolver(otpSchema),
     defaultValues: {
@@ -34,19 +37,25 @@ export default function OtpForm() {
     },
   });
   useEffect(() => {
-    if (message) {
+    if (stats) {
       toast({
-        title: message.title,
-        description: message.description,
+        title: stats.title,
+        description: stats.description,
         variant:
-          message.variant === "destructive"
+        stats.variant === "destructive"
             ? "destructive"
-            : message.variant === null
+            : stats.variant === null
             ? "default"
             : null,
       });
     }
-  }, [message, toast]);
+    if (stats?.success) {
+      setCookie("token", stats.token, { expires: 15 });
+    }
+    if (getCookie("token")){
+      window.history.back()
+    }
+  }, [router, stats, toast]);
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(action)}>
