@@ -3,6 +3,7 @@
 import { Divider } from "@/components/divider";
 import SignupForm from "./_normalSignup/signupForm";
 import SocialSignup from "./_socialSignup/socialsignup";
+import Link from "next/link";
 
 export default function SignUp() {
   return (
@@ -13,6 +14,18 @@ export default function SignUp() {
         <Divider>Or sign up with</Divider>
 
         <SocialSignup />
+
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-600 dark:text-white">
+            Already have an account?{" "}
+            <Link
+              href="/signup"
+              className="font-medium text-indigo-600 hover:text-indigo-500"
+            >
+              Log in
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

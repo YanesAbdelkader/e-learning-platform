@@ -3,7 +3,7 @@ import { SocialButton } from "./socialButton";
 
 export default function SocialSignup() {
   return (
-      <div className="mt-6 grid grid-cols-4 gap-2">
+      <div className=" grid grid-cols-4 gap-2">
         <SocialButton
           provider="facebook"
           Icon={Facebook}
