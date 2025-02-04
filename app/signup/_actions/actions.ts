@@ -1,5 +1,6 @@
 import { handleAPIcall } from "@/functions/custom";
 import { FormData } from "../_normalSignup/signupForm";
+import { setCookie } from "typescript-cookie";
 
 export async function signupAction(prevState: unknown, data: FormData) {
   try {
@@ -15,7 +16,12 @@ export async function signupAction(prevState: unknown, data: FormData) {
     }
 
     if (response?.status === 201 && response?.data) {
-      return { success: true, token: response.data.token };
+      setCookie("token", response.data.token, { expires: 15 });
+      return {
+        title: "Registration success!!",
+        description: `You have been successfully registered.`,
+        variant: "default",
+      };
     }
   } catch (err) {
     console.error("Unexpected Error:", err);

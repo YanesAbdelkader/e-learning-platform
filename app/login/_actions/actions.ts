@@ -1,5 +1,6 @@
 import { handleAPIcall } from "@/functions/custom";
 import { LoginData } from "../_form/loginForm";
+import { setCookie } from "typescript-cookie";
 
 export async function loginAction(_: unknown, data: LoginData) {
   try {
@@ -16,12 +17,12 @@ export async function loginAction(_: unknown, data: LoginData) {
 
     if (response?.status === 200 && response?.data) {
       if (response.data.otp !== true) {
-        return { success: true, token: response.data.token };
+        setCookie("token", response.data.token, { expires: 15 });
+        return { token: response.data.token };
       } else {
+        setCookie("email", data.email, { expires: 1 });
+        setCookie("password", data.password, { expires: 1 });
         return {
-          success: true,
-          email: data.email,
-          password: data.password,
           redirectTo: "/login/otp",
         };
       }

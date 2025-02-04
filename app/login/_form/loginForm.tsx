@@ -17,7 +17,6 @@ import { Loader2 } from "lucide-react";
 import { useActionState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { getCookie, setCookie } from "typescript-cookie";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -45,17 +44,8 @@ export default function LoginForm() {
         variant: "destructive",
       });
     }
-    if (stats?.success) {
-      if (stats.redirectTo) {
-        setCookie("email", stats.email, { expires: 1 });
-        setCookie("password", stats.password, { expires: 1 });
-        router.push(stats.redirectTo);
-      } else {
-        setCookie("token", stats.token, { expires: 15 });
-      }
-    }
-    if (getCookie("token")) {
-      window.history.back();
+    if (stats?.redirectTo) {
+      router.push(stats.redirectTo);
     }
   }, [router, stats, toast]);
   return (

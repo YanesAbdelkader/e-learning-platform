@@ -1,6 +1,6 @@
 import { handleAPIcall } from "@/functions/custom";
 import { OTPFormData } from "../_otpForm/otpForm";
-import { getCookie } from "typescript-cookie";
+import { getCookie, setCookie } from "typescript-cookie";
 
 export async function otpAction(prevState: unknown, formData: OTPFormData) {
   try {
@@ -18,11 +18,10 @@ export async function otpAction(prevState: unknown, formData: OTPFormData) {
     );
 
     if (response?.status === 200) {
+      setCookie("token", response.data.token, { expires: 15 });
       return {
         title: "OTP Submitted",
         description: `Your OTP ${formData.otp} has been submitted successfully.`,
-        success: true,
-        token: response.data.token,
       };
     } else if (error) {
       return {

@@ -25,7 +25,6 @@ import {
 } from "@/components/ui/dialog";
 import ImageCropper from "@/components/image-cropper";
 import { useToast } from "@/hooks/use-toast";
-import { getCookie, setCookie } from "typescript-cookie";
 
 const schema = z
   .object({
@@ -166,18 +165,12 @@ export default function SignupForm() {
   };
 
   useEffect(() => {
-    if (stats?.error) {
+    if (stats?.title) {
       toast({
-        title: "Error SignUp",
-        description: stats?.error,
-        variant: "destructive",
+        title: stats.title,
+        description: stats.description,
+        variant: stats.variant === "destructive" ? "destructive" : "default",
       });
-    }
-    if (stats?.success) {
-      setCookie("token", stats.token, { expires: 15 });
-    }
-    if (getCookie("token")) {
-      window.history.back();
     }
   }, [stats, toast]);
 
