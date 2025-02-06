@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import logo from "@/app/assets/image.jpg";
+import logo from "@/assets/image.jpg";
 import { Heart, ShoppingCart, Menu, Search, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,19 +15,19 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTheme } from "next-themes";
 
-const isLoggedIn = !true;
+const isLoggedIn = true;
 
 export function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const { theme, setTheme } = useTheme();
-  
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Searching for:", searchQuery);
   };
 
   return (
-    <header className="bg-white dark:bg-black shadow-md static">
+    <header className="bg-white dark:bg-black shadow-md">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
@@ -114,7 +114,9 @@ export function Header() {
                     <Link href="/mycourses">My Courses</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <button onClick={() => console.log("Logout clicked")}>
+                    <button
+                      onClick={() => console.log("Logout clicked")}
+                    >
                       Logout
                     </button>
                   </DropdownMenuItem>

@@ -1,9 +1,5 @@
-import React from 'react'
-
 function Dashbord() {
-  return (
-    <div>page</div>
-  )
+  return <div>page</div>;
 }
 
-export default Dashbord
+export default Dashbord;

@@ -16,7 +16,6 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useActionState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -26,7 +25,6 @@ const loginSchema = z.object({
 export type LoginData = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
-  const router = useRouter();
   const { toast } = useToast();
   const [stats, action, isPending] = useActionState(loginAction, null);
   const form = useForm<LoginData>({
@@ -37,17 +35,14 @@ export default function LoginForm() {
     },
   });
   useEffect(() => {
-    if (stats?.error) {
+    if (stats?.title) {
       toast({
-        title: "Error login",
-        description: stats?.error,
-        variant: "destructive",
+        title: stats.title,
+        description: stats?.description,
+        variant: stats.variant === "destructive" ? "destructive" : "default",
       });
     }
-    if (stats?.redirectTo) {
-      router.push(stats.redirectTo);
-    }
-  }, [router, stats, toast]);
+  }, [stats, toast]);
   return (
     <>
       <Form {...form}>

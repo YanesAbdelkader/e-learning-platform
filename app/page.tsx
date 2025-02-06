@@ -10,8 +10,8 @@ export default function Home() {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative bg-purple-900 text-white">
-        <div className="container mx-auto px-4 py-16">
-          <div className="max-w-2xl mx-auto text-center space-y-6">
+        <div className="container mx-auto  px-4 py-16">
+          <div className="max-w-2xl mx-auto text-left space-y-6">
             <h1 className="text-4xl lg:text-6xl font-bold">
               Skills that drive you forward
             </h1>

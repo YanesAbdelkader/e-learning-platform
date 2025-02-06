@@ -12,7 +12,11 @@ export async function signupAction(prevState: unknown, data: FormData) {
     );
 
     if (error) {
-      return { error: error.message || "SignUp failed" };
+      return {
+        title: "SignUp failed",
+        description: error.message,
+        variant: "destructive",
+      };
     }
 
     if (response?.status === 201 && response?.data) {
@@ -20,12 +24,15 @@ export async function signupAction(prevState: unknown, data: FormData) {
       return {
         title: "Registration success!!",
         description: `You have been successfully registered.`,
-        variant: "default",
       };
     }
   } catch (err) {
     console.error("Unexpected Error:", err);
-    return { error: "Something went wrong. Please try again." };
+    return {
+      title: "SignUp failed",
+      description: "Something went wrong. Please try again.",
+      variant: "destructive",
+    };
   }
 }
 

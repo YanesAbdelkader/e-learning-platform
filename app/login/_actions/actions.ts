@@ -1,6 +1,7 @@
 import { handleAPIcall } from "@/functions/custom";
 import { LoginData } from "../_form/loginForm";
 import { setCookie } from "typescript-cookie";
+import { redirect } from "next/navigation";
 
 export async function loginAction(_: unknown, data: LoginData) {
   try {
@@ -12,26 +13,39 @@ export async function loginAction(_: unknown, data: LoginData) {
     );
 
     if (error) {
-      return { error: error.message || "Login failed" };
+      return {
+        title: "Login failed",
+        description: error.message,
+        variant: "destructive",
+      };
     }
 
     if (response?.status === 200 && response?.data) {
       if (response.data.otp !== true) {
         setCookie("token", response.data.token, { expires: 15 });
-        return { token: response.data.token };
+        return {
+          title: "Login success!!",
+          description: `You have been successfully Login.`,
+        };
       } else {
         setCookie("email", data.email, { expires: 1 });
         setCookie("password", data.password, { expires: 1 });
-        return {
-          redirectTo: "/login/otp",
-        };
+        redirect("/login/otp");
       }
     }
 
-    return { error: "Unexpected response from the server" };
+    return {
+      title: "Login failed",
+      description: "Unexpected response from the server",
+      variant: "destructive",
+    };
   } catch (err) {
     console.error("Unexpected Error:", err);
-    return { error: "Something went wrong. Please try again." };
+    return {
+      title: "Login failed",
+      description: "Something went wrong. Please try again.",
+      variant: "destructive",
+    };
   }
 }
 

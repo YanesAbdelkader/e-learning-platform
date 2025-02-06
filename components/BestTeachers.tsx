@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Star, Users, BookOpen } from "lucide-react";
-import img from "../app/assets/image.jpg";
+import img from "../assets/image.jpg";
 const teachers = [
   {
     id: 1,
@@ -65,13 +65,13 @@ export default function BestTeachers() {
       {teachers.map((teacher) => (
         <Card
           key={teacher.id}
-          className="overflow-hidden transition-all duration-300 hover:shadow-lg border-none h-85"
+          className="overflow-hidden transition-all duration-300 hover:shadow-lg border-none h-85 "
           onMouseEnter={() => setHoveredTeacher(teacher.id)}
           onMouseLeave={() => setHoveredTeacher(null)}
         >
           <div className="aspect-square relative overflow-hidden">
             <Image
-              src={teacher.image}
+              src={img}
               alt={teacher.name}
               fill
               className="object-cover transition-transform duration-300 hover:scale-110"
