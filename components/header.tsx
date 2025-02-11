@@ -15,7 +15,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTheme } from "next-themes";
 
-const isLoggedIn = true;
+const isLoggedIn = !true;
 
 export function Header() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -93,18 +93,14 @@ export function Header() {
             {isLoggedIn ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="relative h-8 w-8 rounded-full"
-                  >
+                  
                     <Image
-                      src="/placeholder.svg?height=32&width=32"
+                      src={logo}
                       alt="Profile"
-                      className="rounded-full"
-                      width={32}
-                      height={32}
+                      className="relative h-8 w-8 rounded-full"
+                      width={100}
+                      height={100}
                     />
-                  </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem>
@@ -136,20 +132,15 @@ export function Header() {
               </div>
             )}
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon"
-              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             >
-              <Sun
-                className={`h-[1.2rem] w-[1.2rem] transition-all ${
-                  theme === "dark" ? "rotate-0 scale-100" : "rotate-90 scale-0"
-                }`}
-              />
-              <Moon
-                className={`absolute h-[1.2rem] w-[1.2rem] transition-all ${
-                  theme === "light" ? "rotate-0 scale-100" : "rotate-90 scale-0"
-                }`}
-              />
+              {theme === "dark" ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
             </Button>
           </div>
           <div className="md:hidden">

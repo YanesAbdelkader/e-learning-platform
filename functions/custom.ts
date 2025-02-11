@@ -1,7 +1,8 @@
 import axios from "axios";
+import { getCookie } from "typescript-cookie";
 
 export const handleAPIcall = async (
-  data: unknown,
+  data: unknown | null,
   param: string | null,
   rout: string,
   meth: string
@@ -14,6 +15,12 @@ export const handleAPIcall = async (
     const response = await axios({
       url: endpoint,
       method: meth,
+      headers: {
+        ...(getCookie("token") && {
+          Authorization: `Bearer ${getCookie("token")}`,
+        }),
+        "Content-Type": "application/json",
+      },
       data,
     });
     return {
@@ -34,5 +41,20 @@ export const handleAPIcall = async (
         error: new Error("An unknown error occurred"),
       };
     }
+  }
+};
+
+export async function isAuthenticated () {
+  const token = getCookie("token");
+  if (token) {
+    const { data: response, error } = await handleAPIcall("", "", "", "POST");
+    if (response !== null) {
+      return true;
+    }
+    if (error !== null) {
+      return false;
+    }
+  } else {
+    return false;
   }
 };
