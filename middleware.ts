@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 export function middleware(req: NextRequest) {
   const protectedRoutes = ["/dashboard", "/mycourses"];
 
-  const isloggedin = req.cookies.get("token"); //change it with func
+  const isloggedin = req.cookies.get("token");
 
   if (
     protectedRoutes.some((route) => req.nextUrl.pathname.startsWith(route)) &&

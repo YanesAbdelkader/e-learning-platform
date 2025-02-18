@@ -1,6 +1,6 @@
 "use client";
-import { Header } from "@/components/teacher/header";
-import { Sidebar } from "@/components/teacher/sidebar";
+import { Header } from "@/app/dashboard/teacher/_components/header";
+import { Sidebar } from "@/app/dashboard/teacher/_components/sidebar";
 import { useState } from "react";
 
 export default function DashboardLayout({

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getCookie } from "typescript-cookie";
+import { cookies } from "next/headers";
 
 export const handleAPIcall = async (
   data: unknown | null,
@@ -7,8 +7,9 @@ export const handleAPIcall = async (
   rout: string,
   meth: string
 ) => {
+  const token = (await cookies()).get("token")?.value
   const endpoint = `${process.env.NEXT_PUBLIC_API_URL}/api/${rout}${
-    param !== null && `/${param}`
+    param !== null ? `/${param}` : ""
   }`;
 
   try {
@@ -16,8 +17,8 @@ export const handleAPIcall = async (
       url: endpoint,
       method: meth,
       headers: {
-        ...(getCookie("token") && {
-          Authorization: `Bearer ${getCookie("token")}`,
+        ...(token && {
+          Authorization: `Bearer ${token}`,
         }),
         "Content-Type": "application/json",
       },
@@ -44,8 +45,8 @@ export const handleAPIcall = async (
   }
 };
 
-export async function isAuthenticated () {
-  const token = getCookie("token");
+export async function isAuthenticated() {
+  const token = (await cookies()).get("token")?.value
   if (token) {
     const { data: response, error } = await handleAPIcall("", "", "", "POST");
     if (response !== null) {
@@ -57,4 +58,4 @@ export async function isAuthenticated () {
   } else {
     return false;
   }
-};
+}

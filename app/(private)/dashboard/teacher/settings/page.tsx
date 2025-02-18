@@ -1,4 +1,4 @@
-import { SettingsForm } from "@/components/teacher/settings-form";
+import { SettingsForm } from "@/app/dashboard/teacher/_components/settings-form";
 
 export default function page() {
   return (
@@ -6,5 +6,5 @@ export default function page() {
       <h2 className="text-3xl font-bold mb-6">Settings</h2>
       <SettingsForm />
     </div>
-  )
+  );
 }

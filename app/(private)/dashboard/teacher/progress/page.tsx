@@ -1,4 +1,4 @@
-import { ProgressTracker } from "@/components/teacher/progress-tracker";
+import { ProgressTracker } from "@/app/dashboard/teacher/_components/progress-tracker";
 
 export default function page() {
   return (
