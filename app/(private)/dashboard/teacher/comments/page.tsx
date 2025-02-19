@@ -1,4 +1,4 @@
-import { CommentsViewer } from "@/app/dashboard/teacher/_components/comments-viewer";
+import { CommentsViewer } from "../_components/comments-viewer";
 
 export default function page() {
   return (

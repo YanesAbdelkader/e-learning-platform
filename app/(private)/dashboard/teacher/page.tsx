@@ -1,4 +1,4 @@
-import { DashboardOverview } from "@/app/dashboard/teacher/_components/dashboard-overview";
+import { DashboardOverview } from "./_components/dashboard-overview";
 
 export default function page() {
   return (
