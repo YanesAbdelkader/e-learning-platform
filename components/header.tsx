@@ -27,7 +27,8 @@ export function Header() {
   };
 
   return (
-    <header className="bg-white dark:bg-black shadow-md">
+    
+    <header className="border-grid sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
@@ -93,14 +94,13 @@ export function Header() {
             {isLoggedIn ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  
-                    <Image
-                      src={logo}
-                      alt="Profile"
-                      className="relative h-8 w-8 rounded-full"
-                      width={100}
-                      height={100}
-                    />
+                  <Image
+                    src={logo}
+                    alt="Profile"
+                    className="relative h-8 w-8 rounded-full"
+                    width={100}
+                    height={100}
+                  />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem>
@@ -110,9 +110,7 @@ export function Header() {
                     <Link href="/mycourses">My Courses</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <button
-                      onClick={() => console.log("Logout clicked")}
-                    >
+                    <button onClick={() => console.log("Logout clicked")}>
                       Logout
                     </button>
                   </DropdownMenuItem>
@@ -145,13 +143,25 @@ export function Header() {
           </div>
           <div className="md:hidden">
             <Sheet>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="mr-2"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            >
+              {theme === "dark" ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </Button>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon">
                   <Menu className="h-6 w-6" />
                   <span className="sr-only">Open menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right">
+              <SheetContent side="top">
                 <nav className="flex flex-col space-y-4">
                   <form onSubmit={handleSearch} className="mb-4">
                     <div className="relative">
@@ -231,29 +241,6 @@ export function Header() {
                       </Button>
                     </div>
                   )}
-                  <Button
-                    variant="outline"
-                    size="default"
-                    onClick={() =>
-                      setTheme(theme === "light" ? "dark" : "light")
-                    }
-                  >
-                    <Sun
-                      className={`h-[1.2rem] w-[1.2rem] transition-all ${
-                        theme === "dark"
-                          ? "rotate-0 scale-100"
-                          : "rotate-90 scale-0"
-                      }`}
-                    />
-                    <Moon
-                      className={`absolute h-[1.2rem] w-[1.2rem] transition-all ${
-                        theme === "light"
-                          ? "rotate-0 scale-100"
-                          : "rotate-90 scale-0"
-                      }`}
-                    />
-                    <span className="sr-only">Toggle theme</span>
-                  </Button>
                 </nav>
               </SheetContent>
             </Sheet>

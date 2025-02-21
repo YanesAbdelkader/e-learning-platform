@@ -11,21 +11,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Course } from "../_actions/CoursesAction";
+import { Course, deleteCourse } from "../_actions/CoursesAction";
+import AddCourse from "./course/Add";
+import { Category } from "../_lib/schemaCourse";
+import UpdateCourse from "./course/Update";
+import Image from "next/image";
 
 export function CourseManagement({
   initialCourses,
+  categories,
 }: {
   initialCourses: Course[];
+  categories: Category[];
 }) {
   const [courses] = useState<Course[]>(initialCourses);
   const [searchTerm, setSearchTerm] = useState("");
@@ -44,48 +41,7 @@ export function CourseManagement({
             className="max-w-sm"
           />
         </form>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button>Add New Course</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Course</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="title" className="text-right">
-                  Title
-                </Label>
-                <Input
-                  id="title"
-                  name="tilte"
-                //   value={newCourse.title}
-                //   onChange={(e) =>
-                //     setNewCourse({ ...newCourse, title: e.target.value })
-                //   }
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="description" className="text-right">
-                  Description
-                </Label>
-                <Textarea
-                  id="description"
-                //   value={newCourse.description}
-                //   onChange={(e) =>
-                //     setNewCourse({ ...newCourse, description: e.target.value })
-                //   }
-                  className="col-span-3"
-                />
-              </div>
-            </div>
-            <Button
-            //  onClick={addCourse}
-            >Add Course</Button>
-          </DialogContent>
-        </Dialog>
+        <AddCourse categories={categories} />
       </div>
 
       <Table>
@@ -96,6 +52,7 @@ export function CourseManagement({
             <TableHead>Price</TableHead>
             <TableHead>Duration</TableHead>
             <TableHead>Level</TableHead>
+            <TableHead>Image</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -108,71 +65,24 @@ export function CourseManagement({
               <TableCell>{course.duration}</TableCell>
               <TableCell>{course.level}</TableCell>
               <TableCell>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" className="mr-2">
-                      Edit
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Edit Course</DialogTitle>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="edit-title" className="text-right">
-                          Title
-                        </Label>
-                        <Input
-                          id="edit-title"
-                          //   value={editingCourse?.title}
-                          //   onChange={(e) =>
-                          //     setEditingCourse(
-                          //       editingCourse
-                          //         ? { ...editingCourse, title: e.target.value }
-                          //         : null
-                          //     )
-                          //   }
-                          className="col-span-3"
-                        />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label
-                          htmlFor="edit-description"
-                          className="text-right"
-                        >
-                          Description
-                        </Label>
-                        <Textarea
-                          id="edit-description"
-                          //   value={editingCourse?.description}
-                          //   onChange={(e) =>
-                          //     setEditingCourse(
-                          //       editingCourse
-                          //         ? {
-                          //             ...editingCourse,
-                          //             description: e.target.value,
-                          //           }
-                          //         : null
-                          //     )
-                          //   }
-                          className="col-span-3"
-                        />
-                      </div>
-                    </div>
-                    <Button
-                    // onClick={updateCourse()}
-                    >
-                      Update Course
-                    </Button>
-                  </DialogContent>
-                </Dialog>
-                <Button
-                  variant="destructive"
-                  //   onClick={() => deleteCourse(course.id)}
-                >
-                  Delete
-                </Button>
+                <Image
+                  src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${course.image}`}
+                  alt="Preview"
+                  className="max-w-full h-auto"
+                  width={150}
+                  height={150}
+                />
+              </TableCell>
+              <TableCell>
+                <div className="flex justify-evenly items-center">
+                  <UpdateCourse course={course} categories={categories} />
+                  <Button
+                    variant="destructive"
+                      onClick={async () => await deleteCourse(String(course.id))}
+                  >
+                    Delete
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}

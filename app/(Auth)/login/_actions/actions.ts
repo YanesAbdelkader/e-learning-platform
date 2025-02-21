@@ -1,7 +1,9 @@
+"use server"
 import { handleAPIcall } from "@/functions/custom";
 import { LoginData } from "../_form/loginForm";
 import { setCookie } from "typescript-cookie";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 
 export async function loginAction(_: unknown, data: LoginData) {
   try {
@@ -22,7 +24,13 @@ export async function loginAction(_: unknown, data: LoginData) {
 
     if (response?.status === 200 && response?.data) {
       if (response.data.otp !== true) {
-        setCookie("token", response.data.token, { expires: 15 });
+        (await cookies())
+        .set("token", response.data.token, {
+          httpOnly: true,
+          sameSite: "strict",
+          maxAge: 60 * 60 * 24 * 15,
+          secure: true
+        })
         return {
           title: "Login success!!",
           description: `You have been successfully Login.`,

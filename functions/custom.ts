@@ -1,5 +1,6 @@
+"use server"
 import axios from "axios";
-import { getCookie } from "typescript-cookie";
+import { cookies } from "next/headers";
 
 export const handleAPIcall = async (
   data: unknown | null,
@@ -7,11 +8,10 @@ export const handleAPIcall = async (
   rout: string,
   meth: string
 ) => {
-  const token = getCookie("token")
+  const token = (await cookies()).get("token")?.value;
   const endpoint = `${process.env.NEXT_PUBLIC_API_URL}/api/${rout}${
     param !== null ? `/${param}` : ""
   }`;
-
   try {
     const response = await axios({
       url: endpoint,
@@ -46,7 +46,7 @@ export const handleAPIcall = async (
 };
 
 export async function isAuthenticated() {
-  const token = getCookie("token")
+  const token = (await cookies()).get("token")?.value;
   if (token) {
     const { data: response, error } = await handleAPIcall("", "", "", "POST");
     if (response !== null) {
