@@ -14,8 +14,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTheme } from "next-themes";
+import { getCookie } from "typescript-cookie";
 
-const isLoggedIn = !true;
+const isLoggedIn = () => {
+  const token = getCookie("token");
+  return token ? true : false;
+};
 
 export function Header() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,7 +31,6 @@ export function Header() {
   };
 
   return (
-    
     <header className="border-grid sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -91,7 +94,7 @@ export function Header() {
             >
               <ShoppingCart className="h-6 w-6" />
             </Link>
-            {isLoggedIn ? (
+            {isLoggedIn() ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Image
@@ -143,18 +146,18 @@ export function Header() {
           </div>
           <div className="md:hidden">
             <Sheet>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="mr-2"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            >
-              {theme === "dark" ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
-            </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="mr-2"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              >
+                {theme === "dark" ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
+              </Button>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon">
                   <Menu className="h-6 w-6" />
@@ -206,7 +209,7 @@ export function Header() {
                   >
                     <ShoppingCart className="h-6 w-6 mr-2" /> Cart
                   </Link>
-                  {isLoggedIn ? (
+                  {isLoggedIn() ? (
                     <>
                       <Link
                         href="/dashboard"

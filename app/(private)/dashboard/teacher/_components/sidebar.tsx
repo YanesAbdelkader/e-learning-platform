@@ -2,12 +2,13 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { BookOpen, BarChart2, MessageSquare, Settings, Layout, ChevronLeft, ChevronRight } from "lucide-react"
+import { BookOpen, BarChart2, MessageSquare, Settings, Layout, ChevronLeft, ChevronRight, DollarSign } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 const navItems = [
     { href: "/dashboard/teacher", icon: Layout, label: "Dashboard" },
     { href: "/dashboard/teacher/courses", icon: BookOpen, label: "Courses" },
+    { href: "/dashboard/teacher/transactions", icon: DollarSign, label: "transactions" },
     { href: "/dashboard/teacher/progress", icon: BarChart2, label: "Progress" },
     { href: "/dashboard/teacher/comments", icon: MessageSquare, label: "Comments" },
     { href: "/dashboard/teacher/settings", icon: Settings, label: "Settings" },

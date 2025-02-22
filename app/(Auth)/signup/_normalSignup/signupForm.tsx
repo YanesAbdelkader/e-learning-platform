@@ -33,12 +33,13 @@ const schema = z
     email: z.string().email("Invalid email address"),
     password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string(),
-    picture: z.string().optional(),
+    picture: z.string().min(1, "Profile picture is required"), 
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
+
 
 export type FormData = z.infer<typeof schema>;
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Sun, Moon, LogOut } from "lucide-react";
+import { Sun, Moon, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import {
@@ -20,24 +20,8 @@ export function Header() {
         <div className="flex items-center justify-between w-full">
           <h1 className="text-2xl font-semibold text-foreground">Dashboard</h1>
           <div className="flex items-center space-x-4">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Bell className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {/* use api to get notification */}
-                <DropdownMenuItem>
-                  New comment on &quot;Introduction to React&quot;
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  Course &quot;Advanced JavaScript&quot; completed by a student
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
             <Button
-              variant={theme === "light" ? "ghost" : "outline"}
+              variant="ghost"
               size="icon"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             >
