@@ -14,12 +14,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTheme } from "next-themes";
-import { getCookie } from "typescript-cookie";
+import { redirect } from "next/navigation";
 
-const isLoggedIn = () => {
-  const token = getCookie("token");
-  return token ? true : false;
-};
+const isLoggedIn = true
 
 export function Header() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,11 +24,11 @@ export function Header() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Searching for:", searchQuery);
+    redirect("/courses/search");
   };
 
   return (
-    <header className="border-grid sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="border-grid sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-lg">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
@@ -94,7 +91,7 @@ export function Header() {
             >
               <ShoppingCart className="h-6 w-6" />
             </Link>
-            {isLoggedIn() ? (
+            {isLoggedIn ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Image
@@ -209,7 +206,7 @@ export function Header() {
                   >
                     <ShoppingCart className="h-6 w-6 mr-2" /> Cart
                   </Link>
-                  {isLoggedIn() ? (
+                  {isLoggedIn ? (
                     <>
                       <Link
                         href="/dashboard"

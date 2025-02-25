@@ -65,12 +65,14 @@ export async function addCourse(prevState: unknown, formData: FormData) {
     );
     if (error) {
       console.error(error);
+      return { error: "Failed to create course." };
     }
     if (response) {
-      return response.data;
+      return { success: true, message: "create course successful" };
     }
   } catch (error) {
     console.error(error);
+    return { error: "An unexpected error occurred." };
   }
 }
 
@@ -91,8 +93,7 @@ export async function updateCourse(prevState: unknown, formData: FormData) {
     }
 
     if (response) {
-      console.log("✅ Update successful:", response.data);
-      return response.data;
+      return { success: true, message: "Update course successful" };
     }
   } catch (error) {
     console.error("🔥 Unexpected error in updateCourse:", error);
@@ -110,11 +111,13 @@ export async function deleteCourse(courseId: string) {
     );
     if (error) {
       console.error(error);
+      return { error: "Failed to delete course." };
     }
     if (response) {
-      return response.data;
+      return { success: true, message: "Delete course successful" };
     }
   } catch (error) {
     console.error(error);
+    return { error: "An unexpected error occurred." };
   }
 }

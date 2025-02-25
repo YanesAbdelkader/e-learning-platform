@@ -19,8 +19,7 @@ export const handleAPIcall = async (
       headers: {
         ...(token && {
           Authorization: `Bearer ${token}`,
-        }),
-        "Content-Type": "application/json",
+        })
       },
       data,
     });

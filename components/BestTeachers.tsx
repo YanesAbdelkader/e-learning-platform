@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Star, Users, BookOpen } from "lucide-react";
 import img from "../assets/image.jpg";
+import Link from "next/link";
 const teachers = [
   {
     id: 1,
@@ -65,7 +66,7 @@ export default function BestTeachers() {
       {teachers.map((teacher) => (
         <Card
           key={teacher.id}
-          className="overflow-hidden transition-all duration-300 hover:shadow-lg border-none h-85 "
+          className="overflow-hidden transition-all duration-300 hover:shadow-lg dark:hover:shadow-gray-400 h-85"
           onMouseEnter={() => setHoveredTeacher(teacher.id)}
           onMouseLeave={() => setHoveredTeacher(null)}
         >
@@ -73,17 +74,18 @@ export default function BestTeachers() {
             <Image
               src={img}
               alt={teacher.name}
-              fill
-              className="object-cover transition-transform duration-300 hover:scale-110"
+              className="object-cover transition-transform duration-300 hover:scale-110 w-full h-full"
             />
             {hoveredTeacher === teacher.id && (
               <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                <Button
-                  variant="secondary"
-                  className="bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
-                  View Profile
-                </Button>
+                <Link href={`teachers/${teacher.id}`}>
+                  <Button
+                    variant="secondary"
+                    className="bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  >
+                    View Profile
+                  </Button>
+                </Link>
               </div>
             )}
           </div>

@@ -1,33 +1,38 @@
-import { Button } from '@/components/ui/button'
+"use client";
+
+import { useState } from "react";
+import { Toggle } from "@/components/ui/toggle";
 
 const skills = [
-  'All Categories',
-  'Development',
-  'Business',
-  'IT & Software',
-  'Design',
-  'Marketing',
-  'Personal Development',
-  'Photography',
-]
+  "All Categories",
+  "Development",
+  "Business",
+  "IT & Software",
+  "Design",
+  "Marketing",
+  "Personal Development",
+  "Photography",
+];
 
 export default function SkillsSection() {
+  const [selected, setSelected] = useState("All Categories");
+
   return (
-    <div className="border-b dark:bg-gray-950">
-      <div className="container mx-auto px-4 py-4 overflow-x-auto">
-        <div className="flex gap-2">
+    <div className="border-b bg-white dark:bg-gray-950 ">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide">
           {skills.map((skill) => (
-            <Button
+            <Toggle
               key={skill}
-              variant="ghost"
-              className="whitespace-nowrap"
+              pressed={selected === skill}
+              onPressedChange={() => setSelected(skill)}
+              className="whitespace-nowrap dark:hover:text-gray-100"
             >
               {skill}
-            </Button>
+            </Toggle>
           ))}
         </div>
       </div>
     </div>
-  )
+  );
 }
-
