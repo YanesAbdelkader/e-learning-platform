@@ -27,12 +27,15 @@ import { useToast } from "@/hooks/use-toast";
 export default function UpdateCourse({
   course,
   categories,
+  onCourseUpdated,
 }: {
   course: Course;
   categories: Category[];
+  onCourseUpdated: (updatedCourse: Course) => void;
 }) {
   const { toast } = useToast();
   const [isPending, setIsPending] = useState(false);
+  const [open, setOpen] = useState(false); // Keep dialog open until update completes
 
   const [formValues, setFormValues] = useState({
     id: course.id,
@@ -100,7 +103,17 @@ export default function UpdateCourse({
 
     if (result?.success) {
       toast({ title: "Course Updated", description: result.message });
-      window.location.reload();
+
+      // Update parent state without refetching everything
+      onCourseUpdated({
+        ...course,
+        ...formValues,
+        price: formValues.price,
+        category_id: parseInt(formValues.category_id, 10),
+        image: formValues.imageFile ? formValues.imageFile.name : course.image,
+      });
+
+      setTimeout(() => setOpen(false), 200); // Close after a short delay
     } else {
       toast({
         title: "Error",
@@ -111,9 +124,9 @@ export default function UpdateCourse({
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={(val) => !isPending && setOpen(val)}>
       <DialogTrigger asChild>
-        <Button variant={"default"}>Edit</Button>
+        <Button variant="default">Edit</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -160,7 +173,6 @@ export default function UpdateCourse({
                 id="price"
                 name="price"
                 type="number"
-                step="0.01"
                 className="col-span-3"
                 value={formValues.price}
                 onChange={handleInputChange}
@@ -170,15 +182,14 @@ export default function UpdateCourse({
 
             {/* Category */}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="category" className="text-right">
+              <Label htmlFor="category_id" className="text-right">
                 Category
               </Label>
               <Select
-                name="category_id"
                 onValueChange={(value) =>
                   setFormValues((prev) => ({ ...prev, category_id: value }))
                 }
-                defaultValue={formValues.category_id}
+                value={formValues.category_id}
               >
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Select a category" />
@@ -196,29 +207,6 @@ export default function UpdateCourse({
               </Select>
             </div>
 
-            {/* Level */}
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="level" className="text-right">
-                Level
-              </Label>
-              <Select
-                name="level"
-                onValueChange={(value) =>
-                  setFormValues((prev) => ({ ...prev, level: value }))
-                }
-                defaultValue={formValues.level}
-              >
-                <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select a level" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Beginner">Beginner</SelectItem>
-                  <SelectItem value="Intermediate">Intermediate</SelectItem>
-                  <SelectItem value="Advanced">Advanced</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             {/* Image Upload */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="image" className="text-right">
@@ -228,31 +216,29 @@ export default function UpdateCourse({
                 id="image"
                 name="image"
                 type="file"
-                accept="image/*"
-                onChange={handleImageChange}
+                accept="image/png, image/jpeg, image/jpg"
                 className="col-span-3"
+                onChange={handleImageChange}
               />
             </div>
 
             {/* Image Preview */}
             {formValues.imagePreview && (
               <div className="grid grid-cols-4 items-center gap-4">
-                <div className="col-start-2 col-span-3">
+                <span className="col-span-4 flex justify-center">
                   <Image
                     src={formValues.imagePreview}
-                    alt="Preview"
-                    className="max-w-full h-auto"
-                    width={200}
-                    height={200}
+                    alt="Course Image"
+                    width={150}
+                    height={100}
+                    className="rounded-md"
                   />
-                </div>
+                </span>
               </div>
             )}
           </div>
-
-          {/* Submit Button */}
           <div className="flex justify-end">
-            <Button type="submit" className="" disabled={isPending}>
+            <Button type="submit" disabled={isPending}>
               {isPending ? "Updating..." : "Update Course"}
             </Button>
           </div>

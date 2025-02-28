@@ -19,13 +19,9 @@ import {
   Table,
 } from "@/components/ui/table";
 import { useState } from "react";
-import { Category } from "../_lib/shemaCategorie";
+import { Category, initialCategories } from "../_lib/shemaCategorie";
 
-export default function CategorieManagment({
-  initialCategories,
-}: {
-  initialCategories: Category[];
-}) {
+export default function CategorieManagment() {
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [searchTerm, setSearchTerm] = useState("");
   const [newCategory, setNewCategory] = useState({ name: "", description: "" });

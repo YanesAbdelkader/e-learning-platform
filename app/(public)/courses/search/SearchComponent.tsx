@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Category, SearchResult, SearchType } from "../_lib/shema";
 import FilterC from "../_components/filter";
 import Paginate from "../_components/paginate";
+import CourseCard from "@/components/course-card";
+import TeacherCard from "@/components/teacher-card";
 
 export default function SearchComponent({
   result,
@@ -38,6 +40,28 @@ export default function SearchComponent({
         isOpen={isOpen}
         setIsOpen={setIsOpen}
       />
+
+      {searchType === "Courses" ? (
+        result.Courses.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {result.Courses.map((course) => (
+              <CourseCard key={course.id} course={course} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-500">No courses found.</p>
+        )
+      ) : searchType === "Teachers" ? (
+        result.Teachers.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {result.Teachers.map((teacher) => (
+              <TeacherCard key={teacher.id} teacher={teacher} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-center justify-center text-gray-500 h-[60vh]">No teachers found.</p>
+        )
+      ) : null}
 
       <Paginate
         page={page}
