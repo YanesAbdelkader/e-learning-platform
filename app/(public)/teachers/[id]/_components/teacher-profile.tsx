@@ -1,71 +1,101 @@
-import Image, { StaticImageData } from "next/image"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Star, Users, BookOpen, Award } from "lucide-react"
+"use client"
 
-type Teacher = {
-  id: number
-  name: string
-  expertise: string
-  rating: number
-  students: number
-  courses: number
-  image: StaticImageData 
-  description: string
-  achievements: string[]
-}
+import { useState, useEffect } from "react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import TeacherHeader from "./teacher-header"
+import TeacherAchievements from "./teacher-achievements"
+import TeacherCourses from "./teacher-courses"
+import TeacherBio from "./teacher-bio"
+import TeacherCertifications from "./teacher-certifications"
+import TeacherContact from "./teacher-contact"
+import TeacherSidebar from "./teacher-sidebar"
+import { Teacher } from "../_types/teacher"
+import { getTeacherProfile } from "../_actions/get-teacher-profile"
+import { followTeacher, unfollowTeacher } from "../_actions/follow-teacher"
 
-export default function TeacherProfile({ teacher }: { teacher: Teacher }) {
+export default function TeacherProfile({ teacherId }: { teacherId: string }) {
+  const [teacher, setTeacher] = useState<Teacher | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isFollowing, setIsFollowing] = useState(false)
+
+  useEffect(() => {
+    const loadTeacher = async () => {
+      setIsLoading(true)
+      try {
+        const data = await getTeacherProfile(teacherId)
+        setTeacher(data)
+        setIsFollowing(data.isFollowing)
+      } catch (error) {
+        console.error("Failed to load teacher profile:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadTeacher()
+  }, [teacherId])
+
+  const handleFollowToggle = async () => {
+    if (!teacher) return
+
+    try {
+      if (isFollowing) {
+        await unfollowTeacher(teacher.id)
+      } else {
+        await followTeacher(teacher.id)
+      }
+      setIsFollowing(!isFollowing)
+    } catch (error) {
+      console.error("Failed to update follow status:", error)
+    }
+  }
+
+  if (isLoading) {
+    return <div className="container mx-auto px-4 py-8">Loading...</div>
+  }
+
+  if (!teacher) {
+    return <div className="container mx-auto px-4 py-8">Teacher not found</div>
+  }
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Card className="overflow-hidden">
-        <div className="md:flex">
-          <div className="md:flex-shrink-0">
-            <Image
-              src={teacher.image || "/placeholder.svg"}
-              alt={teacher.name}
-              width={400}
-              height={400}
-              className="h-full w-full object-cover md:w-96"
-            />
-          </div>
-          <div className="p-8">
-            <CardHeader>
-              <h1 className="text-3xl font-bold text-gray-900">{teacher.name}</h1>
-              <p className="mt-2 text-xl text-purple-600">{teacher.expertise}</p>
-            </CardHeader>
-            <CardContent>
-              <div className="mt-4 flex items-center">
-                <Star className="h-5 w-5 text-yellow-400" />
-                <span className="ml-2 font-bold">{teacher.rating}</span>
-                <span className="ml-2 text-gray-600">Rating</span>
-              </div>
-              <div className="mt-4 flex items-center">
-                <Users className="h-5 w-5 text-blue-500" />
-                <span className="ml-2 font-bold">{teacher.students.toLocaleString()}</span>
-                <span className="ml-2 text-gray-600">Students</span>
-              </div>
-              <div className="mt-4 flex items-center">
-                <BookOpen className="h-5 w-5 text-green-500" />
-                <span className="ml-2 font-bold">{teacher.courses}</span>
-                <span className="ml-2 text-gray-600">Courses</span>
-              </div>
-              <p className="mt-6 text-gray-600">{teacher.description}</p>
-              <div className="mt-6">
-                <h2 className="text-xl font-semibold text-gray-900">Achievements</h2>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {teacher.achievements.map((achievement, index) => (
-                    <Badge key={index} variant="secondary" className="flex items-center">
-                      <Award className="mr-1 h-4 w-4" />
-                      {achievement}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </div>
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Main Profile Section */}
+        <div className="md:col-span-2 space-y-6">
+          <TeacherHeader teacher={teacher} isFollowing={isFollowing} onFollowToggle={handleFollowToggle} />
+
+          <TeacherAchievements achievements={teacher.achievements} />
+
+          <Tabs defaultValue="courses">
+            <TabsList className="grid grid-cols-4 w-full">
+              <TabsTrigger value="courses">Courses</TabsTrigger>
+              <TabsTrigger value="bio">Bio</TabsTrigger>
+              <TabsTrigger value="certifications">Certifications</TabsTrigger>
+              <TabsTrigger value="contact">Contact</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="courses" className="space-y-4 pt-4">
+              <TeacherCourses courses={teacher.topCourses} totalCourses={teacher.courseCount} />
+            </TabsContent>
+
+            <TabsContent value="bio" className="space-y-4 pt-4">
+              <TeacherBio bio={teacher.bio} education={teacher.education} />
+            </TabsContent>
+
+            <TabsContent value="certifications" className="space-y-4 pt-4">
+              <TeacherCertifications certifications={teacher.certifications} />
+            </TabsContent>
+
+            <TabsContent value="contact" className="space-y-4 pt-4">
+              <TeacherContact contactInfo={teacher.contactInfo} socialLinks={teacher.socialLinks} />
+            </TabsContent>
+          </Tabs>
         </div>
-      </Card>
+
+        {/* Sidebar */}
+        <TeacherSidebar subjects={teacher.subjects} teacherId={teacher.id} />
+      </div>
     </div>
   )
 }
