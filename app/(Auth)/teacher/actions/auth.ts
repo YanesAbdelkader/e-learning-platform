@@ -3,7 +3,6 @@
 import { handleAPIcall } from "@/functions/custom";
 import { z } from "zod";
 
-
 const emailSchema = z.object({
   email: z.string().email(),
 });
@@ -41,8 +40,9 @@ export async function sendVerificationCode(
   });
 
   if (!validatedFields.success) {
-    return { error: "Invalid email address" };
+    return { success: false, error: "Invalid email address" };
   }
+
   try {
     const { data: response, error } = await handleAPIcall(
       formData,
@@ -50,15 +50,16 @@ export async function sendVerificationCode(
       "email/get-code",
       "POST"
     );
+
     if (error) {
-      return { error: "Verification code not sent" };
+      return { success: false, error: "Verification code not sent" };
     }
     if (response) {
       return { success: true, message: "Verification code sent" };
     }
   } catch (error) {
     console.error("Unexpected Error:", error);
-    return { error: "Something went wrong. Please try again." };
+    return { success: false, error: "Something went wrong. Please try again." };
   }
 }
 
@@ -69,8 +70,9 @@ export async function verifyEmail(prevState: unknown, formData: FormData) {
   });
 
   if (!validatedFields.success) {
-    return { error: "Invalid email or verification code" };
+    return { success: false, error: "Invalid email or verification code" };
   }
+
   try {
     const { data: response, error } = await handleAPIcall(
       formData,
@@ -78,20 +80,21 @@ export async function verifyEmail(prevState: unknown, formData: FormData) {
       "email/verify",
       "POST"
     );
+
     if (error) {
-      return { error: "Error verification code !" };
+      return { success: false, error: "Error verifying code!" };
     }
+
     if (response?.data.verify === true) {
       return { success: true, message: "Email verified successfully" };
     } else {
-      return { error: "Invalid verification code" };
+      return { success: false, error: "Invalid verification code" };
     }
   } catch (error) {
     console.error("Unexpected Error:", error);
-    return { error: "Something went wrong. Please try again." };
+    return { success: false, error: "Something went wrong. Please try again." };
   }
 }
-
 export async function registerTeacher(prevState: unknown, formData: FormData) {
   const validatedFields = registerSchema.safeParse({
     email: formData.get("email"),
@@ -107,8 +110,9 @@ export async function registerTeacher(prevState: unknown, formData: FormData) {
   });
 
   if (!validatedFields.success) {
-    return { error: "Invalid form data" };
+    return { success: false, error: "Invalid form data" };
   }
+
   try {
     const { data: response, error } = await handleAPIcall(
       formData,
@@ -116,16 +120,18 @@ export async function registerTeacher(prevState: unknown, formData: FormData) {
       "teacher-register",
       "POST"
     );
+
     if (error) {
-      return { error: "Error Registering teacher !" };
+      return { success: false, error: "Error registering teacher!" };
     }
+
     if (response?.status === 200) {
       return { success: true, message: "Teacher registered successfully" };
     } else {
-      return { error: "Registering teacher field!" };
+      return { success: false, error: "Registration failed!" };
     }
   } catch (error) {
     console.error("Unexpected Error:", error);
-    return { error: "Something went wrong. Please try again." };
+    return { success: false, error: "Something went wrong. Please try again." };
   }
 }

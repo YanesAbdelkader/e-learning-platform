@@ -30,7 +30,7 @@ export default function AuthLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="light">
           <main>{children}</main>
           <Toaster />
         </ThemeProvider>

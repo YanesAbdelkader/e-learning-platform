@@ -1,16 +1,40 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import { useToast } from "@/hooks/use-toast"
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
-export function EmailVerification({ email, updateFormData, setIsEmailVerified, sendVerificationCode, verifyEmail }) {
-  const [verificationCode, setVerificationCode] = useState("")
-  const [isSendingCode, setIsSendingCode] = useState(false)
-  const [isVerifying, setIsVerifying] = useState(false)
-  const { toast } = useToast()
+interface EmailVerificationProps {
+  email: string;
+  updateFormData: (data: Partial<{ email: string }>) => void;
+  setIsEmailVerified: (verified: boolean) => void;
+  sendVerificationCode: (
+    prevState: unknown,
+    formData: FormData
+  ) => Promise<
+    | { success: boolean; error: string; message?: undefined }
+    | { success: boolean; message: string; error?: undefined }
+    | undefined
+  >;
+  verifyEmail: (
+    prevState: unknown,
+    formData: FormData
+  ) => Promise<{ success: boolean; message?: string; error?: string }>;
+}
+
+export function EmailVerification({
+  email,
+  updateFormData,
+  setIsEmailVerified,
+  sendVerificationCode,
+  verifyEmail,
+}: EmailVerificationProps) {
+  const [verificationCode, setVerificationCode] = useState("");
+  const [isSendingCode, setIsSendingCode] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const { toast } = useToast();
 
   const handleSendVerificationCode = async () => {
     if (!email) {
@@ -18,52 +42,52 @@ export function EmailVerification({ email, updateFormData, setIsEmailVerified, s
         title: "Error",
         description: "Please enter your email address.",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
-    setIsSendingCode(true)
-    const formData = new FormData()
-    formData.append("email", email)
-    const result = await sendVerificationCode(null, formData)
-    setIsSendingCode(false)
+    setIsSendingCode(true);
+    const formData = new FormData();
+    formData.append("email", email);
+    const result = await sendVerificationCode(null, formData);
+    setIsSendingCode(false);
 
-    if (result.success) {
+    if (result?.success) {
       toast({
         title: "Verification code sent",
         description: result.message,
-      })
+      });
     } else {
       toast({
         title: "Error",
-        description: result.error,
+        description: result?.error,
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const handleVerifyCode = async () => {
-    setIsVerifying(true)
-    const formData = new FormData()
-    formData.append("email", email)
-    formData.append("code", verificationCode)
-    const result = await verifyEmail(null, formData)
-    setIsVerifying(false)
+    setIsVerifying(true);
+    const formData = new FormData();
+    formData.append("email", email);
+    formData.append("code", verificationCode);
+    const result = await verifyEmail(null, formData);
+    setIsVerifying(false);
 
     if (result.success) {
       toast({
         title: "Email verified",
         description: result.message,
-      })
-      setIsEmailVerified(true)
+      });
+      setIsEmailVerified(true);
     } else {
       toast({
         title: "Error",
         description: result.error,
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   return (
     <div className="space-y-4">
@@ -77,7 +101,11 @@ export function EmailVerification({ email, updateFormData, setIsEmailVerified, s
           required
         />
       </div>
-      <Button type="button" onClick={handleSendVerificationCode} disabled={isSendingCode}>
+      <Button
+        type="button"
+        onClick={handleSendVerificationCode}
+        disabled={isSendingCode}
+      >
         {isSendingCode ? "Sending..." : "Send Verification Code"}
       </Button>
       <div>
@@ -93,6 +121,5 @@ export function EmailVerification({ email, updateFormData, setIsEmailVerified, s
         {isVerifying ? "Verifying..." : "Verify"}
       </Button>
     </div>
-  )
+  );
 }
-

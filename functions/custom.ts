@@ -1,4 +1,4 @@
-"use server"
+"use server";
 import axios from "axios";
 import { cookies } from "next/headers";
 
@@ -19,7 +19,7 @@ export const handleAPIcall = async (
       headers: {
         ...(token && {
           Authorization: `Bearer ${token}`,
-        })
+        }),
       },
       data,
     });

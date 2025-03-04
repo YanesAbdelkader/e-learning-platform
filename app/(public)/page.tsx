@@ -5,56 +5,84 @@ import SkillsSection from "@/components/SkillsSection";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Award, BookOpen, Users, Zap } from "lucide-react";
 
+const features = [
+  {
+    title: "Expert Instructors",
+    description:
+      "Learn from top professionals with real-world experience in their fields.",
+    icon: <BookOpen className="w-6 h-6 text-primary" />,
+  },
+  {
+    title: "Diverse Course Catalog",
+    description:
+      "Explore a vast selection of courses across multiple disciplines.",
+    icon: <Users className="w-6 h-6 text-primary" />,
+  },
+  {
+    title: "Flexible Learning",
+    description:
+      "Access courses anytime, anywhere, and learn at your own pace.",
+    icon: <Zap className="w-6 h-6 text-primary" />,
+  },
+  {
+    title: "Recognized Certificates",
+    description:
+      "Earn industry-recognized certificates to boost your career.",
+    icon: <Award className="w-6 h-6 text-primary" />,
+  },
+];
+
 export default function Home() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col gap-12">
       {/* Hero Section */}
       <ProCarousel />
 
       {/* Skills Categories */}
-      <section className="py-8">
-        <div className="container mx-auto px-4">
-          <SkillsSection />
-        </div>
+      <section className="container mx-auto px-6">
+        <SkillsSection />
       </section>
 
       {/* Featured Courses */}
-      <section className="py-12 bg-muted">
+      <section className="bg-muted py-12 border-t border-border">
         <CourseGrid />
       </section>
 
       {/* Best Teachers */}
-      <section className="py-12">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-6">Learn from the Best</h2>
-          <BestTeachers />
-        </div>
+      <section className="container mx-auto px-6 text-left py-16">
+        <h2 className="text-4xl font-bold text-primary mb-6">Learn from the Best</h2>
+        <BestTeachers />
       </section>
 
       {/* Why Choose Our Platform */}
-      <section className="py-16 bg-muted">
-        <div className="container mx-auto px-4 text-center max-w-3xl">
-          <h2 className="text-3xl font-bold mb-4">Why Choose Our Platform?</h2>
-          <p className="text-muted-foreground">
-            Our e-learning platform offers a unique blend of expert instruction,
-            cutting-edge courses, and a supportive learning community. Whether
-            you&apos;re looking to advance your career, explore a new hobby, or
-            gain valuable skills, we have the resources to help you succeed.
+      <section className="py-20 bg-gradient-to-b from-muted/50 to-background text-foreground text-center">
+        <div className="container mx-auto max-w-4xl px-6">
+          <h2 className="text-4xl font-extrabold mb-6 text-primary">
+            Why Choose Our Platform?
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Gain access to expert-led courses, interactive learning experiences, and a
+            supportive community to help you succeed.
           </p>
         </div>
 
         {/* Feature Cards */}
-        <div className="container mx-auto px-4 mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="container mx-auto px-6 mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8">
           {features.map((feature, index) => (
-            <Card key={index} className="shadow-md hover:shadow-lg dark:hover:shadow-gray-400 transition">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  {feature.icon}
+            <Card
+              key={index}
+              className="p-6 shadow-md border border-border hover:border-indigo-400 hover:shadow-xl transition duration-300 bg-card"
+            >
+              <CardHeader className="flex flex-col items-center text-center">
+                <div className="text-primary text-5xl mb-4">{feature.icon}</div>
+                <CardTitle className="text-xl font-semibold text-foreground">
                   {feature.title}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">{feature.description}</p>
+                <p className="text-muted-foreground text-sm text-center">
+                  {feature.description}
+                </p>
               </CardContent>
             </Card>
           ))}
@@ -63,30 +91,3 @@ export default function Home() {
     </div>
   );
 }
-
-const features = [
-  {
-    title: "Expert Instructors",
-    description:
-      "Learn from industry professionals and thought leaders in their respective fields.",
-    icon: <BookOpen className="w-5 h-5 text-primary" />,
-  },
-  {
-    title: "Diverse Course Catalog",
-    description:
-      "Explore a wide range of subjects, from technology and business to creative arts.",
-    icon: <Users className="w-5 h-5 text-primary" />,
-  },
-  {
-    title: "Flexible Learning",
-    description:
-      "Study at your own pace, anytime and anywhere, with our mobile-friendly platform.",
-    icon: <Zap className="w-5 h-5 text-primary" />,
-  },
-  {
-    title: "Recognized Certificates",
-    description:
-      "Earn certificates upon course completion to showcase your skills.",
-    icon: <Award className="w-5 h-5 text-primary" />,
-  },
-];

@@ -66,7 +66,7 @@ export default function BestTeachers() {
       {teachers.map((teacher) => (
         <Card
           key={teacher.id}
-          className="overflow-hidden transition-all duration-300 hover:shadow-lg dark:hover:shadow-gray-400 h-85"
+          className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-indigo-400 dark:hover:shadow-gray-400 h-85"
           onMouseEnter={() => setHoveredTeacher(teacher.id)}
           onMouseLeave={() => setHoveredTeacher(null)}
         >

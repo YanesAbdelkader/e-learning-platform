@@ -1,8 +1,8 @@
 "use client";
 
 import type React from "react";
-
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,7 +22,6 @@ import {
   registerTeacher,
 } from "../actions/auth";
 import { useToast } from "@/hooks/use-toast";
-import { redirect } from "next/navigation";
 
 const steps = [
   "Email Verification",
@@ -49,6 +48,7 @@ export function SignUpForm() {
   const [isEmailVerified, setIsEmailVerified] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
 
   const updateFormData = (newData: Partial<typeof formData>) => {
     setFormData((prev) => ({ ...prev, ...newData }));
@@ -65,17 +65,29 @@ export function SignUpForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const result = await registerTeacher(
-      null,
-      new FormData(e.target as HTMLFormElement)
-    );
+
+    const formDataObject = new FormData();
+    Object.entries(formData).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        formDataObject.append(key, JSON.stringify(value)); // Convert arrays to JSON string
+      } else {
+        formDataObject.append(key, value);
+      }
+    });
+
+    const result = (await registerTeacher(null, formDataObject)) || {
+      success: false,
+      error: "Unknown error occurred",
+    };
+
     setIsSubmitting(false);
+
     if (result.success) {
       toast({
         title: "Registration successful",
         description: result.message,
       });
-      redirect("/dashbord/teacher");
+      router.push("/dashboard/teacher");
     } else {
       toast({
         title: "Registration failed",
@@ -86,6 +98,7 @@ export function SignUpForm() {
   };
 
   const renderStep = () => {
+    const stepProps = { formData, updateFormData };
     switch (currentStep) {
       case 0:
         return (
@@ -98,24 +111,13 @@ export function SignUpForm() {
           />
         );
       case 1:
-        return (
-          <PersonalInfo formData={formData} updateFormData={updateFormData} />
-        );
+        return <PersonalInfo {...stepProps} />;
       case 2:
-        return (
-          <ContactInfo formData={formData} updateFormData={updateFormData} />
-        );
+        return <ContactInfo {...stepProps} />;
       case 3:
-        return (
-          <EducationCertifications
-            formData={formData}
-            updateFormData={updateFormData}
-          />
-        );
+        return <EducationCertifications {...stepProps} />;
       case 4:
-        return (
-          <AdditionalInfo formData={formData} updateFormData={updateFormData} />
-        );
+        return <AdditionalInfo {...stepProps} />;
       default:
         return null;
     }
@@ -129,19 +131,21 @@ export function SignUpForm() {
       <CardContent>
         <div className="mb-4">
           <div className="flex justify-between mb-2">
-            {steps.map((step, index) => (
+            {steps.map((_, index) => (
               <div
-                key={step}
+                key={index}
                 className={`w-full h-2 ${
-                  index <= currentStep ? "bg-primary" : "bg-gray-200 dark:bg-gray-800"
+                  index <= currentStep
+                    ? "bg-primary"
+                    : "bg-gray-200 dark:bg-gray-800"
                 }`}
               />
             ))}
           </div>
           <div className="flex justify-between text-sm text-gray-600">
-            {steps.map((step, index) => (
+            {steps.map((_, index) => (
               <span
-                key={step}
+                key={index}
                 className={index <= currentStep ? "text-primary" : ""}
               >
                 Step {index + 1}
@@ -161,8 +165,8 @@ export function SignUpForm() {
           Previous
         </Button>
         <Button
-          type="button"
-          onClick={currentStep === steps.length - 1 ? handleSubmit : handleNext}
+          type={currentStep === steps.length - 1 ? "submit" : "button"}
+          onClick={currentStep === steps.length - 1 ? undefined : handleNext}
           disabled={isSubmitting || (currentStep === 0 && !isEmailVerified)}
         >
           {currentStep === steps.length - 1

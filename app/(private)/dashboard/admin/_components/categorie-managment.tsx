@@ -1,63 +1,64 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import {
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-  Table,
-} from "@/components/ui/table";
-import { useState } from "react";
-import { Category, initialCategories } from "../_lib/shemaCategorie";
 
-export default function CategorieManagment() {
-  const [categories, setCategories] = useState<Category[]>(initialCategories);
+import { Input } from "@/components/ui/input";
+import { Loader2 } from "lucide-react";
+import { Category } from "../_lib/shemaCategorie";
+import { deleteCategory, fetchCategory } from "../_actions/categoryActions";
+import { useEffect, useState } from "react";
+import CategoryDialog from "./category-managment/CategoryDialog";
+import CategoryTable from "./category-managment/CategoryTable";
+import { toast } from "@/hooks/use-toast";
+
+export default function CategoryManagement() {
+  const [categories, setCategories] = useState<Category[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [newCategory, setNewCategory] = useState({ name: "", description: "" });
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchCategory();
+      setCategories(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Error loading data:", error);
+      setCategories([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteCategory = async (courseId: string) => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this course?"
+    );
+    if (!isConfirmed) return;
+
+    const result = await deleteCategory(courseId);
+    if (result?.success) {
+      toast({
+        title: "Course Deleted",
+        description: result.message,
+      });
+
+      await loadData();
+    } else {
+      toast({
+        title: "Error",
+        description: result?.error,
+        variant: "destructive",
+      });
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const filteredCategories = categories.filter(
-    (category) =>
-      category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      category.description.toLowerCase().includes(searchTerm.toLowerCase())
+    ({ name, description }) =>
+      name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      description.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const handleAddCategory = () => {
-    if (newCategory.name && newCategory.description) {
-      setCategories([
-        ...categories,
-        {
-          id: categories.length + 1,
-          name: newCategory.name,
-          description: newCategory.description,
-          coursesCount: 0,
-        },
-      ]);
-      setNewCategory({ name: "", description: "" });
-    }
-  };
-
-  const handleEditCategory = () => {
-    if (editingCategory) {
-      setCategories(
-        categories.map((cat) =>
-          cat.id === editingCategory.id ? editingCategory : cat
-        )
-      );
-      setEditingCategory(null);
-    }
-  };
 
   return (
     <div className="p-6">
@@ -70,117 +71,19 @@ export default function CategorieManagment() {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="max-w-sm"
         />
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button>Add New Category</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Category</DialogTitle>
-              <DialogDescription>
-                Enter the details for the new category.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <Input
-                placeholder="Category Name"
-                value={newCategory.name}
-                onChange={(e) =>
-                  setNewCategory({ ...newCategory, name: e.target.value })
-                }
-              />
-              <Input
-                placeholder="Category Description"
-                value={newCategory.description}
-                onChange={(e) =>
-                  setNewCategory({
-                    ...newCategory,
-                    description: e.target.value,
-                  })
-                }
-              />
-            </div>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setNewCategory({ name: "", description: "" })}
-              >
-                Cancel
-              </Button>
-              <Button onClick={handleAddCategory}>Add Category</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <CategoryDialog category={null} refreshCategories={loadData} />
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Courses Count</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredCategories.map((category) => (
-            <TableRow key={category.id}>
-              <TableCell>{category.name}</TableCell>
-              <TableCell>{category.description}</TableCell>
-              <TableCell>{category.coursesCount}</TableCell>
-              <TableCell>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="default" size="sm">
-                      Edit
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Edit Category</DialogTitle>
-                      <DialogDescription>
-                        Update the details for this category.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <Input
-                        placeholder="Category Name"
-                        value={editingCategory?.name || category.name}
-                        onChange={(e) =>
-                          setEditingCategory({
-                            ...category,
-                            name: e.target.value,
-                          })
-                        }
-                      />
-                      <Input
-                        placeholder="Category Description"
-                        value={
-                          editingCategory?.description || category.description
-                        }
-                        onChange={(e) =>
-                          setEditingCategory({
-                            ...category,
-                            description: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
-                    <DialogFooter>
-                      <Button
-                        variant="outline"
-                        onClick={() => setEditingCategory(null)}
-                      >
-                        Cancel
-                      </Button>
-                      <Button onClick={handleEditCategory}>Save Changes</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      {loading ? (
+        <div className="flex justify-center items-center py-10">
+          <Loader2 className="animate-spin h-10 w-10 text-gray-500" />
+        </div>
+      ) : (
+        <CategoryTable
+          categories={filteredCategories}
+          handleDeleteCategory={handleDeleteCategory}
+          loadData={loadData}
+        />
+      )}
     </div>
   );
 }
