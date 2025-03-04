@@ -74,7 +74,7 @@ export default function CategoryDialog({
   return (
     <Dialog key={category?.id || "new"}>
       <DialogTrigger asChild>
-        <Button>{category ? "Edit Category" : "Add New Category"}</Button>
+        <Button>{category ? "Edit" : "Add New Category"}</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

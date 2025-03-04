@@ -41,14 +41,14 @@ export default function TeacherDialog({
 
     if (data) {
       setTeacher({
-        id: data.id, // Ensure this exists in the response
+        id: data.id,
         name: data.info.name,
         lastname: data.info.lastname,
         picture: data.info.picture,
         email: data.info.email,
-        role: data.info.role, // Ensure `role` exists in the response
-        status: data.info.teacher_info.verified ? "Active" : "Blocked", // Fix 1: Map verification status
-        course_count: data.info.course_count ?? 0, // Default to 0 if missing
+        role: data.info.role,
+        status: data.info.teacher_info.verified ? "Active" : "Blocked",
+        course_count: data.info.course_count ?? 0,
         teacher_info: {
           id: data.info.teacher_info.id,
           user_id: data.info.teacher_info.user_id,
@@ -59,7 +59,7 @@ export default function TeacherDialog({
           education: data.info.teacher_info.education,
           links: data.info.teacher_info.links,
           bio: data.info.teacher_info.bio,
-          verified: data.info.teacher_info.verified, // Keep verified field
+          verified: data.info.teacher_info.verified,
         },
       });
     }
@@ -108,10 +108,10 @@ export default function TeacherDialog({
               width={50}
               height={50}
             />
-            <h2 className="text-lg font-semibold">
+            <h2 className="text-lg font-semibold text-center">
               {teacher.name} {teacher.lastname}
             </h2>
-            <p className="text-sm text-gray-500">{teacher.email}</p>
+            <p className="text-sm text-gray-500 text-center">{teacher.email}</p>
             <p>
               <strong>Subjects:</strong>{" "}
               {teacher.teacher_info?.subjects.join(", ")}
@@ -155,20 +155,24 @@ export default function TeacherDialog({
           >
             Cancel
           </Button>
-          <Button
-            variant="destructive"
-            onClick={() => handleVerify(false)}
-            disabled={loading}
-          >
-            Reject
-          </Button>
-          <Button
-            variant="default"
-            onClick={() => handleVerify(true)}
-            disabled={loading}
-          >
-            Approve
-          </Button>
+          {teacher?.teacher_info?.verified && (
+            <Button
+              variant="destructive"
+              onClick={() => handleVerify(false)}
+              disabled={loading}
+            >
+              Reject
+            </Button>
+          )}
+          {!teacher?.teacher_info?.verified && (
+            <Button
+              variant="default"
+              onClick={() => handleVerify(true)}
+              disabled={loading}
+            >
+              Approve
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

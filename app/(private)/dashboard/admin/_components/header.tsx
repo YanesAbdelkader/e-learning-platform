@@ -15,7 +15,7 @@ export default function Header() {
   const { theme, setTheme } = useTheme();
   return (
     <header className="bg-background border-b border-border py-4 px-6 flex justify-between items-center">
-      <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
+      <h1 className="text-2xl font-semibold">Dashboard</h1>
       <div className="flex items-center space-x-4">
         <Button
           variant="ghost"

@@ -61,42 +61,75 @@ export default function TeacherManagment() {
           <Loader2 className="animate-spin h-10 w-10 text-gray-500" />
         </div>
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Lastname</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Subjects</TableHead>
-              <TableHead>Education</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredTeachers.map((teacher) => (
-              <TableRow key={teacher.id}>
-                <TableCell>{teacher.name}</TableCell>
-                <TableCell>{teacher.lastname}</TableCell>
-                <TableCell>{teacher.email}</TableCell>
-                <TableCell>{teacher.teacher_info?.subjects?.join(", ") || "N/A"}</TableCell>
-                <TableCell>{teacher.teacher_info?.education || "N/A"}</TableCell>
-                <TableCell>
-                  <Badge
-                    variant={
-                      teacher.teacher_info?.verified ? "default" : "destructive"
-                    }
-                  >
-                    {teacher.teacher_info?.verified ? "Verified" : "Not Verified"}
-                  </Badge>
-                </TableCell>
-                <TableCell className="flex justify-evenly">
-                  <TeacherDialog teacherId={String(teacher.id)} refreshTeachers={loadData} />
-                </TableCell>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-gray-50 dark:bg-gray-800">
+                <TableHead className="text-center dark:text-white p-4">
+                  Name
+                </TableHead>
+                <TableHead className="text-center dark:text-white  p-4">
+                  Lastname
+                </TableHead>
+                <TableHead className="text-center dark:text-white p-4">
+                  Email
+                </TableHead>
+                <TableHead className="text-center dark:text-white p-4">
+                  Subjects
+                </TableHead>
+                <TableHead className="text-center dark:text-white p-4">
+                  Education
+                </TableHead>
+                <TableHead className="text-center dark:text-white p-4">
+                  Status
+                </TableHead>
+                <TableHead className="text-center dark:text-white p-4">
+                  Actions
+                </TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filteredTeachers.map((teacher) => (
+                <TableRow key={teacher.id} className="border-b">
+                  <TableCell className="text-center p-4">
+                    {teacher.name}
+                  </TableCell>
+                  <TableCell className="text-center p-4">
+                    {teacher.lastname}
+                  </TableCell>
+                  <TableCell className="text-center p-4">
+                    {teacher.email}
+                  </TableCell>
+                  <TableCell className="text-center p-4">
+                    {teacher.teacher_info?.subjects?.join(", ") || "N/A"}
+                  </TableCell>
+                  <TableCell className="text-center p-4">
+                    {teacher.teacher_info?.education || "N/A"}
+                  </TableCell>
+                  <TableCell className="text-center p-4">
+                    <Badge
+                      variant={
+                        teacher.teacher_info?.verified
+                          ? "default"
+                          : "destructive"
+                      }
+                    >
+                      {teacher.teacher_info?.verified
+                        ? "Verified"
+                        : "Not Verified"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="flex justify-center p-4">
+                    <TeacherDialog
+                      teacherId={String(teacher.id)}
+                      refreshTeachers={loadData}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       )}
     </div>
   );
