@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Autoplay from "embla-carousel-autoplay"
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -54,6 +55,11 @@ export default function ProCarousel() {
           align: "start",
           loop: true,
         }}
+        plugins={[
+          Autoplay({
+            delay: 5000,
+          }),
+        ]}
         className="h-full w-full"
       >
         <CarouselContent>

@@ -1,4 +1,5 @@
-import { Category, SearchResult } from "../_lib/shema"
+
+import { Category, SearchResult } from "../../_lib/shema";
 import SearchComponent from "./SearchComponent"
 
 export default function SearchPage() {

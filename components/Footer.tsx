@@ -17,7 +17,7 @@ export default function Footer() {
   }
 
   return (
-    <footer className="w-full bg-[#1C1D1F] px-6 py-4 relative">
+    <footer className="w-full bg-[#1C1D1F] px-6 py-4 mt-auto">
       <div className="mx-auto flex flex-col md:flex-row items-center justify-between text-center md:text-left max-w-[1340px]">
         <Link href="/" className="flex items-center gap-2 text-white mb-2 md:mb-0">
           {/* Simple logo shape */}
@@ -31,7 +31,7 @@ export default function Footer() {
       <Button
         variant="default"
         size="icon"
-        className="fixed bottom-3 border right-4 rounded-full "
+        className="fixed bottom-3 border right-4 rounded-full"
         onClick={scrollToTop}
         title="Scroll to top"
       >

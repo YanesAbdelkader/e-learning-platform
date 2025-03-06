@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Category, SearchResult, SearchType } from "../_lib/shema";
-import FilterC from "../_components/filter";
-import Paginate from "../_components/paginate";
 import CourseCard from "@/components/course-card";
 import TeacherCard from "@/components/teacher-card";
+import { Category, SearchResult, SearchType } from "../../_lib/shema";
+import FilterC from "../../_components/filter";
+import Paginate from "../../_components/paginate";
 
 export default function SearchComponent({
   result,
