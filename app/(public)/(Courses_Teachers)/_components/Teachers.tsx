@@ -1,20 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Star, Users, BookOpen } from "lucide-react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { BookOpen, Star } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import { Teacher } from "@/data/types";
+import { Teacher } from "../_lib/shema";
 
-
-
-type BestTeachersProps = {
-  teachers: Teacher[];
-};
-
-export default function BestTeachers({ teachers }: BestTeachersProps) {
+export default function Teachers({ teachers }: { teachers: Teacher[] }) {
   const [hoveredTeacher, setHoveredTeacher] = useState<number | null>(null);
 
   return (
@@ -26,9 +20,10 @@ export default function BestTeachers({ teachers }: BestTeachersProps) {
           onMouseEnter={() => setHoveredTeacher(teacher.id)}
           onMouseLeave={() => setHoveredTeacher(null)}
         >
+          {/* Image Section */}
           <div className="aspect-square relative overflow-hidden">
             <Image
-              src={teacher.image || "/placeholder.svg"}
+              src={teacher.picture || "/placeholder.svg"}
               alt={teacher.name}
               width={400}
               height={400}
@@ -47,33 +42,44 @@ export default function BestTeachers({ teachers }: BestTeachersProps) {
               </div>
             )}
           </div>
+
+          {/* Header Section */}
           <CardHeader className="space-y-1">
             <h3 className="font-bold text-lg">{teacher.name}</h3>
             <p className="text-sm text-purple-600 font-medium">
-              {teacher.expertise}
+              {teacher.subjects.join(", ")}
             </p>
           </CardHeader>
+
+          {/* Content Section */}
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
+              {/* Rating */}
               <div className="flex items-center gap-1">
                 <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                <span className="font-bold">{teacher.rating}</span>
+                <span className="font-bold">{teacher.rating.toFixed(1)}</span>
               </div>
-              <div className="flex items-center gap-1">
+
+              {/* Students */}
+              {/* <div className="flex items-center gap-1">
                 <Users className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">
-                  {teacher.students.toLocaleString()}
+                  {teacher.students?.toLocaleString() || "N/A"}
                 </span>
-              </div>
+              </div> */}
+
+              {/* Courses */}
               <div className="flex items-center gap-1">
                 <BookOpen className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">
-                  {teacher.courses}
+                  {teacher.certifications.length} Courses
                 </span>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground">
-              {teacher.description}
+
+            {/* Description */}
+            <p className="text-sm text-muted-foreground line-clamp-3">
+              {teacher.bio}
             </p>
           </CardContent>
         </Card>

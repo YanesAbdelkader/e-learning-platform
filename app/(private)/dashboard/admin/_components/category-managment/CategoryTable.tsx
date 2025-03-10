@@ -53,7 +53,7 @@ export default function CategoryTable({
                 {category.description}
               </TableCell>
               <TableCell className="text-center p-3">
-                {category.coursesCount ? category.coursesCount : 0}
+                {category.courses_count ? category.courses_count : 0}
               </TableCell>
               <TableCell className="flex justify-center gap-3 p-3">
                 <CategoryDialog

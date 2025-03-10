@@ -9,7 +9,7 @@ const emailSchema = z.object({
 
 const verifySchema = z.object({
   email: z.string().email(),
-  code: z.string().length(4),
+  code: z.string().length(6),
 });
 
 const registerSchema = z.object({
@@ -68,7 +68,7 @@ export async function verifyEmail(prevState: unknown, formData: FormData) {
     email: formData.get("email"),
     code: formData.get("code"),
   });
-
+  console.log(formData);
   if (!validatedFields.success) {
     return { success: false, error: "Invalid email or verification code" };
   }
@@ -85,7 +85,7 @@ export async function verifyEmail(prevState: unknown, formData: FormData) {
       return { success: false, error: "Error verifying code!" };
     }
 
-    if (response?.data.verify === true) {
+    if (response?.status === 200) {
       return { success: true, message: "Email verified successfully" };
     } else {
       return { success: false, error: "Invalid verification code" };
@@ -96,22 +96,23 @@ export async function verifyEmail(prevState: unknown, formData: FormData) {
   }
 }
 export async function registerTeacher(prevState: unknown, formData: FormData) {
-  const validatedFields = registerSchema.safeParse({
-    email: formData.get("email"),
-    name: formData.get("name"),
-    lastname: formData.get("lastname"),
-    password: formData.get("password"),
-    contactInfo: formData.get("contactInfo"),
-    subjects: JSON.parse(formData.get("subjects") as string),
-    certifications: JSON.parse(formData.get("certifications") as string),
-    education: JSON.parse(formData.get("education") as string),
-    links: JSON.parse(formData.get("links") as string),
-    bio: formData.get("bio"),
-  });
+  console.log(formData);
+  // const validatedFields = registerSchema.safeParse({
+  //   email: formData.get("email"),
+  //   name: formData.get("name"),
+  //   lastname: formData.get("lastname"),
+  //   password: formData.get("password"),
+  //   contactInfo: formData.get("contactInfo"),
+  //   subjects: JSON.parse(formData.get("subjects") as string),
+  //   certifications: JSON.parse(formData.get("certifications") as string),
+  //   education: JSON.parse(formData.get("education") as string),
+  //   links: JSON.parse(formData.get("links") as string),
+  //   bio: formData.get("bio"),
+  // });
 
-  if (!validatedFields.success) {
-    return { success: false, error: "Invalid form data" };
-  }
+  // if (!validatedFields.success) {
+  //   return { success: false, error: "Invalid form data" };
+  // }
 
   try {
     const { data: response, error } = await handleAPIcall(

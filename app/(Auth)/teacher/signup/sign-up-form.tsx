@@ -125,57 +125,61 @@ export function SignUpForm() {
 
   return (
     <Card className="w-full mx-auto border-none">
-      <CardHeader>
-        <CardTitle>{steps[currentStep]}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="mb-4">
-          <div className="flex justify-between mb-2">
-            {steps.map((_, index) => (
-              <div
-                key={index}
-                className={`w-full h-2 ${
-                  index <= currentStep
-                    ? "bg-primary"
-                    : "bg-gray-200 dark:bg-gray-800"
-                }`}
-              />
-            ))}
+      <form onSubmit={handleSubmit}>
+        {" "}
+        {/* Move form here */}
+        <CardHeader>
+          <CardTitle>{steps[currentStep]}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-4">
+            <div className="flex justify-between mb-2">
+              {steps.map((_, index) => (
+                <div
+                  key={index}
+                  className={`w-full h-2 ${
+                    index <= currentStep
+                      ? "bg-primary"
+                      : "bg-gray-200 dark:bg-gray-800"
+                  }`}
+                />
+              ))}
+            </div>
+            <div className="flex justify-between text-sm text-gray-600">
+              {steps.map((_, index) => (
+                <span
+                  key={index}
+                  className={index <= currentStep ? "text-primary" : ""}
+                >
+                  Step {index + 1}
+                </span>
+              ))}
+            </div>
           </div>
-          <div className="flex justify-between text-sm text-gray-600">
-            {steps.map((_, index) => (
-              <span
-                key={index}
-                className={index <= currentStep ? "text-primary" : ""}
-              >
-                Step {index + 1}
-              </span>
-            ))}
-          </div>
-        </div>
-        <form onSubmit={handleSubmit}>{renderStep()}</form>
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handlePrevious}
-          disabled={currentStep === 0}
-        >
-          Previous
-        </Button>
-        <Button
-          type={currentStep === steps.length - 1 ? "submit" : "button"}
-          onClick={currentStep === steps.length - 1 ? undefined : handleNext}
-          disabled={isSubmitting || (currentStep === 0 && !isEmailVerified)}
-        >
-          {currentStep === steps.length - 1
-            ? isSubmitting
-              ? "Submitting..."
-              : "Submit"
-            : "Next"}
-        </Button>
-      </CardFooter>
+          {renderStep()}
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handlePrevious}
+            disabled={currentStep === 0}
+          >
+            Previous
+          </Button>
+          <Button
+            type="submit" // Ensure it submits the form
+            onClick={currentStep === steps.length - 1 ? undefined : handleNext}
+            disabled={isSubmitting || (currentStep === 0 && !isEmailVerified)}
+          >
+            {currentStep === steps.length - 1
+              ? isSubmitting
+                ? "Submitting..."
+                : "Submit"
+              : "Next"}
+          </Button>
+        </CardFooter>
+      </form>
     </Card>
   );
 }

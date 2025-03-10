@@ -3,5 +3,5 @@ export type Category = {
   id: number
   name: string
   description: string
-  coursesCount: number
+  courses_count: number
 }

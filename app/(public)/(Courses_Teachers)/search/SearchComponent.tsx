@@ -3,9 +3,9 @@
 import { useState } from "react";
 import CourseCard from "@/components/course-card";
 import TeacherCard from "@/components/teacher-card";
-import { Category, SearchResult, SearchType } from "../../_lib/shema";
-import FilterC from "../../_components/filter";
-import Paginate from "../../_components/paginate";
+import { Category, SearchResult, SearchType } from "../_lib/shema";
+import FilterC from "../_components/filter";
+import Paginate from "../_components/paginate";
 
 export default function SearchComponent({
   result,
@@ -59,7 +59,9 @@ export default function SearchComponent({
             ))}
           </div>
         ) : (
-          <p className="text-center justify-center text-gray-500 h-[60vh]">No teachers found.</p>
+          <p className="text-center justify-center text-gray-500 h-[60vh]">
+            No teachers found.
+          </p>
         )
       ) : null}
 

@@ -10,28 +10,31 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Star, Filter, X } from "lucide-react";
 import { Category, SearchType } from "../_lib/shema";
+import { useState } from "react";
 
 export default function FilterC({
-    categories,
-    searchType,
-    setSearchType,
-    rating,
-    setRating,
-    price,
-    setPrice,
-    isOpen,
-    setIsOpen,
-  }: {
-    categories: Category[];
-    searchType: SearchType;
-    setSearchType: (value: SearchType) => void;
-    rating: number;
-    setRating: (value: number) => void;
-    price: number;
-    setPrice: (value: number) => void;
-    isOpen: boolean;
-    setIsOpen: (value: boolean) => void;
-  }) {
+  categories,
+  searchType,
+  setSearchType,
+  rating,
+  setRating,
+  price,
+  setPrice,
+  isOpen,
+  setIsOpen,
+}: {
+  categories: Category[];
+  searchType: SearchType;
+  setSearchType: (value: SearchType) => void;
+  rating: number;
+  setRating: (value: number) => void;
+  price: number;
+  setPrice: (value: number) => void;
+  isOpen: boolean;
+  setIsOpen: (value: boolean) => void;
+}) {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
   return (
     <>
       {/* Toggle Button (For Mobile & Desktop) */}
@@ -45,9 +48,10 @@ export default function FilterC({
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 bg-white p-5 z-50 shadow-lg w-3/4 md:w-1/4 transition-transform duration-100 dark:bg-gray-800 dark:border-gray-700 ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed inset-y-0 left-0 bg-white p-5 z-50 shadow-lg w-3/4 md:w-1/4 transition-transform duration-300 ease-in-out
+ dark:bg-gray-800 dark:border-gray-700 ${
+   isOpen ? "translate-x-0" : "-translate-x-full"
+ }`}
       >
         {/* Close Button */}
         <button
@@ -78,11 +82,17 @@ export default function FilterC({
             <h2 className="text-lg font-semibold dark:text-gray-100">
               Category
             </h2>
-            <Select>
-              <SelectTrigger className="w-full dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700">
-                <SelectValue placeholder="Select Category" />
+            <Select onValueChange={(value) => setSelectedCategory(value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Category">
+                  {selectedCategory
+                    ? categories.find(
+                        (cat) => cat.id.toString() === selectedCategory
+                      )?.name
+                    : ""}
+                </SelectValue>
               </SelectTrigger>
-              <SelectContent className="dark:bg-gray-500 dark:text-gray-200">
+              <SelectContent>
                 {categories.map((category) => (
                   <SelectItem key={category.id} value={category.id.toString()}>
                     {category.name}

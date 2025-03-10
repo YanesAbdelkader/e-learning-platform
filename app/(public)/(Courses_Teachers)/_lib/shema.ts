@@ -26,7 +26,7 @@ export type Teacher = {
   rating: number;
   contactInfo: string;
   certifications: string[];
-  education: [];
+  education:string [];
   links: string[];
   bio: string;
   picture: string;

@@ -1,6 +1,7 @@
 "use server"
 
-import type { Course, Teacher, Category } from "@/app/_lib/shema"
+import { Category, Course, Teacher } from "../_lib/shema"
+
 
 // Mock data for categories
 const mockCategories: Category[] = [

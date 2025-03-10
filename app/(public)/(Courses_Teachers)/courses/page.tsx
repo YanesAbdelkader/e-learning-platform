@@ -1,18 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Clock, BookOpen } from "lucide-react";
 import { Category, Course, SearchType } from "../_lib/shema";
 import { getCategories, getCourses } from "../_actions/data";
 import FilterC from "../_components/filter";
 import Paginate from "../_components/paginate";
+import Courses from "../_components/Courses";
 
 export default function CoursesPage() {
   const [searchType, setSearchType] = useState<SearchType>("Courses");
@@ -82,57 +75,8 @@ export default function CoursesPage() {
         </div>
       ) : (
         <>
-          {/* Course Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {courses.map((course) => (
-              <Card
-                key={course.id}
-                className="overflow-hidden hover:shadow-lg transition-shadow duration-300"
-              >
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src={
-                      course.image || "/placeholder.svg?height=200&width=300"
-                    }
-                    alt={course.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <Badge className="absolute top-2 right-2 bg-primary">
-                    {course.level}
-                  </Badge>
-                </div>
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <h3 className="text-xl font-semibold">{course.title}</h3>
-                    <span className="font-bold text-primary">
-                      ${course.price}
-                    </span>
-                  </div>
-                  <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                    <Badge variant="outline" className="mr-2">
-                      {categories.find((c) => c.id === course.category_id)
-                        ?.name || "Uncategorized"}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 dark:text-gray-300 line-clamp-2">
-                    {course.description}
-                  </p>
-                </CardContent>
-                <CardFooter className="flex justify-between border-t pt-4">
-                  <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                    <Clock className="w-4 h-4 mr-1" />
-                    <span>{course.duration} hours</span>
-                  </div>
-                  <div className="flex items-center">
-                    <BookOpen className="w-4 h-4 mr-1 text-primary" />
-                    <span className="text-sm">Enroll Now</span>
-                  </div>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
+          {/* Course Grid Component */}
+          <Courses courses={courses} />
 
           {courses.length === 0 && (
             <div className="text-center py-12">
@@ -149,7 +93,7 @@ export default function CoursesPage() {
       <Paginate
         page={0}
         totalPages={0}
-        handlePageChange={function (newPage: number): void {
+        handlePageChange={function (): void {
           throw new Error("Function not implemented.");
         }}
       />

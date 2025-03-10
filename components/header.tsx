@@ -3,7 +3,19 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "@/assets/image.jpg";
-import { Heart, ShoppingCart, Menu, Search, Moon, Sun } from "lucide-react";
+import {
+  Heart,
+  ShoppingCart,
+  Menu,
+  Search,
+  Moon,
+  Sun,
+  LayoutDashboard,
+  TvMinimalPlay,
+  LogOut,
+  Users,
+  Youtube,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,7 +28,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTheme } from "next-themes";
 import { redirect } from "next/navigation";
 
-const isLoggedIn = true
+const isLoggedIn = true;
 
 export function Header() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -24,7 +36,7 @@ export function Header() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    redirect("/courses/search");
+    redirect("/search");
   };
 
   return (
@@ -104,13 +116,22 @@ export function Header() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem>
-                    <Link href="/dashboard">Dashboard</Link>
+                    <Link href="/dashboard" className="flex items-center gap-1">
+                      <LayoutDashboard />
+                      Dashboard
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <Link href="/mycourses">My Courses</Link>
+                    <Link href="/mycourses" className="flex items-center gap-1">
+                      <TvMinimalPlay /> My Courses
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <button onClick={() => console.log("Logout clicked")}>
+                    <button
+                      onClick={() => console.log("Logout clicked")}
+                      className="flex items-center gap-1 text-red-500"
+                    >
+                      <LogOut />
                       Logout
                     </button>
                   </DropdownMenuItem>
@@ -184,14 +205,16 @@ export function Header() {
                   </form>
                   <Link
                     href="/courses"
-                    className="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white"
+                    className="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white flex items-center gap-2"
                   >
+                    <Youtube />
                     Courses
                   </Link>
                   <Link
                     href="/teachers"
-                    className="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white"
+                    className="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white flex items-center gap-2"
                   >
+                    <Users />
                     Teachers
                   </Link>
                   <Link
@@ -210,21 +233,24 @@ export function Header() {
                     <>
                       <Link
                         href="/dashboard"
-                        className="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white"
+                        className="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white flex items-center gap-2"
                       >
+                        <LayoutDashboard />
                         Dashboard
                       </Link>
                       <Link
                         href="/mycourses"
-                        className="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white"
+                        className="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white flex items-center gap-2"
                       >
+                        <TvMinimalPlay />
                         My Courses
                       </Link>
                       <Button
                         onClick={() => console.log("Logout clicked")}
                         variant="destructive"
-                        className="w-full"
+                        className="w-full flex items-center gap-1"
                       >
+                        <LogOut />
                         Logout
                       </Button>
                     </>
