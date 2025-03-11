@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "@/assets/image.jpg";
@@ -15,6 +15,7 @@ import {
   LogOut,
   Users,
   Youtube,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,13 +27,45 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTheme } from "next-themes";
+import { getCookie } from "typescript-cookie";
+import { logout } from "@/functions/custom";
+import { useToast } from "@/hooks/use-toast";
 import { redirect } from "next/navigation";
 
-const isLoggedIn = true;
-
 export function Header() {
+  const [picture, setPicture] = useState(getCookie("picture"));
   const [searchQuery, setSearchQuery] = useState("");
   const { theme, setTheme } = useTheme();
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isloading, setIsLoading] = useState(true);
+  const logoutUser = async () => {
+    setLoading(true);
+    const result = await logout();
+    if (result === true) {
+      toast({
+        title: "Logout Successful",
+        description: "You have been logged out.",
+      });
+      setPicture("");
+    } else {
+      toast({
+        title: "Logout Failed",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    }
+    setLoading(false);
+  };
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setIsLoggedIn(picture ? true : false);
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [picture]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,11 +136,13 @@ export function Header() {
             >
               <ShoppingCart className="h-6 w-6" />
             </Link>
-            {isLoggedIn ? (
+            {isloading ? (
+              <Loader2 className="h-8 w-8 animate-spin" />
+            ) : isLoggedIn ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Image
-                    src={logo}
+                    src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${picture}`}
                     alt="Profile"
                     className="relative h-8 w-8 rounded-full"
                     width={100}
@@ -128,7 +163,8 @@ export function Header() {
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <button
-                      onClick={() => console.log("Logout clicked")}
+                      onClick={logoutUser}
+                      disabled={loading}
                       className="flex items-center gap-1 text-red-500"
                     >
                       <LogOut />
@@ -229,7 +265,9 @@ export function Header() {
                   >
                     <ShoppingCart className="h-6 w-6 mr-2" /> Cart
                   </Link>
-                  {isLoggedIn ? (
+                  {isloading ? (
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                  ) : isLoggedIn ? (
                     <>
                       <Link
                         href="/dashboard"
@@ -246,7 +284,7 @@ export function Header() {
                         My Courses
                       </Link>
                       <Button
-                        onClick={() => console.log("Logout clicked")}
+                        onClick={logoutUser}
                         variant="destructive"
                         className="w-full flex items-center gap-1"
                       >

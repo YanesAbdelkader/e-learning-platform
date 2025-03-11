@@ -28,7 +28,6 @@ export default function CategoryDialog({
   const [description, setDescription] = useState(category?.description || "");
   const [loading, setLoading] = useState(false);
 
-  // Update state when category changes
   useEffect(() => {
     setName(category?.name || "");
     setDescription(category?.description || "");

@@ -1,10 +1,9 @@
-"use server"
-import { handleAPIcall } from "@/functions/custom";
+"use server";
+import { getUserData, handleAPIcall } from "@/functions/custom";
 import { LoginData } from "../_form/loginForm";
 import { setCookie } from "typescript-cookie";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-
 export async function loginAction(_: unknown, data: LoginData) {
   try {
     const { data: response, error } = await handleAPIcall(
@@ -24,16 +23,29 @@ export async function loginAction(_: unknown, data: LoginData) {
 
     if (response?.status === 200 && response?.data) {
       if (response.data.otp !== true) {
-        (await cookies())
-        .set("token", response.data.token, {
+        const cookieStore = cookies();
+
+        (await cookieStore).set("token", response.data.token, {
           httpOnly: true,
           sameSite: "strict",
           maxAge: 60 * 60 * 24 * 15,
-          secure: true
-        })
+          secure: true,
+        });
+
+        await getUserData();
+
+        const prevPage =
+          (await cookieStore).get("prevPage")?.value || "/dashboard";
+        const lastVisitedPage = (await cookieStore).get(
+          "lastVisitedPage"
+        )?.value;
+
+        (await cookieStore).delete("prevPage");
+        (await cookieStore).delete("lastVisitedPage");
         return {
           title: "Login success!!",
-          description: `You have been successfully Login.`,
+          description: "You have been successfully Login.",
+          path: prevPage || lastVisitedPage || "/dashboard",
         };
       } else {
         setCookie("email", data.email, { expires: 1 });

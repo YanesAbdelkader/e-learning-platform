@@ -1,6 +1,7 @@
-import { handleAPIcall } from "@/functions/custom";
+import { getUserData, handleAPIcall } from "@/functions/custom";
 import { OTPFormData } from "../_otpForm/otpForm";
-import { getCookie, setCookie } from "typescript-cookie";
+import { getCookie } from "typescript-cookie";
+import { cookies } from "next/headers";
 
 export async function otpAction(prevState: unknown, formData: OTPFormData) {
   try {
@@ -18,7 +19,21 @@ export async function otpAction(prevState: unknown, formData: OTPFormData) {
     );
 
     if (response?.status === 200) {
-      setCookie("token", response.data.token, { expires: 15 });
+      (await cookies()).getAll().forEach(async ({ name }) => {
+        (await cookies()).set(name, "", {
+          httpOnly: true,
+          sameSite: "strict",
+          maxAge: 0,
+          secure: true,
+        });
+      });
+      (await cookies()).set("token", response.data.token, {
+        httpOnly: true,
+        sameSite: "strict",
+        maxAge: 60 * 60 * 24 * 15,
+        secure: true,
+      });
+      await getUserData();
       return {
         title: "OTP Submitted",
         description: `Your OTP ${formData.otp} has been submitted successfully.`,

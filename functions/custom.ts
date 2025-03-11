@@ -44,17 +44,79 @@ export const handleAPIcall = async (
   }
 };
 
+export async function getUserData() {
+  const { data: response, error } = await handleAPIcall(
+    "",
+    "",
+    "get-user-data",
+    "GET"
+  );
+  if (response?.status === 200) {
+    const cookieStore = cookies();
+    Object.entries(response.data.data).forEach(async ([key, value]) => {
+      if (typeof value === "string" || typeof value === "number") {
+        (await cookieStore).set(key, value.toString(), {
+          httpOnly:
+            key !== "picture" &&
+            key !== "name" &&
+            key !== "lastname" &&
+            key !== "email",
+          sameSite: "strict",
+          maxAge: 60 * 60 * 24 * 15,
+          secure: true,
+        });
+      }
+    });
+  }
+  if (error) {
+    return;
+  }
+}
+
+export async function logout() {
+  const { data: response, error } = await handleAPIcall(
+    "",
+    "",
+    "logout",
+    "POST"
+  );
+  if (response?.status === 200) {
+    (await cookies()).getAll().forEach(async ({ name }) => {
+      (await cookies()).set(name, "", {
+        httpOnly: true,
+        sameSite: "strict",
+        maxAge: 0,
+        secure: true,
+      });
+    });
+    return true;
+  }
+  if (error) {
+    return false;
+  }
+}
+
 export async function isAuthenticated() {
-  const token = (await cookies()).get("token")?.value;
-  if (token) {
-    const { data: response, error } = await handleAPIcall("", "", "", "POST");
-    if (response !== null) {
-      return true;
-    }
-    if (error !== null) {
+  try {
+    const token = (await cookies()).get("token")?.value;
+    const role = (await cookies()).get("role")?.value ?? null;
+    if (!token) {
       return false;
     }
-  } else {
+    const { data: response, error } = await handleAPIcall(
+      "",
+      role,
+      "role",
+      "POST"
+    );
+    if (response?.status === 200) {
+      return true;
+    } else if (response?.status === 401 || error !== null) {
+      return false;
+    }
+    return false;
+  } catch (error) {
+    console.error("Error during authentication check:", error);
     return false;
   }
 }

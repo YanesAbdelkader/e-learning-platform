@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useActionState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { redirect } from "next/navigation";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -41,6 +42,9 @@ export default function LoginForm() {
         description: stats?.description,
         variant: stats.variant === "destructive" ? "destructive" : "default",
       });
+    }
+    if (stats?.path) {
+      redirect(stats.path);
     }
   }, [stats, toast]);
   return (
