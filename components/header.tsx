@@ -31,8 +31,11 @@ import { getCookie } from "typescript-cookie";
 import { logout } from "@/functions/custom";
 import { useToast } from "@/hooks/use-toast";
 import { redirect } from "next/navigation";
+import { useCartAndFavorites } from "@/hooks/use-Cart-Fav";
 
 export function Header() {
+  const { favorites, cart } = useCartAndFavorites();
+  // State variables
   const [picture, setPicture] = useState(getCookie("picture"));
   const [searchQuery, setSearchQuery] = useState("");
   const { theme, setTheme } = useTheme();
@@ -40,6 +43,8 @@ export function Header() {
   const { toast } = useToast();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isloading, setIsLoading] = useState(true);
+
+  // Logout function
   const logoutUser = async () => {
     setLoading(true);
     const result = await logout();
@@ -58,6 +63,8 @@ export function Header() {
     }
     setLoading(false);
   };
+
+  // Effect to check login state
   useEffect(() => {
     setIsLoading(true);
     const timer = setTimeout(() => {
@@ -67,11 +74,11 @@ export function Header() {
     return () => clearTimeout(timer);
   }, [picture]);
 
+  // Handle search form submission
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     redirect("/search");
   };
-
   return (
     <header className="border-grid sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-lg">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -129,12 +136,22 @@ export function Header() {
               className="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white"
             >
               <Heart className="h-6 w-6" />
+              {favorites.length > 0 && (
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1">
+                  {favorites.length}
+                </span>
+              )}
             </Link>
             <Link
               href="/cart"
               className="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white"
             >
               <ShoppingCart className="h-6 w-6" />
+              {cart.length > 0 && (
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1">
+                  {cart.length}
+                </span>
+              )}
             </Link>
             {isloading ? (
               <Loader2 className="h-8 w-8 animate-spin" />

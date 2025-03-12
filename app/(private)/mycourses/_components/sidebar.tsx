@@ -4,43 +4,32 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Home,
-  Users,
-  BookOpen,
-  DollarSign,
-  AlertCircle,
-  FolderTree,
+  Clock,
+  Award,
   ChevronLeft,
   ChevronRight,
+  Youtube,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
-  { name: "Dashboard", href: "/dashboard/admin", icon: Home },
-  { name: "Teachers", href: "/dashboard/admin/teachers", icon: Users },
-  { name: "Content", href: "/dashboard/admin/content", icon: BookOpen },
-  { name: "Categories", href: "/dashboard/admin/categories", icon: FolderTree },
-  {
-    name: "Transactions",
-    href: "/dashboard/admin/transactions",
-    icon: DollarSign,
-  },
-  { name: "Issues", href: "/dashboard/admin/issues", icon: AlertCircle },
+  { name: "All Courses", href: "/mycourses", icon: Youtube },
+  { name: "In Progress", href: "/mycourses/in-progress", icon: Clock },
+  { name: "Completed", href: "/mycourses/completed", icon: Award },
 ];
 
-export default function Sidebar() {
+export function Sidebar() {
   const pathname = usePathname();
   const [isMinimized, setIsMinimized] = useState(false);
 
   return (
-
     <aside
       className={`bg-background border-r border-border transition-all duration-300 ease-in-out ${
         isMinimized ? "w-16" : "w-64"
       }`}
     >
       <div className="flex items-center justify-between p-4">
-        {!isMinimized && <h2 className="text-2xl font-semibold">Admin</h2>}
+        {!isMinimized && <h2 className="text-2xl font-semibold">Navbar</h2>}
         <Button
           variant="ghost"
           size="icon"
@@ -61,7 +50,7 @@ export default function Sidebar() {
             <Link
               key={item.name}
               href={item.href}
-              className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
+              className={`flex items-center space-x-2 py-2 px-4 rounded transition duration-200 ${
                 isActive
                   ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
