@@ -3,30 +3,54 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ShoppingCart, Trash2 } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import Image from "next/image";
+import { useCartAndFavorites } from "@/hooks/use-Cart-Fav";
+import { Course } from "@/data/types";
+import { handleAPIcall } from "@/functions/custom";
+import CourseCard from "../_components/course-card-cart";
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState<any[]>([]);
+  const { cart, removeFromCart } = useCartAndFavorites();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedCart = localStorage.getItem("cart");
-    if (storedCart) {
-      setCartItems(JSON.parse(storedCart));
-    }
-  }, []);
+    const fetchCartItems = async (courseIds: string[]) => {
+      try {
+        const { data: response } = await handleAPIcall(
+          courseIds,
+          "",
+          "get-courses-by-id",
+          "GET"
+        );
+        setCourses(response?.data);
+      } catch (error) {
+        console.error("Error fetching cart items:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const removeFromCart = (courseId: number) => {
-    const updatedCart = cartItems.filter((course) => course.id !== courseId);
-    setCartItems(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-  };
+    if (cart.length > 0) {
+      fetchCartItems(cart);
+    } else {
+      setLoading(false);
+    }
+  }, [cart]);
 
   const calculateTotal = () => {
-    return cartItems.reduce((total, item) => total + item.salePrice, 0);
+    return courses.reduce((total, item) => total + item.price, 0);
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <main className="container mx-auto py-8 px-4">
@@ -34,48 +58,15 @@ export default function CartPage() {
         <h1 className="text-3xl font-bold">Shopping Cart</h1>
       </div>
 
-      {cartItems.length > 0 ? (
+      {courses.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
-            {cartItems.map((course) => (
-              <Card key={course.id} className="mb-4">
-                <CardContent className="p-4">
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="flex-shrink-0">
-                      <Image
-                        src={course.image || "/placeholder.svg"}
-                        alt={course.title}
-                        className="w-full sm:w-32 h-auto rounded-md object-cover"
-                      />
-                    </div>
-                    <div className="flex-grow">
-                      <h3 className="font-semibold text-lg">{course.title}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        By {course.instructor}
-                      </p>
-                    </div>
-                    <div className="flex flex-col items-end justify-between">
-                      <div className="text-right">
-                        <p className="text-lg font-bold">
-                          ${course.salePrice.toFixed(2)}
-                        </p>
-                        <p className="text-sm text-muted-foreground line-through">
-                          ${course.price.toFixed(2)}
-                        </p>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive"
-                        onClick={() => removeFromCart(course.id)}
-                      >
-                        <Trash2 className="h-4 w-4 mr-1" />
-                        Remove
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            {courses.map((course) => (
+              <CourseCard
+                key={course.id}
+                course={course}
+                removeFromCart={removeFromCart}
+              />
             ))}
           </div>
 
@@ -85,35 +76,13 @@ export default function CartPage() {
                 <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
 
                 <div className="space-y-2 mb-4">
-                  <div className="flex justify-between">
-                    <span>Original Price:</span>
-                    <span>
-                      $
-                      {cartItems
-                        .reduce((total, item) => total + item.price, 0)
-                        .toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Discounts:</span>
-                    <span className="text-green-600">
-                      -$
-                      {(
-                        cartItems.reduce(
-                          (total, item) => total + item.price,
-                          0
-                        ) - calculateTotal()
-                      ).toFixed(2)}
-                    </span>
+                  <div className="flex justify-between font-bold text-lg">
+                    <span>Total:</span>
+                    <span>${calculateTotal().toFixed(2)}</span>
                   </div>
                 </div>
 
                 <Separator className="my-4" />
-
-                <div className="flex justify-between font-bold text-lg mb-6">
-                  <span>Total:</span>
-                  <span>${calculateTotal().toFixed(2)}</span>
-                </div>
 
                 <Button className="w-full">Checkout</Button>
 
