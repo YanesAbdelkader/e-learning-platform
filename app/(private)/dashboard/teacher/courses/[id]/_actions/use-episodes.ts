@@ -1,117 +1,188 @@
-"use client"
+"use server";
+import { Episode } from "../_components/types";
+import { handleAPIcall } from "@/functions/custom";
+import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 
-import { useState, useEffect, useCallback } from "react"
-import { Episode, NewEpisode } from "../_components/types"
+export async function fetchEpisodes(courseId: string) {
+  try {
+    const { data: response, error } = await handleAPIcall(
+      "",
+      `${courseId}/episodes`,
+      "course",
+      "GET"
+    );
 
-export function useEpisodes(courseId: string) {
-  const [episodes, setEpisodes] = useState<Episode[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const fetchEpisodes = useCallback(async () => {
-    setIsLoading(true)
-    setError(null)
-    try {
-      // TODO: Replace this with an actual API call
-      const response = await fetch(`/api/courses/${courseId}/episodes`)
-      if (!response.ok) {
-        throw new Error("Failed to fetch episodes")
-      }
-      const data = await response.json()
-      setEpisodes(data)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-    } finally {
-      setIsLoading(false)
+    if (error) {
+      console.error("Error fetching episodes:", error);
+      return [];
     }
-  }, [courseId])
-
-  useEffect(() => {
-    fetchEpisodes()
-  }, [fetchEpisodes])
-
-  const addEpisode = async (newEpisode: NewEpisode) => {
-    try {
-      // TODO: Replace this with an actual API call
-      const response = await fetch(`/api/courses/${courseId}/episodes`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newEpisode),
-      })
-      if (!response.ok) {
-        throw new Error("Failed to add episode")
-      }
-      const addedEpisode = await response.json()
-      setEpisodes([...episodes, addedEpisode])
-      return addedEpisode
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to add episode")
-      throw err
-    }
-  }
-
-  const updateEpisode = async (updatedEpisode: Episode) => {
-    try {
-      // TODO: Replace this with an actual API call
-      const response = await fetch(`/api/courses/${courseId}/episodes/${updatedEpisode.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedEpisode),
-      })
-      if (!response.ok) {
-        throw new Error("Failed to update episode")
-      }
-      const updated = await response.json()
-      setEpisodes(episodes.map((ep) => (ep.id === updated.id ? updated : ep)))
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update episode")
-      throw err
-    }
-  }
-
-  const deleteEpisode = async (id: string) => {
-    try {
-      // TODO: Replace this with an actual API call
-      const response = await fetch(`/api/courses/${courseId}/episodes/${id}`, {
-        method: "DELETE",
-      })
-      if (!response.ok) {
-        throw new Error("Failed to delete episode")
-      }
-      setEpisodes(episodes.filter((episode) => episode.id !== id))
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete episode")
-      throw err
-    }
-  }
-
-  const reorderEpisodes = async (reorderedEpisodes: Episode[]) => {
-    try {
-      // TODO: Replace this with an actual API call
-      const response = await fetch(`/api/courses/${courseId}/episodes/reorder`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(reorderedEpisodes),
-      })
-      if (!response.ok) {
-        throw new Error("Failed to reorder episodes")
-      }
-      const updatedEpisodes = await response.json()
-      setEpisodes(updatedEpisodes)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to reorder episodes")
-      throw err
-    }
-  }
-
-  return {
-    episodes,
-    isLoading,
-    error,
-    addEpisode,
-    updateEpisode,
-    deleteEpisode,
-    reorderEpisodes,
+    return response?.data?.data ?? [];
+  } catch (err) {
+    console.error("Fetch Episodes Error:", err);
+    return [];
   }
 }
 
+export async function addEpisode(formData: FormData) {
+  try {
+    const response = await fetch(`/api/episodes`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer `,
+      },
+      body: JSON.stringify({
+        title: formData.get("title"),
+        description: formData.get("description"),
+        video: formData.get("video"),
+        duration: formData.get("duration"),
+        course_id: formData.get("courseId"),
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data?.message || "Failed to add episode");
+    }
+
+    revalidatePath("/dashboard/episodes"); // Revalidate the path to refresh the data
+    return data;
+  } catch (error) {
+    console.error("Error adding episode:", error);
+    throw error;
+  }
+}
+
+export const updateEpisode = async (
+  updatedEpisode: Episode,
+  courseId: string
+) => {
+  try {
+    const { data: response, error } = await handleAPIcall(
+      updatedEpisode,
+      `${courseId}/episodes`,
+      "course",
+      "POST"
+    );
+
+    if (error) throw new Error("Failed to update episode");
+
+    return response?.data;
+  } catch (err) {
+    console.error("Update Episode Error:", err);
+    throw err;
+  }
+};
+
+export const deleteEpisode = async ({
+  id,
+  courseId,
+}: {
+  id: string;
+  courseId: string;
+}) => {
+  try {
+    const { data: response, error } = await handleAPIcall(
+      "",
+      `${courseId}/episodes/${id}`,
+      "course",
+      "DELETE"
+    );
+
+    if (error) throw new Error("Failed to delete episode");
+    return response.data;
+  } catch (err) {
+    console.error("Delete Episode Error:", err);
+    throw err;
+  }
+};
+
+export async function handleSaveEpisode(episodeData: {
+  title: string;
+  description: string;
+  video: string;
+  courseId: string;
+}) {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/courses/${episodeData.courseId}/episodes`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${document.cookie.split("token=")[1]}`,
+        },
+        body: JSON.stringify({
+          title: episodeData.title,
+          description: episodeData.description,
+          video: episodeData.video,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to save episode");
+    }
+
+    const newEpisode = await response.json();
+
+    return newEpisode;
+  } catch (error) {
+    console.error("Error saving episode:", error);
+    throw error;
+  }
+}
+
+export const reorderEpisodes = async (
+  reorderedEpisodes: Episode[],
+  courseId: string
+) => {
+  try {
+    const { data: response, error } = await handleAPIcall(
+      reorderedEpisodes,
+      `${courseId}/episodes/reorder`,
+      "course",
+      "PUT"
+    );
+
+    if (error) throw new Error("Failed to reorder episodes");
+
+    return response?.data;
+  } catch (err) {
+    console.error("Reorder Episodes Error:", err);
+    throw err;
+  }
+};
+
+export async function uploadFileChunks(formData: FormData) {
+  try {
+    const token = (await cookies()).get("token")?.value;
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload-chunks`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+    console.log(response)
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.log(data?.message)
+      throw new Error(data?.message || "Failed to upload file chunks");
+      
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error uploading file chunks:", error);
+    throw error;
+  }
+}
+
+export const saveEpisode = async (episodeData: Omit<Episode, "id" | "order">) => {
+  console.log("Saving episode:", episodeData);
+  return { success: true };
+};

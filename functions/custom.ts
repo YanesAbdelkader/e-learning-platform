@@ -53,21 +53,22 @@ export async function getUserData() {
   );
   if (response?.status === 200) {
     const cookieStore = cookies();
-    Object.entries(response.data.data).forEach(async ([key, value]) => {
-      if (typeof value === "string" || typeof value === "number") {
-        (await cookieStore).set(key, value.toString(), {
-          httpOnly:
-            key !== "picture" &&
-            key !== "name" &&
-            key !== "lastname" &&
-            key !== "email",
-          sameSite: "strict",
-          maxAge: 60 * 60 * 24 * 15,
-          secure: true,
-        });
-      }
-    });
+    const allowedKeys = ["email", "picture", "lastname", "name"];
+
+    Object.entries(response.data.data)
+      .filter(([key]) => allowedKeys.includes(key))
+      .forEach(async ([key, value]) => {
+        if (typeof value === "string" || typeof value === "number") {
+          (await cookieStore).set(key, value.toString(), {
+            httpOnly: false,
+            sameSite: "strict",
+            maxAge: 60 * 60 * 24 * 15,
+            secure: true,
+          });
+        }
+      });
   }
+
   if (error) {
     return;
   }

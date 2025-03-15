@@ -1,13 +1,13 @@
+"use server"
 import { getUserData, handleAPIcall } from "@/functions/custom";
 import { OTPFormData } from "../_otpForm/otpForm";
-import { getCookie } from "typescript-cookie";
 import { cookies } from "next/headers";
 
 export async function otpAction(prevState: unknown, formData: OTPFormData) {
   try {
     const data = {
-      email: getCookie("email"),
-      password: getCookie("password"),
+      email: (await cookies()).get("email")?.value,
+      password: (await cookies()).get("password")?.value,
       otp: formData.otp,
     };
 

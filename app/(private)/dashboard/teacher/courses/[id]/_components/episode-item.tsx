@@ -15,7 +15,7 @@ interface EpisodeItemProps {
 
 export function EpisodeItem({ episode, index, onEdit, onDelete }: EpisodeItemProps) {
   return (
-    <Draggable draggableId={episode.id} index={index}>
+    <Draggable draggableId={String(episode.id)} index={index}>
       {(provided) => (
         <Card ref={provided.innerRef} {...provided.draggableProps} className="border border-border">
           <CardContent className="p-0">

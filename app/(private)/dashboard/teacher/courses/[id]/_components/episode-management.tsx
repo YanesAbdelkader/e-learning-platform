@@ -1,105 +1,113 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useParams } from "next/navigation"
-import type { DropResult } from "@hello-pangea/dnd"
-import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
-import { EpisodeList } from "./episode-list"
-import { EpisodeForm } from "./episode-form"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { useEpisodes } from "../_actions/use-episodes"
-import type { Episode } from "./types"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { toast } from "@/hooks/use-toast"
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import type { DropResult } from "@hello-pangea/dnd";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, Plus } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import type { Episode } from "./types";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { toast } from "@/hooks/use-toast";
+import Loading from "@/app/(public)/loading";
+import {
+  deleteEpisode,
+  fetchEpisodes,
+  reorderEpisodes,
+} from "../_actions/use-episodes";
+import { EpisodeList } from "./episode-list";
+import Link from "next/link";
+import { EpisodeForm } from "./episode-form";
 
 export default function EpisodeManagement() {
-  const params = useParams()
-  const courseId = params.courseId as string
+  const params = useParams();
+  const courseId = params.id as string;
+  const [episodes, setEpisodes] = useState<Episode[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [, setCurrentEpisode] = useState<Episode | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const { episodes, isLoading, error, addEpisode, updateEpisode, deleteEpisode, reorderEpisodes } =
-    useEpisodes(courseId)
+  // Reusable function to load episodes
+  const loadEpisodes = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await fetchEpisodes(courseId);
+      setEpisodes(result);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load episodes.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  const [currentEpisode, setCurrentEpisode] = useState<Episode | null>(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  // Load episodes on component mount
+  useEffect(() => {
+    loadEpisodes();
+  }, [courseId]);
 
   const handleAddEpisode = () => {
-    setCurrentEpisode(null)
-    setIsDialogOpen(true)
-  }
+    setCurrentEpisode(null);
+    setIsDialogOpen(true);
+  };
 
   const handleEditEpisode = (episode: Episode) => {
-    setCurrentEpisode(episode)
-    setIsDialogOpen(true)
-  }
+    setCurrentEpisode(episode);
+    setIsDialogOpen(true);
+  };
 
   const handleDeleteEpisode = async (id: string) => {
     try {
-      await deleteEpisode(id)
+      await deleteEpisode({ id, courseId });
+      await loadEpisodes();
       toast({
         title: "Episode deleted",
         description: "The episode has been successfully deleted.",
-      })
+      });
     } catch (err) {
-      console.log(err)
+      console.log(err);
       toast({
         title: "Error",
         description: "Failed to delete the episode. Please try again.",
         variant: "destructive",
-      })
+      });
     }
-  }
-
-  const handleSaveEpisode = async (episodeData: Omit<Episode, "id" | "order">) => {
-    try {
-      if (currentEpisode) {
-        const updatedEpisode = { ...currentEpisode, ...episodeData }
-        await updateEpisode(updatedEpisode)
-        toast({
-          title: "Episode updated",
-          description: "The episode has been successfully updated.",
-        })
-      } else {
-        await addEpisode(episodeData)
-        toast({
-          title: "Episode added",
-          description: "The episode has been successfully added.",
-        })
-      }
-      setIsDialogOpen(false)
-      setCurrentEpisode(null)
-    } catch (err) {
-      console.log(err)
-      toast({
-        title: "Error",
-        description: "Failed to save the episode. Please try again.",
-        variant: "destructive",
-      })
-    }
-  }
+  };
 
   const handleDragEnd = async (result: DropResult) => {
-    if (!result.destination) return
+    if (!result.destination) return;
 
-    const items = Array.from(episodes)
-    const [reorderedItem] = items.splice(result.source.index, 1)
-    items.splice(result.destination.index, 0, reorderedItem)
+    const reorderedEpisodes = [...episodes];
+    const [movedEpisode] = reorderedEpisodes.splice(result.source.index, 1);
+    reorderedEpisodes.splice(result.destination.index, 0, movedEpisode);
 
+    const updatedEpisodes = reorderedEpisodes.map((ep, idx) => ({
+      ...ep,
+      order: idx + 1,
+    }));
+
+    setEpisodes(updatedEpisodes);
     try {
-      await reorderEpisodes(items)
+      const result = await reorderEpisodes(updatedEpisodes, courseId);
+      if (result) {
+        toast({
+          title: "Success",
+          description: "Reordered episode successfully",
+        });
+      }
     } catch (err) {
-      console.log(err)
+      console.log(err);
       toast({
         title: "Error",
         description: "Failed to reorder episodes. Please try again.",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
-  if (isLoading) {
-    return <div className="flex justify-center items-center h-64">Loading episodes...</div>
-  }
+  if (isLoading) return <Loading />;
 
   if (error) {
     return (
@@ -107,11 +115,18 @@ export default function EpisodeManagement() {
         <AlertTitle>Error</AlertTitle>
         <AlertDescription>{error}</AlertDescription>
       </Alert>
-    )
+    );
   }
 
   return (
-    <div className="container mx-auto py-6">
+    <div className="container mx-auto">
+      <Link
+        href="/dashboard/teacher/courses"
+        className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-4"
+      >
+        <ChevronLeft className="mr-1 h-4 w-4" />
+        Back to Courses
+      </Link>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Course Episodes</h1>
         <Button onClick={handleAddEpisode}>
@@ -128,11 +143,17 @@ export default function EpisodeManagement() {
       />
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <EpisodeForm episode={currentEpisode} onSave={handleSaveEpisode} onCancel={() => setIsDialogOpen(false)} />
+        <DialogContent className="sm:max-w-[900px]">
+          <EpisodeForm
+            courseId={courseId} // Pass the current episode for editing
+            onSuccess={() => {
+              setIsDialogOpen(false);
+              loadEpisodes(); // Reload episodes after successful addition/update
+            }}
+            onCancel={() => setIsDialogOpen(false)}
+          />
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
-

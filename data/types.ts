@@ -3,13 +3,12 @@ import { StaticImageData } from "next/image";
 export type Course = {
   id: number;
   title: string;
-  instructor: string;
+  instructor: { id: number; name: string; lastname: string };
   rating: number;
   students: number;
-  price: number;
+  price: string;
   image: string | StaticImageData;
-  badge?: string;
-  category: string;
+  category: { id: number; name: string; description?: string };
 };
 
 export type Category = {
@@ -20,11 +19,21 @@ export type Category = {
 export type Teacher = {
   id: number;
   name: string;
-  expertise: string;
-  rating: number;
-  students: number;
-  courses: number;
-  image: string | StaticImageData;
-  description: string;
-  achievements: string[];
+  lastname: string;
+  picture: string;
+  email: string;
+  role: string;
+  course_count: number;
+  teacher_info: {
+    id: number;
+    user_id: number;
+    subjects: string[];
+    rating: number | null;
+    contactinfo: string;
+    certifications: string[];
+    education: string;
+    links: string[];
+    bio: string;
+    verified: boolean;
+  };
 };

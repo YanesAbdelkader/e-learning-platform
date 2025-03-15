@@ -14,7 +14,7 @@ import { toast } from "@/hooks/use-toast";
 import { Teacher } from "../../_lib/shemaTecher";
 import { fetchTeacherInfo, verifyTeacher } from "../../_actions/teacherActions";
 import Image from "next/image";
-import { Loader2 } from "lucide-react";
+import { ChevronRight, Loader2 } from "lucide-react";
 
 interface TeacherDialogProps {
   teacherId: string;
@@ -87,12 +87,12 @@ export default function TeacherDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="default" size="sm">
-          Verify
+          Manage <ChevronRight />
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Verify Teacher</DialogTitle>
+          <DialogTitle>Manage Teacher</DialogTitle>
         </DialogHeader>
 
         {loading ? (
