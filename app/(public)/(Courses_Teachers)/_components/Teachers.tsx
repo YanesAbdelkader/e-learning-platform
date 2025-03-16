@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { BookOpen, Star } from "lucide-react";
+import { BookOpen, Star, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Teacher } from "../_lib/shema";
@@ -23,7 +23,7 @@ export default function Teachers({ teachers }: { teachers: Teacher[] }) {
           {/* Image Section */}
           <div className="aspect-square relative overflow-hidden">
             <Image
-              src={teacher.picture || "/placeholder.svg"}
+              src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${teacher.picture}`}
               alt={teacher.name}
               width={400}
               height={400}
@@ -45,9 +45,9 @@ export default function Teachers({ teachers }: { teachers: Teacher[] }) {
 
           {/* Header Section */}
           <CardHeader className="space-y-1">
-            <h3 className="font-bold text-lg">{teacher.name}</h3>
+            <h3 className="font-bold text-lg">{`${teacher.name} ${teacher.lastname}`}</h3>
             <p className="text-sm text-purple-600 font-medium">
-              {teacher.subjects.join(", ")}
+              {teacher.teacher_info.education}
             </p>
           </CardHeader>
 
@@ -57,29 +57,29 @@ export default function Teachers({ teachers }: { teachers: Teacher[] }) {
               {/* Rating */}
               <div className="flex items-center gap-1">
                 <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                <span className="font-bold">{teacher.rating.toFixed(1)}</span>
+                <span className="font-bold">{teacher.teacher_info.rating?teacher.teacher_info.rating : 0}</span>
               </div>
 
               {/* Students */}
-              {/* <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1">
                 <Users className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">
-                  {teacher.students?.toLocaleString() || "N/A"}
+                  {teacher.students? teacher.students : "N/A"}
                 </span>
-              </div> */}
+              </div>
 
               {/* Courses */}
               <div className="flex items-center gap-1">
                 <BookOpen className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">
-                  {teacher.certifications.length} Courses
+                  {teacher.course_count} Courses
                 </span>
               </div>
             </div>
 
             {/* Description */}
             <p className="text-sm text-muted-foreground line-clamp-3">
-              {teacher.bio}
+              {teacher.teacher_info.bio}
             </p>
           </CardContent>
         </Card>

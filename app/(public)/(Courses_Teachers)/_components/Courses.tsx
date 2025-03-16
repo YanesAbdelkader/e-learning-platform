@@ -20,7 +20,7 @@ export default function Courses({ courses }: CoursesProps) {
         >
           <div className="relative h-56 w-full">
             <Image
-              src={course.image || "/placeholder.svg"}
+              src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${course.image}`}
               alt={course.title}
               width={400}
               height={300}

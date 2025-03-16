@@ -13,7 +13,6 @@ export default async function CourseDetailPage({
     Id: string;
   };
 }) {
-  // In a real app, you would fetch this data from your Laravel API
   const courseData = await getCourseDetails(params.Id);
   const relatedCourses = await getRelatedCourses(params.Id);
 

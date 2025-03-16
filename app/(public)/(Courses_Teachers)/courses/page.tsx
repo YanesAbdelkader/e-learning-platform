@@ -1,19 +1,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Category, Course, SearchType } from "../_lib/shema";
 import { getCategories, getCourses } from "../_actions/data";
 import FilterC from "../_components/filter";
-import Paginate from "../_components/paginate";
 import Courses from "../_components/Courses";
 
 export default function CoursesPage() {
+  const router = useRouter();
   const [searchType, setSearchType] = useState<SearchType>("Courses");
   const [rating, setRating] = useState(0);
-  const [price, setPrice] = useState(100);
+  const [price, setPrice] = useState(10000);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedLevel, setSelectedLevel] = useState<string>("all");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,11 +24,11 @@ export default function CoursesPage() {
       setLoading(true);
       try {
         const [coursesData, categoriesData] = await Promise.all([
-          getCourses(rating, price),
+          getCourses(),
           getCategories(),
         ]);
         setCourses(coursesData);
-        setCategories(categoriesData);
+        setCategories([{ id: "all", name: "All Categories", description: "" }, ...categoriesData]);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -34,14 +37,20 @@ export default function CoursesPage() {
     };
 
     fetchData();
-  }, [rating, price]);
+  }, []);
 
-  // Handle search type change
+  const filteredCourses = courses.filter((course) =>
+    course.price <= price &&
+    course.rating >= rating &&
+    (selectedCategory === "all" || course.category.id.toString() === selectedCategory) &&
+    (selectedLevel === "all" || course.level.toLowerCase() === selectedLevel.toLowerCase())
+  );
+
   const handleSearchTypeChange = (type: SearchType) => {
-    setSearchType(type);
     if (type === "Teachers") {
-      // Navigate to teachers page
-      window.location.href = "/teachers";
+      router.push("/teachers");
+    } else {
+      setSearchType(type);
     }
   };
 
@@ -65,6 +74,10 @@ export default function CoursesPage() {
             setPrice={setPrice}
             isOpen={isFilterOpen}
             setIsOpen={setIsFilterOpen}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            selectedLevel={selectedLevel}
+            setSelectedLevel={setSelectedLevel}
           />
         </div>
       </div>
@@ -75,10 +88,8 @@ export default function CoursesPage() {
         </div>
       ) : (
         <>
-          {/* Course Grid Component */}
-          <Courses courses={courses} />
-
-          {courses.length === 0 && (
+          <Courses courses={filteredCourses} />
+          {filteredCourses.length === 0 && (
             <div className="text-center py-12">
               <h3 className="text-xl font-medium mb-2">
                 No courses match your filters
@@ -90,13 +101,6 @@ export default function CoursesPage() {
           )}
         </>
       )}
-      <Paginate
-        page={0}
-        totalPages={0}
-        handlePageChange={function (): void {
-          throw new Error("Function not implemented.");
-        }}
-      />
     </div>
   );
 }

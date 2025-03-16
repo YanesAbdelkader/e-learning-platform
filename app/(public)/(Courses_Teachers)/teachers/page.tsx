@@ -1,16 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Category, SearchType, Teacher } from "../_lib/shema";
 import { getCategories, getTeachers } from "../_actions/data";
 import FilterC from "../_components/filter";
-import Paginate from "../_components/paginate";
 import Teachers from "../_components/Teachers";
 
 export default function TeachersPage() {
+  const router = useRouter();
   const [searchType, setSearchType] = useState<SearchType>("Teachers");
   const [rating, setRating] = useState(0);
-  const [price, setPrice] = useState(100);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -21,7 +21,7 @@ export default function TeachersPage() {
       setLoading(true);
       try {
         const [teachersData, categoriesData] = await Promise.all([
-          getTeachers(rating),
+          getTeachers(),
           getCategories(),
         ]);
         setTeachers(teachersData);
@@ -34,12 +34,19 @@ export default function TeachersPage() {
     };
 
     fetchData();
-  }, [rating]);
+  }, []);
+
+  const filteredTeachers = useMemo(() => {
+    return teachers.filter(
+      (teacher) =>
+        teacher.teacher_info.rating >= rating
+    );
+  }, [teachers, rating]);
 
   const handleSearchTypeChange = (type: SearchType) => {
     setSearchType(type);
     if (type === "Courses") {
-      window.location.href = "/courses";
+      router.push("/courses");
     }
   };
 
@@ -59,10 +66,14 @@ export default function TeachersPage() {
             setSearchType={handleSearchTypeChange}
             rating={rating}
             setRating={setRating}
-            price={price}
-            setPrice={setPrice}
             isOpen={isFilterOpen}
             setIsOpen={setIsFilterOpen}
+            price={0}
+            setPrice={() => {}}
+            selectedCategory={""}
+            setSelectedCategory={() => {}}
+            selectedLevel={""}
+            setSelectedLevel={() => {}}
           />
         </div>
       </div>
@@ -73,8 +84,8 @@ export default function TeachersPage() {
         </div>
       ) : (
         <>
-          {teachers.length > 0 ? (
-            <Teachers teachers={teachers} />
+          {filteredTeachers.length > 0 ? (
+            <Teachers teachers={filteredTeachers} />
           ) : (
             <div className="text-center py-12">
               <h3 className="text-xl font-medium mb-2">
@@ -87,13 +98,6 @@ export default function TeachersPage() {
           )}
         </>
       )}
-      <Paginate
-        page={0}
-        totalPages={0}
-        handlePageChange={function (): void {
-          throw new Error("Function not implemented.");
-        }}
-      />
     </div>
   );
 }

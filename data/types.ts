@@ -17,6 +17,7 @@ export type Category = {
 };
 
 export type Teacher = {
+  students: number;
   id: number;
   name: string;
   lastname: string;

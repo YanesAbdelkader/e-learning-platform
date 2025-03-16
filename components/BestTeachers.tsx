@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Star, BookOpen } from "lucide-react";
+import { Star, BookOpen, Users } from "lucide-react";
 import Link from "next/link";
 import { Teacher } from "@/data/types";
 import { fetchTeachers } from "@/data/getData";
@@ -17,7 +17,6 @@ export default function BestTeachers() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const startTime = performance.now(); // Start timing API call
       try {
         const result = await fetchTeachers();
         setTeachers(result);
@@ -25,7 +24,6 @@ export default function BestTeachers() {
         console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
-        console.log("API call took:", performance.now() - startTime, "ms");
       }
     };
     fetchData();
@@ -59,7 +57,7 @@ export default function BestTeachers() {
                   width={400}
                   height={400}
                   className="object-cover transition-transform duration-300 hover:scale-110 w-full h-full"
-                  priority={false} 
+                  priority={false}
                 />
                 {hoveredTeacher === teacher.id && (
                   <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -86,6 +84,13 @@ export default function BestTeachers() {
                     <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                     <span className="font-bold">
                       {teacher.teacher_info.rating || "N/A"}
+                    </span>
+                  </div>
+                  {/* Students */}
+                  <div className="flex items-center gap-1">
+                    <Users className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">
+                      {teacher.students ? teacher.students : "N/A"}
                     </span>
                   </div>
                   <div className="flex items-center gap-1">

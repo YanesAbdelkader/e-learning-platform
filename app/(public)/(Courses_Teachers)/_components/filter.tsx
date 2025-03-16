@@ -1,3 +1,5 @@
+"use client";
+
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
@@ -10,7 +12,6 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Star, Filter, X } from "lucide-react";
 import { Category, SearchType } from "../_lib/shema";
-import { useState } from "react";
 
 export default function FilterC({
   categories,
@@ -20,6 +21,10 @@ export default function FilterC({
   setRating,
   price,
   setPrice,
+  selectedCategory,
+  setSelectedCategory,
+  selectedLevel,
+  setSelectedLevel,
   isOpen,
   setIsOpen,
 }: {
@@ -30,14 +35,16 @@ export default function FilterC({
   setRating: (value: number) => void;
   price: number;
   setPrice: (value: number) => void;
+  selectedCategory: string | "all";
+  setSelectedCategory: (value: string | "all") => void;
+  selectedLevel: string | "all";
+  setSelectedLevel: (value: string | "all") => void;
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
 }) {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
   return (
     <>
-      {/* Toggle Button (For Mobile & Desktop) */}
+      {/* Toggle Button */}
       <button
         className="flex items-center gap-2 p-2 text-gray-700 bg-gray-200 rounded-md shadow dark:bg-gray-800 dark:text-gray-100"
         onClick={() => setIsOpen(true)}
@@ -63,9 +70,10 @@ export default function FilterC({
 
         {/* Filters */}
         <div className="space-y-6">
+          {/* Level Selection */}
           <div>
             <h2 className="text-lg font-semibold dark:text-gray-100">Level</h2>
-            <Select>
+            <Select value={selectedLevel} onValueChange={setSelectedLevel}>
               <SelectTrigger className="w-full dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700">
                 <SelectValue placeholder="Select Level" />
               </SelectTrigger>
@@ -78,19 +86,14 @@ export default function FilterC({
             </Select>
           </div>
 
+          {/* Category Selection */}
           <div>
             <h2 className="text-lg font-semibold dark:text-gray-100">
               Category
             </h2>
-            <Select onValueChange={(value) => setSelectedCategory(value)}>
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
               <SelectTrigger>
-                <SelectValue placeholder="Select Category">
-                  {selectedCategory
-                    ? categories.find(
-                        (cat) => cat.id.toString() === selectedCategory
-                      )?.name
-                    : ""}
-                </SelectValue>
+                <SelectValue placeholder="Select Category" />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((category) => (
@@ -102,6 +105,7 @@ export default function FilterC({
             </Select>
           </div>
 
+          {/* Rating Filter */}
           <div>
             <h2 className="text-lg font-semibold dark:text-gray-100">
               Minimum Rating
@@ -134,24 +138,26 @@ export default function FilterC({
             </div>
           </div>
 
+          {/* Price Range Filter */}
           <div>
             <h2 className="text-lg font-semibold dark:text-gray-100">
               Price Range
             </h2>
             <Slider
               min={0}
-              max={100}
+              max={10000}
               step={1}
               value={[price]}
               onValueChange={(value) => setPrice(value[0])}
               className="dark:bg-gray-700"
             />
             <div className="flex justify-between mt-2 text-sm dark:text-gray-300">
-              <span>${price}</span>
-              <span>$100</span>
+              <span>{price}DA</span>
+              <span>10000DA</span>
             </div>
           </div>
 
+          {/* Search By Courses/Teachers */}
           <div>
             <h2 className="text-lg font-semibold dark:text-gray-100">
               Search By
