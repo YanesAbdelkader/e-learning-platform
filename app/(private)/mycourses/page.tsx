@@ -7,7 +7,6 @@ export default function Dashboard() {
       <div className="flex flex-1">
         <main className="flex-1 p-6 md:p-8 lg:p-10">
             <div>
-              <h2 className="text-xl font-semibold mb-4">All My Courses</h2>
               <CoursesList filter="all" />
             </div>
         </main>

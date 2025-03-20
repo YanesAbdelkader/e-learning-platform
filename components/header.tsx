@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import logo from "@/assets/image.jpg";
+import logo from "@/assets/logo.png";
 import {
   Heart,
   ShoppingCart,
@@ -77,32 +77,43 @@ export function Header() {
   // Handle search form submission
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    redirect("/search");
+    const form = e.currentTarget as HTMLFormElement;
+    const searchTerm = form.search.value.trim();
+    console.log(searchTerm);
+    redirect(`/${searchTerm}`);
   };
+
   return (
     <header className="border-grid sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-lg">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <Link href="/" className="flex-shrink-0">
+            <Link href="/" className="flex items-center flex-shrink-0">
               <Image
                 src={logo}
                 alt="Logo"
-                width={40}
-                height={40}
-                className="rounded-3xl"
+                width={190}
+                height={400}
+                className="rounded-3xl ring-indigo-500"
               />
             </Link>
             <nav className="hidden md:ml-6 md:flex md:space-x-8">
               <Link
                 href="/courses"
-                className="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white"
+                className="relative text-xl text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white 
+             after:content-[''] after:absolute after:left-0 after:-bottom-1 after:w-full after:h-[2px] 
+             after:bg-gray-900 dark:after:bg-white after:scale-x-0 after:transition-transform 
+             after:duration-300 after:ease-in-out hover:after:scale-x-100"
               >
                 Courses
               </Link>
+
               <Link
                 href="/teachers"
-                className="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white"
+                className="relative text-xl text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white 
+             after:content-[''] after:absolute after:left-0 after:-bottom-1 after:w-full after:h-[2px] 
+             after:bg-gray-900 dark:after:bg-white after:scale-x-0 after:transition-transform 
+             after:duration-300 after:ease-in-out hover:after:scale-x-100"
               >
                 Teachers
               </Link>

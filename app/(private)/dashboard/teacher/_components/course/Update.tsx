@@ -103,8 +103,6 @@ export default function UpdateCourse({
 
     if (result?.success) {
       toast({ title: "Course Updated", description: result.message });
-
-      // Update parent state without refetching everything
       onCourseUpdated({
         ...course,
         ...formValues,
@@ -112,8 +110,6 @@ export default function UpdateCourse({
         category_id: parseInt(formValues.category_id, 10),
         image: formValues.imageFile ? formValues.imageFile.name : course.image,
       });
-
-      setTimeout(() => setOpen(false), 200); // Close after a short delay
     } else {
       toast({
         title: "Error",

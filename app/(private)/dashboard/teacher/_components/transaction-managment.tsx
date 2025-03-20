@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
@@ -13,40 +13,43 @@ import {
   Table,
 } from "@/components/ui/table";
 import { Transaction } from "../_lib/shemaTransaction";
+import { fetchTransactions } from "../_actions/TransactionActions";
+import Loading from "@/app/(public)/loading";
 
-export default function TransactionManagment({
-  initialTransactions,
-}: {
-  initialTransactions: Transaction[];
-}) {
-  const [transactions, setTransactions] =
-    useState<Transaction[]>(initialTransactions);
+export default function TransactionManagment() {
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [totalAmount, setTotalAmount] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    // Simulate automatic processing of pending transactions
-    const processingInterval = setInterval(() => {
-      setTransactions((prevTransactions) =>
-        prevTransactions.map((transaction) =>
-          transaction.status === "Pending"
-            ? {
-                ...transaction,
-                status: Math.random() > 0.2 ? "Completed" : "Failed",
-              }
-            : transaction
-        )
-      );
-    }, 5000); // Process every 5 seconds
+    const loadTransactions = async () => {
+      setLoading(true);
+      try {
+        const { total_amount, transaction } = await fetchTransactions();
+        setTransactions(transaction);
+        setTotalAmount(Number(total_amount));
+      } catch (error) {
+        console.error("Error loading data:", error);
+        setTransactions([]);
+        setTotalAmount(0);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return () => clearInterval(processingInterval);
+    loadTransactions();
   }, []);
 
   const filteredTransactions = transactions.filter(
     (transaction) =>
       transaction.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      transaction.course.toLowerCase().includes(searchTerm.toLowerCase())
+      transaction.courses
+        .map((course) => course.title)
+        .join(" ")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
   );
-
   return (
     <div className="p-6">
       <h1 className="text-2xl font-semibold mb-6">Transaction Management</h1>
@@ -59,45 +62,53 @@ export default function TransactionManagment({
           className="max-w-sm"
         />
         <Button variant="outline" size="sm" className="text-lg">
-          Total Amount : 647450 DA
+          Total Amount : {totalAmount} DA
         </Button>
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>User</TableHead>
-            <TableHead>Course</TableHead>
-            <TableHead>Amount</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Payment Method</TableHead>
-            <TableHead>Status</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredTransactions.map((transaction) => (
-            <TableRow key={transaction.id}>
-              <TableCell>{transaction.user}</TableCell>
-              <TableCell>{transaction.course}</TableCell>
-              <TableCell>${transaction.amount.toFixed(2)}</TableCell>
-              <TableCell>{transaction.date}</TableCell>
-              <TableCell>{transaction.paymentMethod}</TableCell>
-              <TableCell>
-                <Badge
-                  variant={
-                    transaction.status === "Completed"
-                      ? "default"
-                      : transaction.status === "Pending"
-                      ? "secondary"
-                      : "destructive"
-                  }
-                >
-                  {transaction.status}
-                </Badge>
-              </TableCell>
+      {loading ? (
+        <Loading />
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>User</TableHead>
+              <TableHead>Course</TableHead>
+              <TableHead>Amount</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Payment Method</TableHead>
+              <TableHead>Status</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {filteredTransactions.map((transaction) => (
+              <TableRow key={transaction.id}>
+                <TableCell>{transaction.user}</TableCell>
+                <TableCell>
+                  <ul className="list-none space-y-1">
+                    {transaction.courses.map((course) => (
+                      <li key={course.title}>{course.title}</li>
+                    ))}
+                  </ul>
+                </TableCell>
+                <TableCell>{transaction.amount} DA</TableCell>
+                <TableCell>{transaction.date}</TableCell>
+                <TableCell>{transaction.payment_method}</TableCell>
+                <TableCell>
+                  <Badge
+                    variant={
+                      transaction.status === "Completed"
+                        ? "default"
+                        : "destructive"
+                    }
+                  >
+                    {transaction.status}
+                  </Badge>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </div>
   );
 }

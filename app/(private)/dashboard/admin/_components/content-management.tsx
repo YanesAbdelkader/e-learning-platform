@@ -11,19 +11,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Course } from "../_lib/shemaCourse";
 import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { updateCourseStatus } from "../_actions/ContentActions";
+import { toast } from "@/hooks/use-toast";
 
 export default function ContentManagement({
   initialCourses,
@@ -32,35 +31,62 @@ export default function ContentManagement({
 }) {
   const [courses, setCourses] = useState<Course[]>(initialCourses);
   const [searchTerm, setSearchTerm] = useState("");
-  const [unpublishReason, setUnpublishReason] = useState("");
-  const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
+  const [filterStatus, setFilterStatus] = useState<
+    "All" | "Published" | "Unpublished"
+  >("All");
+  const [loadingId, setLoadingId] = useState<number | null>(null); 
 
-  const filteredCourses = courses.filter(
-    (course) =>
+  const filteredCourses = courses.filter((course) => {
+    const matchesSearchTerm =
       course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      course.teacher.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+      course.teacher.toLowerCase().includes(searchTerm.toLowerCase());
 
-  const handleUnpublishCourse = () => {
-    if (selectedCourseId && unpublishReason) {
-      setCourses(
-        courses.map((course) =>
-          course.id === selectedCourseId
-            ? { ...course, status: "Unpublished", unpublishReason }
-            : course
-        )
-      );
-      setUnpublishReason("");
-      setSelectedCourseId(null);
+    const matchesStatus =
+      filterStatus === "All" || course.status === filterStatus;
+
+    return matchesSearchTerm && matchesStatus;
+  });
+
+  // Handle course status change
+  const handleStatusChange = async (id: number, newStatus: boolean) => {
+    setLoadingId(id);
+    try {
+      const result = await updateCourseStatus(String(id), newStatus);
+      if (result?.success) {
+        setCourses((prevCourses) =>
+          prevCourses.map((course) =>
+            course.id === id
+              ? { ...course, status: newStatus ? "Published" : "Unpublished" }
+              : course
+          )
+        );
+        toast({
+          title: "Status updated",
+          description: result.message,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: result?.error || "Failed to update course status",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Failed to update course status:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingId(null); 
     }
   };
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-6">
-        Courses and Content Management
-      </h1>
-      <div className="mb-4">
+      <h1 className="text-2xl font-semibold mb-6">Content Management</h1>
+      <div className="flex items-center gap-4 mb-4">
         <Input
           type="text"
           placeholder="Search courses or content..."
@@ -68,6 +94,21 @@ export default function ContentManagement({
           onChange={(e) => setSearchTerm(e.target.value)}
           className="max-w-sm"
         />
+        <Select
+          value={filterStatus}
+          onValueChange={(value) =>
+            setFilterStatus(value as "All" | "Published" | "Unpublished")
+          }
+        >
+          <SelectTrigger className="w-[130px]">
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="All">All</SelectItem>
+            <SelectItem value="Published">Published</SelectItem>
+            <SelectItem value="Unpublished">Unpublished</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       <Tabs defaultValue="courses">
         <TabsContent value="courses">
@@ -76,7 +117,7 @@ export default function ContentManagement({
               <TableRow>
                 <TableHead>Title</TableHead>
                 <TableHead>Teacher</TableHead>
-                <TableHead>Enrollments</TableHead>
+                <TableHead>Price</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -86,7 +127,7 @@ export default function ContentManagement({
                 <TableRow key={course.id}>
                   <TableCell>{course.title}</TableCell>
                   <TableCell>{course.teacher}</TableCell>
-                  <TableCell>{course.enrollments}</TableCell>
+                  <TableCell>{course.price} DA</TableCell>
                   <TableCell>
                     <Badge
                       variant={
@@ -97,52 +138,29 @@ export default function ContentManagement({
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {course.status === "Published" && (
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => setSelectedCourseId(course.id)}
-                          >
-                            Unpublish
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Unpublish Course</DialogTitle>
-                            <DialogDescription>
-                              Please provide a reason for unpublishing this
-                              course.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <Textarea
-                            placeholder="Enter reason for unpublishing..."
-                            value={unpublishReason}
-                            onChange={(e) => setUnpublishReason(e.target.value)}
-                          />
-                          <DialogFooter>
-                            <Button
-                              variant="outline"
-                              onClick={() => setUnpublishReason("")}
-                            >
-                              Cancel
-                            </Button>
-                            <Button
-                              variant="destructive"
-                              onClick={handleUnpublishCourse}
-                            >
-                              Unpublish
-                            </Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-                    )}
-                    {course.status === "Unpublished" && (
-                      <div className="text-sm text-muted-foreground">
-                        Reason: {course.unpublishReason}
-                      </div>
-                    )}
+                    <Button
+                      variant={
+                        course.status === "Published"
+                          ? "destructive"
+                          : "default"
+                      }
+                      size="sm"
+                      onClick={() =>
+                        handleStatusChange(
+                          course.id,
+                          course.status === "Published" ? false : true
+                        )
+                      }
+                      disabled={loadingId === course.id} // Disable button while loading
+                    >
+                      {loadingId === course.id ? (
+                        "Loading..."
+                      ) : course.status === "Published" ? (
+                        "Unpublish"
+                      ) : (
+                        "Publish"
+                      )}
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}

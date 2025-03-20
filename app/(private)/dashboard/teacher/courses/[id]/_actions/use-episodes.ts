@@ -44,10 +44,11 @@ export async function addEpisode(formData: FormData) {
     const data = await response.json();
 
     if (!response.ok) {
+      console.log(data?.message)
       throw new Error(data?.message || "Failed to add episode");
     }
 
-    revalidatePath("/dashboard/episodes"); // Revalidate the path to refresh the data
+    revalidatePath("/dashboard/episodes"); 
     return data;
   } catch (error) {
     console.error("Error adding episode:", error);

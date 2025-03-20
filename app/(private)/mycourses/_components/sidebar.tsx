@@ -56,7 +56,7 @@ export function Sidebar() {
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
-              <item.icon className="mr-3 h-6 w-6" />
+              <item.icon className={`h-6 w-6 ${!isMinimized ? "mr-3" : ""}`} />
               {!isMinimized && <span>{item.name}</span>}
             </Link>
           );

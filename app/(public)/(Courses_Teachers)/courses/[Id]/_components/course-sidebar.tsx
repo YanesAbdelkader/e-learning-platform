@@ -1,24 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { addToCart, buyNow } from "../_actions/actions";
 import Image from "next/image";
-import img from "@/assets/image.jpg";
 interface CourseSidebarProps {
   price: number;
-  thumbnail: string;
+  image:string;
   courseId: string;
 }
 
 export default function CourseSidebar({
   price,
-  thumbnail,
+  image,
   courseId,
 }: CourseSidebarProps) {
-  const router = useRouter();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isBuyingNow, setIsBuyingNow] = useState(false);
 
@@ -28,7 +25,6 @@ export default function CourseSidebar({
     setIsAddingToCart(true);
     try {
       await addToCart(courseId);
-      // You could show a success message or update a cart counter here
     } catch (error) {
       console.error("Failed to add to cart:", error);
     } finally {
@@ -42,7 +38,7 @@ export default function CourseSidebar({
     setIsBuyingNow(true);
     try {
       const checkoutUrl = await buyNow(courseId);
-      router.push(checkoutUrl);
+      window.open(checkoutUrl, "_blank");
     } catch (error) {
       console.error("Failed to process purchase:", error);
       setIsBuyingNow(false);
@@ -53,13 +49,15 @@ export default function CourseSidebar({
     <Card className="sticky top-4">
       <CardContent className="p-0">
         <Image
-          src={ img}
+          src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${image}`}
           alt="Course thumbnail"
-          className="w-full h-full object-cover"
+          className="object-cover"
+          width={400}
+          height={100}
         />
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <span className="text-3xl font-bold">${price.toFixed(2)}</span>
+            <span className="text-3xl font-bold">{price}DA</span>
           </div>
           <div className="space-y-2">
             <Button

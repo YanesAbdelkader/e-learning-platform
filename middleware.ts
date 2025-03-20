@@ -66,7 +66,7 @@ export async function middleware(req: NextRequest) {
       // Cache user data in a cookie with an expiry (e.g., 1 hour)
       res.cookies.set("userData", JSON.stringify({ role, verify: isVerified }), {
         path: "/",
-        maxAge: 600,
+        maxAge: 60,
       });
     } catch (error) {
       console.error("Error in middleware:", error);

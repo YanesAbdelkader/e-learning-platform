@@ -17,14 +17,13 @@ export default async function CourseDetailPage({
   const relatedCourses = await getRelatedCourses(params.Id);
 
   return (
-    <div className="container mx-auto px-4">
+    <div className="container mx-auto px-4 py-10">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
           <CourseHeader
             title={courseData.title}
             rating={courseData.rating}
             students={courseData.students}
-            isBestseller={courseData.isBestseller}
             courseId={params.Id}
           />
 
@@ -49,8 +48,8 @@ export default async function CourseDetailPage({
 
         <div className="lg:col-span-1">
           <CourseSidebar
+            image={courseData.image}
             price={courseData.price}
-            thumbnail={courseData.thumbnail}
             courseId={params.Id}
           />
         </div>

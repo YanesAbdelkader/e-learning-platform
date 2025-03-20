@@ -61,7 +61,7 @@ export default function Courses({ courses }: CoursesProps) {
             </div>
             <div className="flex items-center justify-between mt-auto">
               <span className="font-bold text-xl">
-                ${parseFloat(course.price).toFixed(2)}
+                {(course.price)}DA
               </span>
               <Link href={`/courses/${course.id}`}>
                 <Button

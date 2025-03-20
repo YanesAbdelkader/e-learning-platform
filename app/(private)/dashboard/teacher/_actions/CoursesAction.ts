@@ -3,6 +3,7 @@
 import { handleAPIcall } from "@/functions/custom";
 
 export type Course = {
+  status: "created" | "published" | "unpublished";
   id: number;
   user_id: number;
   category_id: number;
@@ -115,6 +116,30 @@ export async function deleteCourse(courseId: string) {
     }
     if (response) {
       return { success: true, message: "Delete course successful" };
+    }
+  } catch (error) {
+    console.error(error);
+    return { error: "An unexpected error occurred." };
+  }
+}
+
+export async function updateCourseStatus(courseId: string, status: boolean) {
+  const data = {
+    status: status,
+  };
+  try {
+    const { data: response, error } = await handleAPIcall(
+      data,
+      `${courseId}/status`,
+      "teacher/courses",
+      "POST"
+    );
+    if (error) {
+      console.error(error);
+      return { error: "Failed to Update course." };
+    }
+    if (response) {
+      return { success: true, message: "Update course status successful" };
     }
   } catch (error) {
     console.error(error);

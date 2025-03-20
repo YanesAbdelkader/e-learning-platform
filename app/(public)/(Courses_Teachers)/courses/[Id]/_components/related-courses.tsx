@@ -15,10 +15,10 @@ interface Course {
 
 export default function RelatedCourses({ courses }: { courses: Course[] }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
       {courses.map((course) => (
         <Card key={course.id} className="overflow-hidden">
-          <Image src={course.image || "/placeholder.svg"} alt={course.title} className="w-full h-40 object-cover" />
+          <Image src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${course.image}`} alt={course.title} className="object-cover" width={40} height={40}/>
           <CardContent className="p-4">
             <h3 className="font-bold text-lg mb-1">{course.title}</h3>
             <div className="flex items-center mb-2">
@@ -34,7 +34,7 @@ export default function RelatedCourses({ courses }: { courses: Course[] }) {
               <span className="text-xs text-gray-500 ml-1">({course.students.toLocaleString()})</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="font-bold">${course.price.toFixed(2)}</span>
+              <span className="font-bold">${course.price}</span>
               <Link href={`/courses/${course.id}`}>
                 <Button variant="outline" size="sm">
                   View Course

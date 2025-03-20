@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star } from "lucide-react";
 import Link from "next/link";
-import { Course } from "@/app/(public)/courses/_lib/shema";
 
 const CourseCard = ({ course }: { course: Course }) => {
   return (

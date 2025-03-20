@@ -9,11 +9,10 @@ interface CourseHeaderProps {
   title: string
   rating: number
   students: number
-  isBestseller: boolean
   courseId: string
 }
 
-export default function CourseHeader({ title, rating, students, isBestseller, courseId }: CourseHeaderProps) {
+export default function CourseHeader({ title, rating, students, courseId }: CourseHeaderProps) {
   const [wishlist, setWishlist] = useState(false)
   const [isPending, setIsPending] = useState(false)
 
@@ -30,15 +29,12 @@ export default function CourseHeader({ title, rating, students, isBestseller, co
       setIsPending(false)
     }
   }
-
+  console.log(title, rating, students, courseId)
   return (
     <div className="flex justify-between items-start">
       <div>
         <h1 className="text-3xl font-bold">{title}</h1>
         <div className="flex items-center mt-2 space-x-2">
-          {isBestseller && (
-            <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">Bestseller</span>
-          )}
           <div className="flex items-center">
             <span className="font-bold mr-1">{rating}</span>
             {[1, 2, 3, 4, 5].map((i) => (

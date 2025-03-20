@@ -1,4 +1,5 @@
 export type Course = {
+  duration: number;
   id: number;
   title: string;
   description: string;
@@ -49,3 +50,7 @@ export type Teacher = {
 };
 
 export type SearchType = "Courses" | "Teachers";
+export type SearchResult = {
+  Courses: Course[];
+  Teachers: Teacher[];
+};

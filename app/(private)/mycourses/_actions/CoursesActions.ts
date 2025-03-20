@@ -1,74 +1,51 @@
 "use server";
-
 import { handleAPIcall } from "@/functions/custom";
 
-export async function getCategories() {
+export async function fetchCourses() {
   try {
     const { data: response, error } = await handleAPIcall(
       null,
       null,
-      "categories",
+      "student/courses",
       "GET"
     );
     if (error) {
       console.error(error);
     }
     if (response) {
-      return response.data.categories;
+      return response.data;
     }
   } catch (error) {
     console.error(error);
   }
 }
 
-export async function getCourses() {
+export async function fetchCoursesById(courseId: string) {
   try {
     const { data: response, error } = await handleAPIcall(
       null,
-      null,
-      "courses",
+      courseId,
+      "student/courses",
       "GET"
     );
     if (error) {
       console.error(error);
     }
     if (response) {
-      return response.data.courses;
+      return response.data;
     }
   } catch (error) {
     console.error(error);
   }
 }
 
-export async function getTeachers() {
+export async function fetchCourse(courseId: string) {
   try {
     const { data: response, error } = await handleAPIcall(
       null,
-      null,
-      "teachers",
+      `${courseId}/watch`,
+      "student/courses",
       "GET"
-    );
-    if (error) {
-      console.error(error);
-    }
-    if (response) {
-      return response.data.teachers;
-    }
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-export async function getSearchResult(keyWord: string) {
-  const keyword = {
-    search: keyWord,
-  };
-  try {
-    const { data: response, error } = await handleAPIcall(
-      keyword,
-      null,
-      "search",
-      "POST"
     );
     if (error) {
       console.error(error);

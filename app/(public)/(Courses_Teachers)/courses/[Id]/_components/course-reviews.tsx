@@ -98,7 +98,7 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
           <div key={review.id} className="border-b pb-4">
             <div className="flex items-center mb-2">
               <Avatar className="h-10 w-10 mr-2">
-                <AvatarImage src={review.avatar} alt={review.name} />
+                <AvatarImage src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${review.avatar}`} alt={review.name} />
                 <AvatarFallback>{review.name.charAt(0)}</AvatarFallback>
               </Avatar>
               <div>

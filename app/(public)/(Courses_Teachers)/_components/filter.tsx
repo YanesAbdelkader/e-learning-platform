@@ -87,15 +87,18 @@ export default function FilterC({
           </div>
 
           {/* Category Selection */}
-          <div>
+          <div className="space-y-6">
             <h2 className="text-lg font-semibold dark:text-gray-100">
               Category
             </h2>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger>
+            <Select
+              value={selectedCategory}
+              onValueChange={setSelectedCategory}
+            >
+              <SelectTrigger className="w-full dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700">
                 <SelectValue placeholder="Select Category" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="dark:bg-gray-500 dark:text-gray-200">
                 {categories.map((category) => (
                   <SelectItem key={category.id} value={category.id.toString()}>
                     {category.name}
