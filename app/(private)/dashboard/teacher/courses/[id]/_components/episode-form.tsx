@@ -230,7 +230,7 @@ export function EpisodeForm({ onCancel, courseId, onSuccess }: EpisodeFormProps)
                         <FileVideo className="h-5 w-5 text-primary" />
                       </div>
                       <div>
-                        <p className="font-medium text-sm truncate max-w-[200px] md:max-w-[300px]">{fileInfo?.name}</p>
+                        <p className="font-medium text-sm truncate max-w-[150px] md:max-w-[200px]">{fileInfo?.name}</p>
                         <p className="text-xs text-muted-foreground">{fileInfo?.size}</p>
                       </div>
                     </div>

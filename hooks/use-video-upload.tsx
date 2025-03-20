@@ -118,7 +118,7 @@ export function useVideoUpload({
         return
       }
 
-      const chunkSize = 1 * 1024 * 1024 // 1MB chunks (adjustable)
+      const chunkSize = 5 * 1024 * 1024 // 5MB chunks 
       const totalChunks = Math.ceil(file.size / chunkSize)
       const totalSize = (file.size / (1024 * 1024)).toFixed(2) // Size in MB
 

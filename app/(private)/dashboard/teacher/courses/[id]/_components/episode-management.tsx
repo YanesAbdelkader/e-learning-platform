@@ -143,7 +143,7 @@ export default function EpisodeManagement() {
       />
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[900px]">
+        <DialogContent className="sm:max-w-[800px]">
           <EpisodeForm
             courseId={courseId} // Pass the current episode for editing
             onSuccess={() => {
