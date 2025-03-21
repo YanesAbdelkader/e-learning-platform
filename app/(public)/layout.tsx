@@ -18,7 +18,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "A-Z learning",
+  title: "Bright Mind",
   description: "Your best place to learn online",
 };
 

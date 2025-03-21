@@ -13,8 +13,8 @@ import {
 import { loginAction } from "../_actions/actions";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, Eye, EyeOff } from "lucide-react"; // Import Eye and EyeOff icons
-import { useActionState, useEffect, useState } from "react"; // Add useState
+import { Loader2, Eye, EyeOff } from "lucide-react";
+import { useActionState, useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { redirect } from "next/navigation";
 
@@ -77,7 +77,7 @@ export default function LoginForm() {
                 <FormControl>
                   <div className="relative">
                     <Input
-                      type={showPassword ? "text" : "password"} 
+                      type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
                       {...field}
                     />
@@ -86,7 +86,7 @@ export default function LoginForm() {
                       variant="ghost"
                       size="sm"
                       className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)} 
+                      onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
                         <EyeOff className="h-4 w-4" />
