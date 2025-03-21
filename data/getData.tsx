@@ -41,20 +41,22 @@ export async function fetchCategories() {
 }
 
 export async function fetchTeachers() {
-    try {
-      const { data: response, error } = await handleAPIcall(
-        null,
-        null,
-        "teachers",
-        "GET"
-      );
-      if (error) {
-        console.error(error);
-      }
-      if (response) {
-        return response.data.teachers;
-      }
-    } catch (error) {
+  try {
+    const { data: response, error } = await handleAPIcall(
+      null,
+      null,
+      "teachers",
+      "GET"
+    );
+    if (error) {
       console.error(error);
+      return [];
     }
+    if (response) {
+      return response.data.teachers;
+    }
+  } catch (error) {
+    console.error(error);
+    return [];
   }
+}

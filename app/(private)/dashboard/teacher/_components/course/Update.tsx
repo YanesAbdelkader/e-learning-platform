@@ -23,6 +23,7 @@ import Image from "next/image";
 import { updateCourse } from "../../_actions/CoursesAction";
 import { Category, Course } from "../../_lib/schemaCourse";
 import { useToast } from "@/hooks/use-toast";
+import { Edit } from "lucide-react";
 
 export default function UpdateCourse({
   course,
@@ -122,7 +123,13 @@ export default function UpdateCourse({
   return (
     <Dialog open={open} onOpenChange={(val) => !isPending && setOpen(val)}>
       <DialogTrigger asChild>
-        <Button variant="default">Edit</Button>
+        <Button
+          variant="ghost"
+          className="w-full justify-start p-2 h-8 font-normal"
+        >
+          <Edit className="h-4 w-4 mr-2" />
+          Edit
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

@@ -44,11 +44,11 @@ export async function addEpisode(formData: FormData) {
     const data = await response.json();
 
     if (!response.ok) {
-      console.log(data?.message)
+      console.log(data?.message);
       throw new Error(data?.message || "Failed to add episode");
     }
 
-    revalidatePath("/dashboard/episodes"); 
+    revalidatePath("/dashboard/episodes");
     return data;
   } catch (error) {
     console.error("Error adding episode:", error);
@@ -160,20 +160,22 @@ export const reorderEpisodes = async (
 export async function uploadFileChunks(formData: FormData) {
   try {
     const token = (await cookies()).get("token")?.value;
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload-chunks`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    });
-    console.log(response)
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/upload-chunks`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      }
+    );
+    console.log(response);
     const data = await response.json();
 
     if (!response.ok) {
-      console.log(data?.message)
+      console.log(data?.message);
       throw new Error(data?.message || "Failed to upload file chunks");
-      
     }
 
     return data;
@@ -183,7 +185,9 @@ export async function uploadFileChunks(formData: FormData) {
   }
 }
 
-export const saveEpisode = async (episodeData: Omit<Episode, "id" | "order">) => {
+export const saveEpisode = async (
+  episodeData: Omit<Episode, "id" | "order">
+) => {
   console.log("Saving episode:", episodeData);
   return { success: true };
 };

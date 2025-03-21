@@ -1,223 +1,178 @@
 "use client";
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import logo from "@/assets/logo.png";
-import {
-  Heart,
-  ShoppingCart,
-  Menu,
-  Search,
-  Moon,
-  Sun,
-  LayoutDashboard,
-  TvMinimalPlay,
-  LogOut,
-  Users,
-  Youtube,
-  Loader2,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useTheme } from "next-themes";
-import { getCookie } from "typescript-cookie";
-import { logout } from "@/functions/custom";
-import { useToast } from "@/hooks/use-toast";
-import { redirect } from "next/navigation";
+import { checkAuthStatus, logout } from "@/functions/custom";
 import { useCartAndFavorites } from "@/hooks/use-Cart-Fav";
+import { useToast } from "@/hooks/use-toast";
+import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { getCookie } from "typescript-cookie";
+import { Logo } from "./Header/logo";
+import { NavLink } from "./Header/nav-link";
+import { SearchForm } from "./Header/search-form";
+import Link from "next/link";
+import { Heart, Loader2, Moon, ShoppingCart, Sun } from "lucide-react";
+import { CountBadge } from "./Header/count-badge";
+import { UserDropdown } from "./Header/user-dropdown";
+import { AuthButtons } from "./Header/auth-button";
+import { Button } from "./ui/button";
+import { MobileMenu } from "./Header/mobile-menu";
 
 export function Header() {
   const { favorites, cart } = useCartAndFavorites();
-  // State variables
-  const [picture, setPicture] = useState(getCookie("picture"));
-  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
   const { theme, setTheme } = useTheme();
-  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isloading, setIsLoading] = useState(true);
 
-  // Logout function
-  const logoutUser = async () => {
+  const [picture, setPicture] = useState<string | undefined>(undefined);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const cookiePicture = getCookie("picture");
+
+      if (cookiePicture) {
+        setPicture(cookiePicture);
+        setIsLoggedIn(true);
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const { isLoggedIn } = await checkAuthStatus();
+        if (isLoggedIn) {
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        console.error("Auth check failed:", error);
+        setIsLoggedIn(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initAuth();
+  }, []);
+
+  const logoutUser = useCallback(async () => {
     setLoading(true);
-    const result = await logout();
-    if (result === true) {
+    try {
+      const result = await logout();
+      if (result === true) {
+        toast({
+          title: "Logout Successful",
+          description: "You have been logged out.",
+        });
+        setPicture(undefined);
+        setIsLoggedIn(false);
+      } else {
+        toast({
+          title: "Logout Failed",
+          description: "Something went wrong. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.log(error);
       toast({
-        title: "Logout Successful",
-        description: "You have been logged out.",
-      });
-      setPicture("");
-    } else {
-      toast({
-        title: "Logout Failed",
-        description: "Something went wrong. Please try again.",
+        title: "Logout Error",
+        description: "An unexpected error occurred.",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  };
+  }, [toast]);
 
-  // Effect to check login state
-  useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      setIsLoggedIn(picture ? true : false);
-      setIsLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [picture]);
-
-  // Handle search form submission
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const form = e.currentTarget as HTMLFormElement;
     const searchTerm = form.search.value.trim();
-    console.log(searchTerm);
-    redirect(`/${searchTerm}`);
+
+    if (searchTerm) {
+      router.push(`/${searchTerm}`);
+    }
   };
 
+  const toggleTheme = useCallback(() => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  }, [theme, setTheme]);
+
+  const getProfileImageUrl = useCallback(() => {
+    if (picture && picture.startsWith("http")) {
+      return picture;
+    } else if (picture) {
+      return `${process.env.NEXT_PUBLIC_API_URL}/storage/${picture}`;
+    }
+    return "/placeholder.svg?height=32&width=32";
+  }, [picture]);
+
   return (
-    <header className="border-grid sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-lg">
+    <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm border-b">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <Link href="/" className="flex items-center flex-shrink-0">
-              <Image
-                src={logo}
-                alt="Logo"
-                width={190}
-                height={400}
-                className="rounded-3xl ring-indigo-500"
-              />
-            </Link>
-            <nav className="hidden md:ml-6 md:flex md:space-x-8">
-              <Link
-                href="/courses"
-                className="relative text-xl text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white 
-             after:content-[''] after:absolute after:left-0 after:-bottom-1 after:w-full after:h-[2px] 
-             after:bg-gray-900 dark:after:bg-white after:scale-x-0 after:transition-transform 
-             after:duration-300 after:ease-in-out hover:after:scale-x-100"
-              >
-                Courses
-              </Link>
-
-              <Link
-                href="/teachers"
-                className="relative text-xl text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white 
-             after:content-[''] after:absolute after:left-0 after:-bottom-1 after:w-full after:h-[2px] 
-             after:bg-gray-900 dark:after:bg-white after:scale-x-0 after:transition-transform 
-             after:duration-300 after:ease-in-out hover:after:scale-x-100"
-              >
-                Teachers
-              </Link>
+            <Logo />
+            <nav
+              className="hidden md:ml-6 md:flex md:space-x-8"
+              aria-label="Main Navigation"
+            >
+              <NavLink href="/courses">Courses</NavLink>
+              <NavLink href="/teachers">Teachers</NavLink>
             </nav>
           </div>
+
           <div className="hidden md:flex items-center space-x-4 flex-grow justify-end">
-            <form
-              onSubmit={handleSearch}
-              className="w-full md:pl-10 max-w-sm mr-4"
-            >
-              <div className="relative">
-                <Input
-                  type="search"
-                  placeholder="Search courses..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full  pr-10 rounded-full"
-                />
-                <Button
-                  type="submit"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute inset-y-0 right-0 flex items-center pr-3 rounded-e-full"
-                >
-                  <Search className="h-5 w-5 text-gray-400" />
-                </Button>
-              </div>
-            </form>
+            <SearchForm
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              handleSearch={handleSearch}
+            />
+
             <Link
               href="/favorite"
-              className="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white"
+              className="relative text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white"
+              aria-label={`Favorites (${favorites.length})`}
             >
               <Heart className="h-6 w-6" />
-              {favorites.length > 0 && (
-                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1">
-                  {favorites.length}
-                </span>
-              )}
+              {favorites.length > 0 && <CountBadge count={favorites.length} />}
             </Link>
+
             <Link
               href="/cart"
-              className="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white"
+              className="relative text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white"
+              aria-label={`Cart (${cart.length})`}
             >
               <ShoppingCart className="h-6 w-6" />
-              {cart.length > 0 && (
-                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1">
-                  {cart.length}
-                </span>
-              )}
+              {cart.length > 0 && <CountBadge count={cart.length} />}
             </Link>
-            {isloading ? (
-              <Loader2 className="h-8 w-8 animate-spin" />
+
+            {isLoading ? (
+              <Loader2
+                className="h-8 w-8 animate-spin"
+                aria-label="Loading user profile"
+              />
             ) : isLoggedIn ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Image
-                    src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${picture}`}
-                    alt="Profile"
-                    className="relative h-8 w-8 rounded-full"
-                    width={100}
-                    height={100}
-                  />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem>
-                    <Link href="/dashboard" className="flex items-center gap-1">
-                      <LayoutDashboard />
-                      Dashboard
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link href="/mycourses" className="flex items-center gap-1">
-                      <TvMinimalPlay /> My Courses
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <button
-                      onClick={logoutUser}
-                      disabled={loading}
-                      className="flex items-center gap-1 text-red-500"
-                    >
-                      <LogOut />
-                      Logout
-                    </button>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <UserDropdown
+                profileImageUrl={getProfileImageUrl()}
+                logoutUser={logoutUser}
+                loading={loading}
+              />
             ) : (
-              <div className="flex space-x-2">
-                <Button variant="outline" asChild>
-                  <Link href="/login">Log in</Link>
-                </Button>
-                <Button
-                  className="bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                  asChild
-                >
-                  <Link href="/signup">Sign up</Link>
-                </Button>
-              </div>
+              <AuthButtons />
             )}
+
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              onClick={toggleTheme}
+              aria-label={`Switch to ${
+                theme === "dark" ? "light" : "dark"
+              } mode`}
             >
               {theme === "dark" ? (
                 <Sun className="h-5 w-5" />
@@ -226,116 +181,33 @@ export function Header() {
               )}
             </Button>
           </div>
-          <div className="md:hidden">
-            <Sheet>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="mr-2"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              >
-                {theme === "dark" ? (
-                  <Sun className="h-5 w-5" />
-                ) : (
-                  <Moon className="h-5 w-5" />
-                )}
-              </Button>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <Menu className="h-6 w-6" />
-                  <span className="sr-only">Open menu</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="top">
-                <nav className="flex flex-col space-y-4">
-                  <form onSubmit={handleSearch} className="mb-4">
-                    <div className="relative">
-                      <Input
-                        type="search"
-                        placeholder="Search courses..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pr-10 rounded-full"
-                      />
-                      <Button
-                        type="submit"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute inset-y-0 right-0 flex items-center pr-3 rounded-e-full"
-                      >
-                        <Search className="h-5 w-5 text-gray-400" />
-                      </Button>
-                    </div>
-                  </form>
-                  <Link
-                    href="/courses"
-                    className="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white flex items-center gap-2"
-                  >
-                    <Youtube />
-                    Courses
-                  </Link>
-                  <Link
-                    href="/teachers"
-                    className="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white flex items-center gap-2"
-                  >
-                    <Users />
-                    Teachers
-                  </Link>
-                  <Link
-                    href="/favorite"
-                    className="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white flex items-center"
-                  >
-                    <Heart className="h-6 w-6 mr-2" /> Favorite
-                  </Link>
-                  <Link
-                    href="/cart"
-                    className="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white flex items-center"
-                  >
-                    <ShoppingCart className="h-6 w-6 mr-2" /> Cart
-                  </Link>
-                  {isloading ? (
-                    <Loader2 className="h-8 w-8 animate-spin" />
-                  ) : isLoggedIn ? (
-                    <>
-                      <Link
-                        href="/dashboard"
-                        className="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white flex items-center gap-2"
-                      >
-                        <LayoutDashboard />
-                        Dashboard
-                      </Link>
-                      <Link
-                        href="/mycourses"
-                        className="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white flex items-center gap-2"
-                      >
-                        <TvMinimalPlay />
-                        My Courses
-                      </Link>
-                      <Button
-                        onClick={logoutUser}
-                        variant="destructive"
-                        className="w-full flex items-center gap-1"
-                      >
-                        <LogOut />
-                        Logout
-                      </Button>
-                    </>
-                  ) : (
-                    <div className="space-y-2">
-                      <Button variant="outline" className="w-full" asChild>
-                        <Link href="/login">Log in</Link>
-                      </Button>
-                      <Button
-                        className="w-full bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        asChild
-                      >
-                        <Link href="/signup">Sign up</Link>
-                      </Button>
-                    </div>
-                  )}
-                </nav>
-              </SheetContent>
-            </Sheet>
+
+          <div className="md:hidden flex items-center">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="mr-2"
+              onClick={toggleTheme}
+              aria-label={`Switch to ${
+                theme === "dark" ? "light" : "dark"
+              } mode`}
+            >
+              {theme === "dark" ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </Button>
+            <MobileMenu
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              handleSearch={handleSearch}
+              isLoading={isLoading}
+              isLoggedIn={isLoggedIn}
+              logoutUser={logoutUser}
+              favorites={favorites}
+              cart={cart}
+            />
           </div>
         </div>
       </div>

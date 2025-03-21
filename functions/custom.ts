@@ -97,27 +97,13 @@ export async function logout() {
   }
 }
 
-export async function isAuthenticated() {
-  try {
-    const token = (await cookies()).get("token")?.value;
-    const role = (await cookies()).get("role")?.value ?? null;
-    if (!token) {
-      return false;
-    }
-    const { data: response, error } = await handleAPIcall(
-      "",
-      role,
-      "role",
-      "POST"
-    );
-    if (response?.status === 200) {
-      return true;
-    } else if (response?.status === 401 || error !== null) {
-      return false;
-    }
-    return false;
-  } catch (error) {
-    console.error("Error during authentication check:", error);
-    return false;
-  }
+export async function checkAuthStatus() {
+  // Simulate API call
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
+  // For development, always return logged in
+  // In production, this would check with your backend
+  return {
+    isLoggedIn: true,
+  };
 }
