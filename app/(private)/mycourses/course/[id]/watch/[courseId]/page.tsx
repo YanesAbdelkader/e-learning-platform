@@ -5,11 +5,11 @@ import Loading from "@/app/(public)/loading";
 import { fetchCourse } from "@/app/(private)/mycourses/_actions/CoursesActions";
 
 interface PageProps {
-  params: { Id: string };
+  params: { courseId: string };
 }
 
 export default async function Page({ params }: PageProps) {
-  const courseId = params.Id;
+  const courseId = params.courseId;
   const token = (await cookies()).get("token")?.value;
   const course = await fetchCourse(courseId);
 

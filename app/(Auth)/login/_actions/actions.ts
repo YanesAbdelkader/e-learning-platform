@@ -21,7 +21,7 @@ export async function loginAction(_: unknown, data: LoginData) {
       };
     }
 
-    if (response?.status === 200 && response?.data) {
+    if (response?.status === 200 && response?.data.role !=="admin") {
       if (response.data.otp !== true) {
         const cookieStore = cookies();
 
@@ -69,10 +69,25 @@ export async function loginAction(_: unknown, data: LoginData) {
   }
 }
 
-export async function socialLoginAction(prevState: unknown, provider: string) {
-  window.open(
-    `${process.env.NEXT_PUBLIC_API_URL}/auth/redirect/${provider}/web`,
-    "",
-    "popup=true"
-  );
+export async function socialLoginAction(token: string) {
+  const cookieStore = cookies();
+  (await cookieStore).set("token", token, {
+    httpOnly: true,
+    sameSite: "strict",
+    maxAge: 60 * 60 * 24 * 15,
+    secure: true,
+  });
+
+  await getUserData();
+
+  const prevPage = (await cookieStore).get("prevPage")?.value || "/dashboard";
+  const lastVisitedPage = (await cookieStore).get("lastVisitedPage")?.value;
+
+  (await cookieStore).delete("prevPage");
+  (await cookieStore).delete("lastVisitedPage");
+  return {
+    title: "Login success!!",
+    description: "You have been successfully Login.",
+    path: prevPage || lastVisitedPage || "/dashboard",
+  };
 }

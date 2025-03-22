@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import type { DropResult } from "@hello-pangea/dnd";
 import { Button } from "@/components/ui/button";
@@ -29,7 +29,7 @@ export default function EpisodeManagement() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Reusable function to load episodes
-  const loadEpisodes = async () => {
+  const loadEpisodes = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -41,12 +41,12 @@ export default function EpisodeManagement() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [courseId]);
 
   // Load episodes on component mount
   useEffect(() => {
     loadEpisodes();
-  }, [courseId]);
+  }, [loadEpisodes]);
 
   const handleAddEpisode = () => {
     setCurrentEpisode(null);

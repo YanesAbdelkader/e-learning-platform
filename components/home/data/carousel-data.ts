@@ -1,6 +1,8 @@
 import p0 from "@/assets/p01.jpeg";
 import p1 from "@/assets/p02.jpg";
 import p2 from "@/assets/p03.jpg";
+import p3 from "@/assets/p04.jpg";
+import p4 from "@/assets/p05.jpg";
 import { StaticImageData } from "next/image";
 
 // Define the carousel item type for better type safety
@@ -59,7 +61,7 @@ export const carouselItems: CarouselItemType[] = [
     title: "Interactive Workshops",
     description:
       "Engage in hands-on learning experiences that build practical skills through real-world projects.",
-    imageSrc: "/placeholder.svg?height=1080&width=1920",
+    imageSrc: p3,
     color: "from-amber-500 to-orange-600",
     textPosition: "center",
     ctaText: "Join a Workshop",
@@ -71,7 +73,7 @@ export const carouselItems: CarouselItemType[] = [
     title: "Global Community",
     description:
       "Connect with learners worldwide, share insights, and grow your professional network.",
-    imageSrc: "/placeholder.svg?height=1080&width=1920",
+    imageSrc: p4,
     color: "from-cyan-500 to-blue-500",
     textPosition: "left",
     ctaText: "Join Community",

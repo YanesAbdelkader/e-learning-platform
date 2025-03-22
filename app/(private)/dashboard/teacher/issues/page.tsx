@@ -1,5 +1,6 @@
 "use server";
-import { fetchIssues } from "../_actions/data";
+
+import { fetchIssues } from "../../student/_actions/data";
 import { IssuesTable } from "../_components/issues-table";
 
 export default async function IssuesPage() {

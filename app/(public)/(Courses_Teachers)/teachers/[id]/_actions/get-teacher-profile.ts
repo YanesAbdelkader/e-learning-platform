@@ -1,6 +1,5 @@
-import type { Teacher } from "@/types/teacher"
 
-export async function getTeacherProfile(teacherId: string): Promise<Teacher> {
+export async function getTeacherProfile(teacherId: string) {
   // In a real application, you would fetch this data from your API
   // Example API call:
   // const response = await fetch(`/api/teachers/${teacherId}`)

@@ -1,7 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, ArrowRight, ArrowLeft, Check } from "lucide-react";
+import {
+  Loader2,
+  ArrowRight,
+  ArrowLeft,
+  Check,
+  Eye,
+  EyeOff,
+} from "lucide-react"; // Added Eye and EyeOff icons
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -15,7 +22,11 @@ import {
 } from "@/components/ui/form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useActionState, useCallback, useEffect, useState } from "react";
-import { signupAction } from "../_actions/actions";
+import {
+  sendVerificationCode,
+  verifyEmail,
+  signupAction,
+} from "../_actions/actions";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
@@ -25,27 +36,32 @@ import {
 } from "@/components/ui/dialog";
 import ImageCropper from "@/components/image-cropper";
 import { useToast } from "@/hooks/use-toast";
+import { redirect } from "next/navigation";
 
 const schema = z
   .object({
     name: z.string().min(2, "First name must be at least 2 characters"),
     lastName: z.string().min(2, "Last name must be at least 2 characters"),
     email: z.string().email("Invalid email address"),
+    verificationCode: z
+      .string()
+      .min(6, "Verification code must be 6 characters"),
     password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string(),
-    picture: z.string().min(1, "Profile picture is required"), 
+    picture: z.string().min(1, "Profile picture is required"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
 
-
 export type FormData = z.infer<typeof schema>;
 
 const steps = [
   { title: "Account Details", fields: ["name", "lastName"] },
   { title: "Email", fields: ["email"] },
+  { title: "Send Verification Code", fields: [] }, // Step to send the code
+  { title: "Verify Code", fields: ["verificationCode"] }, // Step to verify the code
   { title: "Password", fields: ["password", "confirmPassword"] },
   { title: "Profile Picture", fields: ["picture"] },
   { title: "Confirm Details", fields: [] },
@@ -53,21 +69,28 @@ const steps = [
 
 export default function SignupForm() {
   const { toast } = useToast();
-  const [stats, action, isPending] = useActionState(signupAction, null);
+  const [stats, , isPending] = useActionState(signupAction, null);
   const [step, setStep] = useState(0);
   const [cropDialogOpen, setCropDialogOpen] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [isCodeSent, setIsCodeSent] = useState(false); // Track if the code has been sent
+  const [isCodeVerified, setIsCodeVerified] = useState(false); // Track if the code is verified
+  const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Toggle confirm password visibility
+
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
       name: "",
       lastName: "",
       email: "",
+      verificationCode: "",
       password: "",
       confirmPassword: "",
       picture: "",
     },
   });
+
   const nextStep = () => {
     const fieldsToValidate = steps[step].fields as (keyof FormData)[];
     form.trigger(fieldsToValidate).then((isValid) => {
@@ -75,7 +98,12 @@ export default function SignupForm() {
     });
   };
 
-  const prevStep = () => setStep((prev) => Math.max(prev - 1, 0));
+  const prevStep = () => {
+    if (step === 4) {
+      setIsCodeVerified(false); // Reset verification status if going back from password step
+    }
+    setStep((prev) => Math.max(prev - 1, 0));
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -96,6 +124,81 @@ export default function SignupForm() {
     },
     [form]
   );
+
+  const handleSendVerificationCode = async () => {
+    const email = form.getValues("email");
+    const response = await sendVerificationCode(null, email);
+    if (response?.success) {
+      setIsCodeSent(true);
+      toast({
+        title: "Verification Code Sent",
+        description: "A verification code has been sent to your email.",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: response?.error || "Failed to send verification code.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleVerifyCode = async () => {
+    // Validate the verificationCode field
+    const isValid = await form.trigger("verificationCode");
+    if (!isValid) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid 6-digit code.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const email = form.getValues("email");
+    const code = form.getValues("verificationCode");
+    const response = await verifyEmail(null, email, code);
+
+    if (response.success) {
+      setIsCodeVerified(true); // Mark code as verified
+      toast({
+        title: "Email Verified",
+        description: "Your email has been successfully verified.",
+      });
+      nextStep(); // Move to the next step
+    } else {
+      toast({
+        title: "Error",
+        description: response.message || "Failed to verify the code.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const onSubmit = async (data: FormData) => {
+    // Exclude verificationCode from the form data
+    const { verificationCode, ...formDataWithoutCode } = data;
+
+    // Convert the data to FormData
+    const formData = new FormData();
+    Object.entries(formDataWithoutCode).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+
+    // Call the signupAction with the modified data
+    const result = await signupAction(null, formData);
+
+    if (result?.title === "Registration success!!") {
+      toast({ title: result.title, description: result.description });
+      redirect(`${result.path}`);
+    } else {
+      toast({
+        title: result?.title || "Error",
+        description: result?.description || "Something went wrong.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const renderConfirmationStep = () => {
     const formData = form.getValues();
@@ -186,7 +289,7 @@ export default function SignupForm() {
         </p>
       </div>
       <Form {...form}>
-        <form onSubmit={(e) => e.preventDefault()} className="mt-8 space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8 space-y-6">
           {step === 0 && (
             <>
               <div className="space-y-4">
@@ -241,6 +344,52 @@ export default function SignupForm() {
           )}
 
           {step === 2 && (
+            <div className="flex flex-col items-center space-y-4">
+              <Button
+                type="button"
+                onClick={handleSendVerificationCode}
+                disabled={isCodeSent || isPending}
+                className=" bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              >
+                {isPending ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : null}
+                {isCodeSent ? "Code Sent" : "Send Verification Code"}
+              </Button>
+              {isCodeSent && (
+                <p className="text-sm text-muted-foreground">
+                  A verification code has been sent to your email.
+                </p>
+              )}
+            </div>
+          )}
+
+          {step === 3 && (
+            <>
+              <FormField
+                control={form.control}
+                name="verificationCode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Verification Code</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter the 6-digit code" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="button"
+                onClick={handleVerifyCode}
+                className="ml-auto bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              >
+                Verify Code
+              </Button>
+            </>
+          )}
+
+          {step === 4 && (
             <div className="space-y-4">
               <FormField
                 control={form.control}
@@ -249,11 +398,24 @@ export default function SignupForm() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        type="password"
-                        placeholder="••••••••"
-                      />
+                      <div className="relative">
+                        <Input
+                          {...field}
+                          type={showPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4 text-gray-500 dark:text-gray-100" />
+                          ) : (
+                            <Eye className="h-4 w-4 text-gray-500 dark:text-gray-100" />
+                          )}
+                        </button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -266,11 +428,26 @@ export default function SignupForm() {
                   <FormItem>
                     <FormLabel>Confirm Password</FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        type="password"
-                        placeholder="••••••••"
-                      />
+                      <div className="relative">
+                        <Input
+                          {...field}
+                          type={showConfirmPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff className="h-4 w-4 text-gray-500 dark:text-gray-100" />
+                          ) : (
+                            <Eye className="h-4 w-4 text-gray-500 dark:text-gray-100" />
+                          )}
+                        </button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -279,7 +456,7 @@ export default function SignupForm() {
             </div>
           )}
 
-          {step === 3 && (
+          {step === 5 && (
             <FormField
               control={form.control}
               name="picture"
@@ -315,7 +492,7 @@ export default function SignupForm() {
             />
           )}
 
-          {step === 4 && renderConfirmationStep()}
+          {step === 6 && renderConfirmationStep()}
 
           <div className="flex justify-between">
             {step > 0 && (
@@ -326,17 +503,19 @@ export default function SignupForm() {
             {step < steps.length - 1 ? (
               <Button
                 type="button"
-                onClick={nextStep}
+                onClick={step === 3 ? handleVerifyCode : nextStep}
                 className="ml-auto bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                disabled={step === 3 && !isCodeVerified} // Only disable if not on step 3 and pending
               >
-                Next <ArrowRight className="ml-2 h-4 w-4" />
+                {"Next"}
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             ) : (
               <Button
                 type="button"
+                onClick={() => form.handleSubmit(onSubmit)()}
                 className="ml-auto bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 disabled={isPending}
-                onClick={() => form.handleSubmit(action)()}
               >
                 {isPending ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

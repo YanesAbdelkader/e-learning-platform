@@ -10,12 +10,14 @@ import { handleAPIcall } from "@/functions/custom";
        "GET"
      );
      if (error) {
-       console.error(error);
+       console.log(error);
+       return [];
      }
      if (response) {
        return response.data;
      }
    } catch (error) {
-     console.error(error);
+     console.log(error);
+     return []
    }
  }

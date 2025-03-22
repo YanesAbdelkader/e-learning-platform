@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Category, SearchResult, SearchType } from "../_lib/shema";
 import FilterC from "../_components/filter";
 import { useParams } from "next/navigation";
@@ -28,7 +28,7 @@ export default function SearchComponent({
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedLevel, setSelectedLevel] = useState<string>("");
 
-  const loadResults = async () => {
+  const loadResults = useCallback(async () => {
     setIsLoading(true);
     try {
       const data = await getSearchResult(keyWord);
@@ -39,11 +39,12 @@ export default function SearchComponent({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [keyWord]);
 
+  // Load results on component mount or when keyWord changes
   useEffect(() => {
     loadResults();
-  }, [keyWord]);
+  }, [loadResults]);
 
   return (
     <div className="space-y-2">
@@ -67,13 +68,13 @@ export default function SearchComponent({
         <Loading />
       ) : searchType === "Courses" ? (
         result?.Courses.length > 0 ? (
-            <Courses courses={result?.Courses} />
+          <Courses courses={result?.Courses} />
         ) : (
           <p className="text-center text-gray-500">No courses found.</p>
         )
       ) : searchType === "Teachers" ? (
         result?.Teachers.length > 0 ? (
-            <Teachers teachers={result?.Teachers} />
+          <Teachers teachers={result?.Teachers} />
         ) : (
           <p className="text-center justify-center text-gray-500 h-[60vh]">
             No teachers found.

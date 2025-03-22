@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -29,58 +29,80 @@ export default function TeacherDialog({
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
+  const loadTeacherInfo = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchTeacherInfo(String(teacherId));
+      if (data) {
+        setTeacher({
+          id: data.id,
+          name: data.info.name,
+          lastname: data.info.lastname,
+          picture: data.info.picture,
+          email: data.info.email,
+          role: data.info.role,
+          status: data.info.teacher_info.verified ? "Active" : "Blocked",
+          course_count: data.info.course_count ?? 0,
+          teacher_info: {
+            id: data.info.teacher_info.id,
+            user_id: data.info.teacher_info.user_id,
+            subjects: data.info.teacher_info.subjects,
+            rating: data.info.teacher_info.rating,
+            contactinfo: data.info.teacher_info.contactinfo,
+            certifications: data.info.teacher_info.certifications,
+            education: data.info.teacher_info.education,
+            links: data.info.teacher_info.links,
+            bio: data.info.teacher_info.bio,
+            verified: data.info.teacher_info.verified,
+          },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "Error",
+        description: "Failed to load teacher information.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [teacherId]);
+
   useEffect(() => {
     if (open) {
       loadTeacherInfo();
     }
-  }, [open]);
-
-  const loadTeacherInfo = async () => {
-    setLoading(true);
-    const data = await fetchTeacherInfo(String(teacherId));
-
-    if (data) {
-      setTeacher({
-        id: data.id,
-        name: data.info.name,
-        lastname: data.info.lastname,
-        picture: data.info.picture,
-        email: data.info.email,
-        role: data.info.role,
-        status: data.info.teacher_info.verified ? "Active" : "Blocked",
-        course_count: data.info.course_count ?? 0,
-        teacher_info: {
-          id: data.info.teacher_info.id,
-          user_id: data.info.teacher_info.user_id,
-          subjects: data.info.teacher_info.subjects,
-          rating: data.info.teacher_info.rating,
-          contactinfo: data.info.teacher_info.contactinfo,
-          certifications: data.info.teacher_info.certifications,
-          education: data.info.teacher_info.education,
-          links: data.info.teacher_info.links,
-          bio: data.info.teacher_info.bio,
-          verified: data.info.teacher_info.verified,
-        },
-      });
-    }
-    setLoading(false);
-  };
+  }, [open, loadTeacherInfo]);
 
   const handleVerify = async (status: boolean) => {
     setLoading(true);
-    const result = await verifyTeacher(String(teacherId), status);
-    if (result?.success) {
-      toast({ title: "Success", description: "Teacher verification updated." });
-      await refreshTeachers();
-      setOpen(false);
-    } else {
+    try {
+      const result = await verifyTeacher(String(teacherId), status);
+      if (result?.success) {
+        toast({
+          title: "Success",
+          description: "Teacher verification updated.",
+        });
+        await refreshTeachers();
+        setOpen(false);
+      } else {
+        toast({
+          title: "Error",
+          description: result?.error || "Failed to update verification status.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.log(error);
       toast({
         title: "Error",
-        description: result?.error,
+        description: "An unexpected error occurred.",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -103,10 +125,13 @@ export default function TeacherDialog({
           <div className="space-y-3">
             <Image
               src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${teacher.picture}`}
-              alt="Profile"
+              alt={`${teacher.name} ${teacher.lastname}`}
               className="rounded-full mx-auto"
               width={50}
               height={50}
+              onError={(e) => {
+                e.currentTarget.src = "/default-profile.png"; // Fallback image
+              }}
             />
             <h2 className="text-lg font-semibold text-center">
               {teacher.name} {teacher.lastname}
@@ -136,7 +161,12 @@ export default function TeacherDialog({
             <ul className="list-disc pl-4">
               {teacher.teacher_info?.links.map((link, index) => (
                 <li key={index}>
-                  <a href={link} className="text-blue-500" target="_blank">
+                  <a
+                    href={link}
+                    className="text-blue-500"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     {link}
                   </a>
                 </li>
@@ -155,22 +185,15 @@ export default function TeacherDialog({
           >
             Cancel
           </Button>
-          {teacher?.teacher_info?.verified && (
+          {teacher?.teacher_info && (
             <Button
-              variant="destructive"
-              onClick={() => handleVerify(false)}
+              variant={
+                teacher.teacher_info.verified ? "destructive" : "default"
+              }
+              onClick={() => handleVerify(!teacher.teacher_info.verified)}
               disabled={loading}
             >
-              Reject
-            </Button>
-          )}
-          {!teacher?.teacher_info?.verified && (
-            <Button
-              variant="default"
-              onClick={() => handleVerify(true)}
-              disabled={loading}
-            >
-              Approve
+              {teacher.teacher_info.verified ? "Reject" : "Approve"}
             </Button>
           )}
         </DialogFooter>

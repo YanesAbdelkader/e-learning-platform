@@ -1,3 +1,4 @@
+"use server";
 import { Suspense } from "react";
 import { getCourseDetails, getRelatedCourses } from "./_actions/actions";
 import CourseHeader from "./_components/course-header";
@@ -5,6 +6,7 @@ import CourseDetails from "./_components/course-details";
 import CourseTabs from "../../teachers/[id]/course-tabs";
 import CourseSidebar from "./_components/course-sidebar";
 import RelatedCourses from "./_components/related-courses";
+import Loading from "@/app/(public)/loading";
 
 export default async function CourseDetailPage({
   params,
@@ -15,7 +17,6 @@ export default async function CourseDetailPage({
 }) {
   const courseData = await getCourseDetails(params.Id);
   const relatedCourses = await getRelatedCourses(params.Id);
-
   return (
     <div className="container mx-auto px-4 py-10">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -36,7 +37,7 @@ export default async function CourseDetailPage({
             lastUpdated={courseData.lastUpdated}
           />
 
-          <Suspense fallback={<div>Loading course content...</div>}>
+          <Suspense fallback={<Loading />}>
             <CourseTabs
               curriculum={courseData.curriculum}
               skills={courseData.skills}

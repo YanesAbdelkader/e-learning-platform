@@ -1,6 +1,6 @@
-import type { Course } from "@/types/teacher"
 
-export async function getRecommendedCourses(teacherId: string): Promise<Course[]> {
+
+export async function getRecommendedCourses(teacherId: string) {
   // In a real application, you would fetch this data from your API
   // Example API call:
   // const response = await fetch(`/api/teachers/${teacherId}/recommended-courses`)

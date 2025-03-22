@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Card, CardContent } from "@/components/ui/card"
@@ -19,60 +19,56 @@ export default function ImageCropper({ imageSrc, onCropComplete, onCancel }: Ima
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const imageRef = useRef<HTMLImageElement | null>(null)
 
-  useEffect(() => {
-    const image = new Image()
-    image.src = imageSrc
-    image.crossOrigin = "anonymous"
-    image.onload = () => {
-      imageRef.current = image
-      drawImage()
-    }
-  }, [imageSrc])
+  const drawImage = useCallback(() => {
+    if (!canvasRef.current || !imageRef.current) return;
 
-  useEffect(() => {
-    drawImage()
-  }, [scale, rotation])
-
-  const drawImage = () => {
-    if (!canvasRef.current || !imageRef.current) return
-
-    const canvas = canvasRef.current
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
-
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
     // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     // Save context
-    ctx.save()
-
+    ctx.save();
     // Translate to center of canvas
-    ctx.translate(canvas.width / 2, canvas.height / 2)
-
+    ctx.translate(canvas.width / 2, canvas.height / 2);
     // Rotate
-    ctx.rotate((rotation * Math.PI) / 180)
-
+    ctx.rotate((rotation * Math.PI) / 180);
     // Scale
-    ctx.scale(scale, scale)
-
+    ctx.scale(scale, scale);
     // Draw image centered
-    ctx.drawImage(imageRef.current, -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height)
-
+    ctx.drawImage(imageRef.current, -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
     // Restore context
-    ctx.restore()
-  }
+    ctx.restore();
+  }, [scale, rotation]);
+
+  useEffect(() => {
+    const image = new Image();
+    image.src = imageSrc;
+    image.crossOrigin = "anonymous";
+    image.onload = () => {
+      imageRef.current = image;
+      drawImage();
+    };
+    image.onerror = (error) => {
+      console.error("Failed to load image", error);
+    };
+  }, [imageSrc, drawImage]);
+
+  useEffect(() => {
+    drawImage();
+  }, [scale, rotation, drawImage]);
 
   const handleCrop = () => {
-    if (!canvasRef.current) return
+    if (!canvasRef.current) return;
 
-    const canvas = canvasRef.current
-    const croppedImage = canvas.toDataURL("image/jpeg")
-    onCropComplete(croppedImage)
-  }
+    const canvas = canvasRef.current;
+    const croppedImage = canvas.toDataURL("image/jpeg");
+    onCropComplete(croppedImage);
+  };
 
   const handleRotate = () => {
-    setRotation((prev) => (prev + 90) % 360)
-  }
+    setRotation((prev) => (prev + 90) % 360);
+  };
 
   return (
     <Card className="w-full">
@@ -130,6 +126,5 @@ export default function ImageCropper({ imageSrc, onCropComplete, onCancel }: Ima
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
-

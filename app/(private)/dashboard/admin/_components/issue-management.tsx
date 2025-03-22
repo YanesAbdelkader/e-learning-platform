@@ -1,44 +1,105 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
+import { toast } from "@/hooks/use-toast";
+import { updateIssues } from "../_actions/IssuesActions";
+import { Badge } from "@/components/ui/badge"; // Assuming you have a Badge component
 
 type Issue = {
-  id: number
-  title: string
-  reporter: string
-  date: string
-  status: "Open" | "In Progress" | "Resolved"
-}
+  id: number;
+  title: string;
+  content: string;
+  reporter: string;
+  date: string;
+  status: "open" | "in progress" | "resolved" | "closed";
+};
 
-export default function IssueManagement() {
-  const [issues, setIssues] = useState<Issue[]>([
-    { id: 1, title: "Login not working", reporter: "John Doe", date: "2023-05-15", status: "Open" },
-    { id: 2, title: "Video playback issue", reporter: "Jane Smith", date: "2023-05-14", status: "In Progress" },
-    { id: 3, title: "Certificate not generating", reporter: "Mike Johnson", date: "2023-05-13", status: "Resolved" },
-  ])
-  const [searchTerm, setSearchTerm] = useState("")
+type IssuesTableProps = {
+  issues: Issue[];
+};
 
-  const updateIssueStatus = (issueId: number, newStatus: "Open" | "In Progress" | "Resolved") => {
-    setIssues(issues.map((issue) => (issue.id === issueId ? { ...issue, status: newStatus } : issue)))
-  }
+type Status = "open" | "in progress" | "resolved" | "closed";
+
+export default function IssueManagement({ issues }: IssuesTableProps) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const filteredIssues = issues.filter(
     (issue) =>
       issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      issue.reporter.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+      issue.reporter.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  async function updateIssueStatus(id: number, status: Status): Promise<void> {
+    setIsUpdating(true);
+    try {
+      const result = await updateIssues(id, status);
+      if (result.success) {
+        toast({
+          title: "Update Success",
+          description: `Issue status updated to ${status}.`,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "Update Failed",
+        description: "An error occurred while updating the issue status.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  }
+
+  const StatusButton = ({
+    issueId,
+    status,
+  }: {
+    issueId: number;
+    status: Status;
+  }) => (
+    <Button
+      onClick={() => updateIssueStatus(issueId, status)}
+      disabled={isUpdating}
+      variant="outline"
+    >
+      {status}
+    </Button>
+  );
+
+  const getBadgeColor = (status: Status) => {
+    switch (status) {
+      case "open":
+        return "bg-blue-500";
+      case "in progress":
+        return "bg-yellow-500";
+      case "resolved":
+        return "bg-green-500";
+      case "closed":
+        return "bg-red-500";
+      default:
+        return "bg-gray-500";
+    }
+  };
 
   return (
     <div>
@@ -55,6 +116,7 @@ export default function IssueManagement() {
         <TableHeader>
           <TableRow>
             <TableHead>Title</TableHead>
+            <TableHead>Content</TableHead>
             <TableHead>Reporter</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Status</TableHead>
@@ -65,9 +127,14 @@ export default function IssueManagement() {
           {filteredIssues.map((issue) => (
             <TableRow key={issue.id}>
               <TableCell>{issue.title}</TableCell>
+              <TableCell>{issue.content}</TableCell>
               <TableCell>{issue.reporter}</TableCell>
               <TableCell>{issue.date}</TableCell>
-              <TableCell>{issue.status}</TableCell>
+              <TableCell>
+                <Badge className={getBadgeColor(issue.status)}>
+                  {issue.status}
+                </Badge>
+              </TableCell>
               <TableCell>
                 <Dialog>
                   <DialogTrigger asChild>
@@ -78,18 +145,15 @@ export default function IssueManagement() {
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>Update Issue Status</DialogTitle>
-                      <DialogDescription>Choose the new status for this issue.</DialogDescription>
+                      <DialogDescription>
+                        Choose the new status for this issue.
+                      </DialogDescription>
                     </DialogHeader>
                     <div className="flex justify-around">
-                      <Button onClick={() => updateIssueStatus(issue.id, "Open")}>Open</Button>
-                      <Button onClick={() => updateIssueStatus(issue.id, "In Progress")}>In Progress</Button>
-                      <Button onClick={() => updateIssueStatus(issue.id, "Resolved")}>Resolved</Button>
+                      <StatusButton issueId={issue.id} status="in progress" />
+                      <StatusButton issueId={issue.id} status="resolved" />
+                      <StatusButton issueId={issue.id} status="closed" />
                     </div>
-                    <DialogFooter>
-                      <Button variant="outline" onClick={() => {}}>
-                        Cancel
-                      </Button>
-                    </DialogFooter>
                   </DialogContent>
                 </Dialog>
               </TableCell>
@@ -98,6 +162,5 @@ export default function IssueManagement() {
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }
-

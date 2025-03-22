@@ -5,7 +5,6 @@ import {
   CheckCircle,
   ChevronLeft,
   Clock,
-  Link,
   PlayCircle,
 } from "lucide-react";
 import {
@@ -21,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import VideoPlayer from "./video-player";
+import Link from "next/link";
 
 interface Episode {
   id: string;
@@ -129,6 +129,13 @@ export default function VideoPage({ token, course }: VideoPageProps) {
 function CourseHeader({ course }: { course: Course }) {
   return (
     <CardContent className="px-0 pt-0">
+      <Link
+        href={`/mycourses/course/${course.id}`}
+        className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-4 transition-colors"
+      >
+        <ChevronLeft className="mr-1 h-4 w-4" />
+        <span>Back Course</span>
+      </Link>
       <h1 className="text-2xl font-bold mb-2">{course.title}</h1>
       <div className="flex items-center gap-2 mb-2">
         <Badge variant="outline">{course.level}</Badge>

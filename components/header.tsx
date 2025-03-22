@@ -32,7 +32,6 @@ export function Header() {
   useEffect(() => {
     const initAuth = async () => {
       const cookiePicture = getCookie("picture");
-
       if (cookiePicture) {
         setPicture(cookiePicture);
         setIsLoggedIn(true);

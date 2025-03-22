@@ -25,9 +25,9 @@ function CourseInstructor({ instructor }: CourseInstructorProps) {
         />
       </Avatar>
       <div>
-        <div className="flex items-center justify-between">
+        <div className="w-full flex items-center justify-between">
           <h3 className="text-xl font-bold">{instructor.name}</h3>
-          <Link href={`/teachers/${instructor.id}`}>
+          <Link href={`/teachers/${instructor.id}`} className="pl-4">
             <Button variant={"default"} className="text-sm">
               View Profile
             </Button>

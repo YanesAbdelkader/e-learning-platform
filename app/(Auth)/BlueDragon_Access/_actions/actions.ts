@@ -19,7 +19,7 @@ export async function loginAction(_: unknown, data: LoginData) {
       };
     }
 
-    if (response?.status === 200 && response?.data) {
+    if (response?.status === 200 && response?.data.role === "admin") {
       const cookieStore = cookies();
       (await cookieStore).set("token", response.data.token, {
         httpOnly: true,

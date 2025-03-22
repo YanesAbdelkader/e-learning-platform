@@ -98,12 +98,9 @@ export async function logout() {
 }
 
 export async function checkAuthStatus() {
-  // Simulate API call
-  await new Promise((resolve) => setTimeout(resolve, 500));
-
-  // For development, always return logged in
-  // In production, this would check with your backend
-  return {
-    isLoggedIn: true,
-  };
+  const token = (await cookies()).get("token")?.value;
+  if (token) {
+    return { isLoggedIn: true };
+  }
+  return { isLoggedIn: false };
 }
