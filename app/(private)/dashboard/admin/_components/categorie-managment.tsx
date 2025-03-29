@@ -27,16 +27,16 @@ export default function CategoryManagement() {
     }
   };
 
-  const handleDeleteCategory = async (courseId: string) => {
+  const handleDeleteCategory = async (categoryId: string) => {
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this course?"
+      "Are you sure you want to delete this Category?"
     );
     if (!isConfirmed) return;
 
-    const result = await deleteCategory(courseId);
+    const result = await deleteCategory(categoryId);
     if (result?.success) {
       toast({
-        title: "Course Deleted",
+        title: "Category Deleted",
         description: result.message,
       });
 

@@ -170,8 +170,6 @@ export async function registerTeacher(prevState: unknown, formData: FormData) {
     links: validatedFields.data.links, // Include links array
   };
 
-  console.log("Payload:", payload); // Log the payload for debugging
-
   try {
     const { data: response, error } = await handleAPIcall(
       payload,
@@ -181,6 +179,7 @@ export async function registerTeacher(prevState: unknown, formData: FormData) {
     );
 
     if (error) {
+      console.log(error)
       return {
         success: false,
         error: "Error registering teacher!",
@@ -195,6 +194,7 @@ export async function registerTeacher(prevState: unknown, formData: FormData) {
         error: "",
       };
     } else {
+      console.log(error)
       return { success: false, error: "Registration failed!", message: "" };
     }
   } catch (error) {

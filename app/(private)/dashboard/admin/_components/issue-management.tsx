@@ -52,7 +52,7 @@ export default function IssueManagement({ issues }: IssuesTableProps) {
     setIsUpdating(true);
     try {
       const result = await updateIssues(id, status);
-      if (result.success) {
+      if (result?.success) {
         toast({
           title: "Update Success",
           description: `Issue status updated to ${status}.`,
