@@ -9,6 +9,7 @@ import {
   CreditCard,
   HelpCircle,
   Home,
+  Lock,
   Settings,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,11 @@ const routes = [
     label: "Issues",
     icon: HelpCircle,
     href: "/dashboard/student/issues",
+  },
+  {
+    label: "Security",
+    icon: Lock,
+    href: "/dashboard/student/security",
   },
   {
     label: "Settings",

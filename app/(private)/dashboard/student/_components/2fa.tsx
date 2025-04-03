@@ -1,7 +1,5 @@
 "use client";
 
-import type React from "react";
-
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -28,26 +26,35 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { enable2FA, verify2FA } from "../_actions/user";
+import { enable2FA, verify2FA, disable2FA } from "../_actions/user";
 import { AlertCircle, CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
 import QRCode from "react-qr-code";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-export default function TwoFactorAuth() {
-  const [is2FAEnabled, setIs2FAEnabled] = useState(false);
+interface TwoFactorAuthProps {
+  tfa: boolean;
+}
+
+export default function TwoFactorAuth({ tfa }: TwoFactorAuthProps) {
+  const [is2FAEnabled, setIs2FAEnabled] = useState<boolean>(tfa);
   const [showDialog, setShowDialog] = useState(false);
+  const [showDisableDialog, setShowDisableDialog] = useState(false);
   const [otpAuthUrl, setOtpAuthUrl] = useState("");
   const [secret, setSecret] = useState("");
   const [otpCode, setOtpCode] = useState("");
+  const [disableOtpCode, setDisableOtpCode] = useState("");
   const [isLoading, setIsLoading] = useState({
     toggle: false,
     verify: false,
+    disable: false,
   });
   const [error, setError] = useState("");
+  const [disableError, setDisableError] = useState("");
 
   const handle2FAToggle = async (checked: boolean) => {
     setIsLoading((prev) => ({ ...prev, toggle: true }));
     setError("");
+    setDisableError("");
 
     try {
       if (checked) {
@@ -59,15 +66,10 @@ export default function TwoFactorAuth() {
         setSecret(data.secret);
         setShowDialog(true);
       } else {
-        setIs2FAEnabled(false);
-        toast({
-          title: "Two-factor authentication disabled",
-          description: "Your account is now using password-only authentication",
-          variant: "default",
-        });
+        setShowDisableDialog(true);
       }
     } catch (error) {
-      console.error(error);
+      console.log(error);
       toast({
         title: "Setup failed",
         description:
@@ -97,10 +99,9 @@ export default function TwoFactorAuth() {
       toast({
         title: "Two-factor authentication enabled",
         description: "Your account is now protected with 2FA",
-        variant: "default",
       });
     } catch (error) {
-      console.error(error);
+      console.log(error);
       setError(
         error instanceof Error ? error.message : "Invalid verification code"
       );
@@ -110,11 +111,45 @@ export default function TwoFactorAuth() {
     }
   };
 
+  const handleDisable2FA = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading((prev) => ({ ...prev, disable: true }));
+    setDisableError("");
+
+    try {
+      if (disableOtpCode.length !== 6) {
+        throw new Error("Verification code must be 6 digits");
+      }
+
+      await disable2FA(disableOtpCode);
+      setIs2FAEnabled(false);
+      setShowDisableDialog(false);
+      setDisableOtpCode("");
+      toast({
+        title: "Two-factor authentication disabled",
+        description: "Your account is now using password-only authentication",
+      });
+    } catch (error) {
+      console.log(error);
+      setDisableError(
+        error instanceof Error ? error.message : "Failed to disable 2FA"
+      );
+    } finally {
+      setIsLoading((prev) => ({ ...prev, disable: false }));
+    }
+  };
+
   const handleDialogClose = () => {
     setShowDialog(false);
     setIs2FAEnabled(false);
     setOtpCode("");
     setError("");
+  };
+
+  const handleDisableDialogClose = () => {
+    setShowDisableDialog(false);
+    setDisableOtpCode("");
+    setDisableError("");
   };
 
   return (
@@ -137,7 +172,7 @@ export default function TwoFactorAuth() {
                 id="2fa"
                 checked={is2FAEnabled}
                 onCheckedChange={handle2FAToggle}
-                disabled={isLoading.toggle}
+                disabled={isLoading.toggle || isLoading.disable}
                 aria-label={
                   is2FAEnabled
                     ? "Disable two-factor authentication"
@@ -150,7 +185,9 @@ export default function TwoFactorAuth() {
                   : "Enable Two-Factor Authentication"}
               </Label>
             </div>
-            {isLoading.toggle && <Loader2 className="h-4 w-4 animate-spin" />}
+            {(isLoading.toggle || isLoading.disable) && (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            )}
           </div>
 
           {is2FAEnabled && (
@@ -160,7 +197,7 @@ export default function TwoFactorAuth() {
               <AlertDescription>
                 Your account is protected with two-factor authentication.
                 You&apos;ll need to enter a verification code from your
-                authenticator app when signing in.
+                authenticator app when logging in.
               </AlertDescription>
             </Alert>
           )}
@@ -172,6 +209,7 @@ export default function TwoFactorAuth() {
         </CardFooter>
       </Card>
 
+      {/* Enable 2FA Dialog */}
       <Dialog
         open={showDialog}
         onOpenChange={(open) => !open && handleDialogClose()}
@@ -259,6 +297,83 @@ export default function TwoFactorAuth() {
                     </>
                   ) : (
                     "Verify and Enable"
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Disable 2FA Dialog */}
+      <Dialog
+        open={showDisableDialog}
+        onOpenChange={(open) => !open && handleDisableDialogClose()}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-primary" />
+              Disable Two-Factor Authentication
+            </DialogTitle>
+            <DialogDescription>
+              To disable two-factor authentication, please enter the 6-digit
+              verification code from your authenticator app.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center py-4">
+            <form onSubmit={handleDisable2FA} className="w-full space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="disable-otp">
+                  Enter verification code from your app
+                </Label>
+                <div className="flex justify-center">
+                  <InputOTP
+                    maxLength={6}
+                    value={disableOtpCode}
+                    onChange={(value) => {
+                      setDisableOtpCode(value);
+                      setDisableError("");
+                    }}
+                    aria-label="Enter 6-digit verification code"
+                  >
+                    <InputOTPGroup>
+                      <InputOTPSlot index={0} />
+                      <InputOTPSlot index={1} />
+                      <InputOTPSlot index={2} />
+                      <InputOTPSlot index={3} />
+                      <InputOTPSlot index={4} />
+                      <InputOTPSlot index={5} />
+                    </InputOTPGroup>
+                  </InputOTP>
+                </div>
+                {disableError && (
+                  <div className="flex items-center justify-center gap-2 text-sm text-red-500 mt-2">
+                    <AlertCircle className="h-4 w-4" />
+                    <p>{disableError}</p>
+                  </div>
+                )}
+              </div>
+              <DialogFooter className="sm:justify-between">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleDisableDialogClose}
+                  disabled={isLoading.disable}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={disableOtpCode.length !== 6 || isLoading.disable}
+                >
+                  {isLoading.disable ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Disabling...
+                    </>
+                  ) : (
+                    "Disable 2FA"
                   )}
                 </Button>
               </DialogFooter>

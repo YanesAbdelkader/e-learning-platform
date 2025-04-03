@@ -26,7 +26,7 @@ export async function updateUserProfile(formData: FormData) {
       };
     }
   } catch (error) {
-    console.error("Unexpected Error:", error);
+    console.log("Unexpected Error:", error);
     return {
       success: false,
       error: "Something went wrong. Please try again.",
@@ -55,7 +55,7 @@ export async function sendVerificationEmail(email: string) {
       return { success: true, message: "Verification code sent", error: "" };
     }
   } catch (error) {
-    console.error("Unexpected Error:", error);
+    console.log("Unexpected Error:", error);
     return {
       success: false,
       error: "Something went wrong. Please try again.",
@@ -91,7 +91,7 @@ export async function verifyEmailAndUpdate(code: string, email: string) {
       };
     }
   } catch (error) {
-    console.error("Unexpected Error:", error);
+    console.log("Unexpected Error:", error);
     return {
       success: false,
       error: "Something went wrong. Please try again.",
@@ -125,7 +125,7 @@ export async function updateUserPassword(formData: FormData) {
       };
     }
   } catch (error) {
-    console.error("Unexpected Error:", error);
+    console.log("Unexpected Error:", error);
     return {
       success: false,
       error: "Something went wrong. Please try again.",
@@ -152,6 +152,24 @@ export async function enable2FA() {
   }
 }
 
+export async function disable2FA(otpCode: string) {
+  try {
+    const { data: response, error } = await handleAPIcall(
+      { otp: otpCode },
+      "",
+      "disable-2fa",
+      "POST"
+    );
+    if (error) {
+      throw new Error("Failed to disable 2FA");
+    }
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Failed to disable two-factor authentication");
+  }
+}
+
 export async function verify2FA(secret: string, otpCode: string) {
   try {
     const { data: response, error } = await handleAPIcall(
@@ -165,7 +183,25 @@ export async function verify2FA(secret: string, otpCode: string) {
     }
     return response.data;
   } catch (error) {
-    console.error(error);
+    console.log(error);
     throw new Error("Invalid verification code");
+  }
+}
+
+export async function check2fa() {
+  try {
+    const { data: response, error } = await handleAPIcall(
+      "",
+      "",
+      "check-2fa",
+      "GET"
+    );
+    if (error) {
+      throw new Error("Failed to fetch 2fa");
+    }
+    return response.data.has_2fa;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Something went wrong. Please try again.");
   }
 }
