@@ -11,13 +11,13 @@ export async function fetchCourses() {
       "GET"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
     }
     if (response) {
       return response.data.courses;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }
 
@@ -30,13 +30,13 @@ export async function fetchCategories() {
       "GET"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
     }
     if (response) {
       return response.data.categories;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }
 
@@ -49,14 +49,14 @@ export async function fetchTeachers() {
       "GET"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
       return [];
     }
     if (response) {
       return response.data.teachers;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return [];
   }
 }

@@ -33,7 +33,7 @@ export default function Categories({
         setCategories([{ id: 0, name: "All Categories" }, ...result]);
       }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.log("Error fetching data:", error);
       setError("Failed to fetch categories. Please refresh to try again.");
     } finally {
       setLoading(false);
