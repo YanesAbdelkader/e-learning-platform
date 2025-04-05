@@ -53,11 +53,17 @@ export async function otpAction(formData: OTPFormData): Promise<ActionResult> {
       (await cookieStore).set("token", response.data.token, AUTH_COOKIE_CONFIG);
 
       await getUserData();
+      const prevPage = (await cookieStore).get("prevPage")?.value;
+      const lastVisitedPage = (await cookieStore).get("lastVisitedPage")?.value;
+
+      // Clean up navigation cookies
+      (await cookieStore).delete("prevPage");
+      (await cookieStore).delete("lastVisitedPage");
 
       return {
         title: "Verification Successful",
         description: "Your account has been verified",
-        path: "/dashboard",
+        path: prevPage || lastVisitedPage || "/dashboard",
       };
     }
 

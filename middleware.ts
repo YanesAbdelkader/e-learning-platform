@@ -30,7 +30,7 @@ export async function middleware(req: NextRequest) {
       role = cachedRole;
       isVerified = cachedVerify;
     } catch (error) {
-      console.error("Error parsing cached user data:", error);
+      console.log("Error parsing cached user data:", error);
     }
   }
 
@@ -45,7 +45,7 @@ export async function middleware(req: NextRequest) {
       );
 
       if (!apiRes.ok) {
-        console.error("Failed to fetch user data:", apiRes.status);
+        console.log("Failed to fetch user data:", apiRes.status);
         return NextResponse.redirect(new URL("/login", req.url));
       }
 
@@ -69,7 +69,7 @@ export async function middleware(req: NextRequest) {
         maxAge: 60,
       });
     } catch (error) {
-      console.error("Error in middleware:", error);
+      console.log("Error in middleware:", error);
       return NextResponse.redirect(new URL("/login", req.url));
     }
   }

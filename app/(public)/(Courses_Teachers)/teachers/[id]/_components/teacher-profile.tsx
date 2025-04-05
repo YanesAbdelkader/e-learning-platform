@@ -1,61 +1,28 @@
-"use client"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import TeacherHeader from "./teacher-header";
+import TeacherBio from "./teacher-bio";
+import TeacherCertifications from "./teacher-certifications";
+import TeacherContact from "./teacher-contact";
+import TeacherSidebar from "./teacher-sidebar";
+import { Course, Teacher } from "../_types/teacher";
 
-import { useState, useEffect } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import TeacherHeader from "./teacher-header"
-import TeacherAchievements from "./teacher-achievements"
-import TeacherCourses from "./teacher-courses"
-import TeacherBio from "./teacher-bio"
-import TeacherCertifications from "./teacher-certifications"
-import TeacherContact from "./teacher-contact"
-import TeacherSidebar from "./teacher-sidebar"
-import { Teacher } from "../_types/teacher"
-import { getTeacherProfile } from "../_actions/get-teacher-profile"
-import { followTeacher, unfollowTeacher } from "../_actions/follow-teacher"
+interface TeacherProfileProps {
+  teacher: Teacher;
+  coursesData: Course[];
+}
 
-export default function TeacherProfile({ teacherId }: { teacherId: string }) {
-  const [teacher, setTeacher] = useState<Teacher | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isFollowing, setIsFollowing] = useState(false)
-
-  useEffect(() => {
-    const loadTeacher = async () => {
-      setIsLoading(true)
-      try {
-        const data = await getTeacherProfile(teacherId)
-        setTeacher(data)
-        setIsFollowing(data.isFollowing)
-      } catch (error) {
-        console.error("Failed to load teacher profile:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadTeacher()
-  }, [teacherId])
-
-  const handleFollowToggle = async () => {
-    if (!teacher) return
-
-    try {
-      if (isFollowing) {
-        await unfollowTeacher(teacher.id)
-      } else {
-        await followTeacher(teacher.id)
-      }
-      setIsFollowing(!isFollowing)
-    } catch (error) {
-      console.error("Failed to update follow status:", error)
-    }
-  }
-
-  if (isLoading) {
-    return <div className="container mx-auto px-4 py-8">Loading...</div>
-  }
-
+export default function TeacherProfile({
+  teacher,
+  coursesData,
+}: TeacherProfileProps) {
   if (!teacher) {
-    return <div className="container mx-auto px-4 py-8">Teacher not found</div>
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <div className="bg-muted p-4 rounded-lg inline-block">
+          Teacher not found
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -63,21 +30,14 @@ export default function TeacherProfile({ teacherId }: { teacherId: string }) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Main Profile Section */}
         <div className="md:col-span-2 space-y-6">
-          <TeacherHeader teacher={teacher} isFollowing={isFollowing} onFollowToggle={handleFollowToggle} />
+          <TeacherHeader teacher={teacher} />
 
-          <TeacherAchievements achievements={teacher.achievements} />
-
-          <Tabs defaultValue="courses">
-            <TabsList className="grid grid-cols-4 w-full">
-              <TabsTrigger value="courses">Courses</TabsTrigger>
+          <Tabs defaultValue="bio" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-3">
               <TabsTrigger value="bio">Bio</TabsTrigger>
               <TabsTrigger value="certifications">Certifications</TabsTrigger>
               <TabsTrigger value="contact">Contact</TabsTrigger>
             </TabsList>
-
-            <TabsContent value="courses" className="space-y-4 pt-4">
-              <TeacherCourses courses={teacher.topCourses} totalCourses={teacher.courseCount} />
-            </TabsContent>
 
             <TabsContent value="bio" className="space-y-4 pt-4">
               <TeacherBio bio={teacher.bio} education={teacher.education} />
@@ -88,15 +48,22 @@ export default function TeacherProfile({ teacherId }: { teacherId: string }) {
             </TabsContent>
 
             <TabsContent value="contact" className="space-y-4 pt-4">
-              <TeacherContact contactInfo={teacher.contactInfo} socialLinks={teacher.socialLinks} />
+              <TeacherContact
+                contactInfo={teacher.contactInfo}
+                socialLinks={teacher.socialLinks}
+              />
             </TabsContent>
           </Tabs>
         </div>
 
         {/* Sidebar */}
-        <TeacherSidebar subjects={teacher.subjects} teacherId={teacher.id} />
+        <div className="space-y-6">
+          <TeacherSidebar
+            subjects={teacher.subjects}
+            recommendedCourses={coursesData}
+          />
+        </div>
       </div>
     </div>
-  )
+  );
 }
-

@@ -115,7 +115,7 @@ export async function verifyEmail(prevState: unknown, formData: FormData) {
   }
 }
 
-export async function registerTeacher(prevState: unknown, formData: FormData) {
+export async function registerTeacher(formData: FormData) {
   console.log(formData);
 
   // Extract array data from FormData
@@ -124,16 +124,7 @@ export async function registerTeacher(prevState: unknown, formData: FormData) {
   const links = formData.getAll("links[]");
 
   // Extract education data from FormData and convert it to a string
-  const educationArray = JSON.parse(formData.get("education") as string) as Array<{
-    year: string;
-    place: string;
-    certificate: string;
-  }>;
-
-  // Convert education array to a string
-  const educationString = educationArray
-    .map((edu) => `${edu.year}: ${edu.certificate} at ${edu.place}`)
-    .join("; ");
+  const educationString = JSON.parse(formData.get("education") as string);
 
   // Parse and validate the form data
   const validatedFields = registerSchema.safeParse({
@@ -143,10 +134,10 @@ export async function registerTeacher(prevState: unknown, formData: FormData) {
     password: formData.get("password"),
     contactInfo: formData.get("contactInfo"),
     picture: formData.get("picture"),
-    subjects: subjects, // Use the extracted subjects array
-    certifications: certifications, // Use the extracted certifications array
+    subjects: subjects, 
+    certifications: certifications, 
     education: educationString,
-    links: links, // Use the extracted links array
+    links: links,
     bio: formData.get("bio"),
   });
 
@@ -155,19 +146,18 @@ export async function registerTeacher(prevState: unknown, formData: FormData) {
     return { success: false, error: "Invalid form data", message: "" };
   }
 
-  // Prepare the data for the API call
   const payload = {
     name: validatedFields.data.name,
     lastname: validatedFields.data.lastname,
     email: validatedFields.data.email,
     password: validatedFields.data.password,
     picture: validatedFields.data.picture,
-    subjects: validatedFields.data.subjects, // Include subjects array
+    subjects: validatedFields.data.subjects, 
     contactinfo: validatedFields.data.contactInfo,
     education: validatedFields.data.education,
     bio: validatedFields.data.bio,
-    certifications: validatedFields.data.certifications, // Include certifications array
-    links: validatedFields.data.links, // Include links array
+    certifications: validatedFields.data.certifications,
+    links: validatedFields.data.links, 
   };
 
   try {
@@ -179,7 +169,7 @@ export async function registerTeacher(prevState: unknown, formData: FormData) {
     );
 
     if (error) {
-      console.log(error)
+      console.log(error);
       return {
         success: false,
         error: "Error registering teacher!",
@@ -194,7 +184,7 @@ export async function registerTeacher(prevState: unknown, formData: FormData) {
         error: "",
       };
     } else {
-      console.log(error)
+      console.log(error);
       return { success: false, error: "Registration failed!", message: "" };
     }
   } catch (error) {

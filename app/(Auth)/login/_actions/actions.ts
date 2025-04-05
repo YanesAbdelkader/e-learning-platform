@@ -53,8 +53,8 @@ export async function loginAction(data: LoginData): Promise<ActionResult> {
     if (response.status === 200) {
       if (response.data.role === "admin") {
         return {
-          title: "Access denied",
-          description: "Admin login not allowed here",
+          title: "Login failed",
+          description: "Something went wrong. Please try again",
           variant: "destructive",
         };
       }

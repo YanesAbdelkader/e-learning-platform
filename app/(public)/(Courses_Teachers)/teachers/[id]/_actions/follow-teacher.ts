@@ -1,40 +1,81 @@
-export async function followTeacher(teacherId: string): Promise<void> {
-  // In a real application, you would make an API call to follow the teacher
-  // Example API call:
-  // const response = await fetch(`/api/teachers/${teacherId}/follow`, {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json'
-  //   }
-  // })
-  // if (!response.ok) throw new Error('Failed to follow teacher')
+import { handleAPIcall } from "@/functions/custom";
 
-  // For now, just log the action
-  console.log(`Following teacher: ${teacherId}`)
+export async function followTeacher(
+  teacherId: string
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    const { data: response, error } = await handleAPIcall(
+      null,
+      `${teacherId}`,
+      "follow",
+      "POST"
+    );
 
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 500))
+    if (error) {
+      console.log("Follow teacher error:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to follow teacher",
+      };
+    }
 
-  return
+    if (!response) {
+      return {
+        success: false,
+        message: "No response received from server",
+      };
+    }
+
+    return {
+      success: true,
+      message: "Successfully followed teacher",
+    };
+  } catch (error) {
+    console.log("Unexpected error in followTeacher:", error);
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : "An unexpected error occurred",
+    };
+  }
 }
 
-export async function unfollowTeacher(teacherId: string): Promise<void> {
-  // In a real application, you would make an API call to unfollow the teacher
-  // Example API call:
-  // const response = await fetch(`/api/teachers/${teacherId}/unfollow`, {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json'
-  //   }
-  // })
-  // if (!response.ok) throw new Error('Failed to unfollow teacher')
+export async function unfollowTeacher(
+  teacherId: string
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    const { data: response, error } = await handleAPIcall(
+      null,
+      `${teacherId}`,
+      "unfollow",
+      "POST"
+    );
 
-  // For now, just log the action
-  console.log(`Unfollowing teacher: ${teacherId}`)
+    if (error) {
+      console.log("Unfollow teacher error:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to unfollow teacher",
+      };
+    }
 
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 500))
+    if (!response) {
+      return {
+        success: false,
+        message: "No response received from server",
+      };
+    }
 
-  return
+    return {
+      success: true,
+      message: "Successfully unfollowed teacher",
+    };
+  } catch (error) {
+    console.log("Unexpected error in unfollowTeacher:", error);
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : "An unexpected error occurred",
+    };
+  }
 }
-

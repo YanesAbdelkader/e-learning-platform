@@ -1,82 +1,62 @@
+import { Clock, Zap, Calendar, Tag } from "lucide-react";
+
+interface CourseDetailItem {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}
+
 export default function CourseDetails({
   duration,
   level,
-  hasCertificate,
+  category,
   lastUpdated,
 }: {
-  duration: string
-  level: string
-  hasCertificate: boolean
-  lastUpdated: string
+  duration: string;
+  level: string;
+  category: string;
+  lastUpdated: string;
 }) {
-  return (
-    <div className="grid grid-cols-2 gap-4 mt-6">
-      <div className="flex items-center">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5 mr-2 text-gray-500"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-        <span>{duration}</span>
-      </div>
-      <div className="flex items-center">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5 mr-2 text-gray-500"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
-        <span>{level}</span>
-      </div>
-      {hasCertificate && (
-        <div className="flex items-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 mr-2 text-gray-500"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <span>Certificate of completion</span>
-        </div>
-      )}
-      <div className="flex items-center">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5 mr-2 text-gray-500"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-          />
-        </svg>
-        <span>Last updated {lastUpdated}</span>
-      </div>
-    </div>
-  )
-}
+  const details: CourseDetailItem[] = [
+    {
+      icon: <Clock className="h-5 w-5" />,
+      label: "Duration",
+      value: duration,
+    },
+    {
+      icon: <Zap className="h-5 w-5" />,
+      label: "Level",
+      value: level,
+    },
+    {
+      icon: <Tag className="h-5 w-5" />,
+      label: "Category",
+      value: category,
+    },
+    {
+      icon: <Calendar className="h-5 w-5" />,
+      label: "Last updated",
+      value: lastUpdated,
+    },
+  ];
 
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+      {details.map((detail, index) => (
+        <div key={index} className="flex items-center p-3">
+          <div className="flex items-center justify-center h-10 w-10 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 mr-3">
+            {detail.icon}
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              {detail.label}
+            </p>
+            <p className="text-base font-semibold text-gray-700 dark:text-white">
+              {detail.value}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}

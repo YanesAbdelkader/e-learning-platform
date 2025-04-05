@@ -127,7 +127,7 @@ export default function TeacherSignupForm() {
     submitFormData.append("bio", formData.bio);
 
     try {
-      const result = await registerTeacher(null, submitFormData);
+      const result = await registerTeacher(submitFormData);
       if (result) {
         setRegisterState(result);
 

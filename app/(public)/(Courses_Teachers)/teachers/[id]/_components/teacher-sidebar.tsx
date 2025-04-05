@@ -1,45 +1,25 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { BookOpen, Plus, Star } from "lucide-react"
-import { Course, Teacher } from "../_types/teacher"
-import { getSimilarTeachers } from "../_actions/get-similar-teachers"
-import { getRecommendedCourses } from "../_actions/get-recommended-courses"
+"use client";
+import { useRouter } from "next/navigation";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { BookOpen, Star, ArrowRight } from "lucide-react";
+import { Course } from "../_types/teacher";
 
 interface TeacherSidebarProps {
-  subjects: string[]
-  teacherId: string
+  subjects: string[];
+  recommendedCourses: Course[];
 }
 
-export default function TeacherSidebar({ subjects, teacherId }: TeacherSidebarProps) {
-  const [similarTeachers, setSimilarTeachers] = useState<Teacher[]>([])
-  const [recommendedCourses, setRecommendedCourses] = useState<Course[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+export default function TeacherSidebar({
+  subjects,
+  recommendedCourses,
+}: TeacherSidebarProps) {
+  const router = useRouter();
 
-  useEffect(() => {
-    const loadSidebarData = async () => {
-      setIsLoading(true)
-      try {
-        const [teachersData, coursesData] = await Promise.all([
-          getSimilarTeachers(teacherId),
-          getRecommendedCourses(teacherId),
-        ])
-
-        setSimilarTeachers(teachersData)
-        setRecommendedCourses(coursesData)
-      } catch (error) {
-        console.error("Failed to load sidebar data:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadSidebarData()
-  }, [teacherId])
+  const handleCourseClick = (courseId: string) => {
+    router.push(`/courses/${courseId}`);
+  };
 
   return (
     <div className="space-y-6">
@@ -57,69 +37,45 @@ export default function TeacherSidebar({ subjects, teacherId }: TeacherSidebarPr
       </Card>
 
       <Card>
-        <CardContent className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Similar Teachers</h3>
-          {isLoading ? (
-            <div>Loading similar teachers...</div>
-          ) : (
-            <div className="space-y-4">
-              {similarTeachers.map((teacher) => (
-                <div key={teacher.id} className="flex items-center gap-3">
-                  <Avatar className="w-10 h-10">
-                    <AvatarImage
-                      src={teacher.profileImage || `/placeholder.svg?height=40&width=40`}
-                      alt={teacher.name}
-                    />
-                    <AvatarFallback>
-                      {teacher.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-medium text-sm">{teacher.name}</p>
-                    <p className="text-xs text-muted-foreground">{teacher.subject}</p>
-                  </div>
-                  <Button variant="ghost" size="icon" className="ml-auto">
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Recommended Courses</h3>
-          {isLoading ? (
-            <div>Loading recommended courses...</div>
-          ) : (
-            <div className="space-y-4">
+        <CardContent className="p-5">
+          <h3 className="text-lg font-semibold mb-4">Best Courses</h3>
+          {recommendedCourses.length > 0 ? (
+            <div className="space-y-2">
               {recommendedCourses.map((course) => (
-                <div key={course.id} className="flex items-start gap-3">
-                  <div className="w-12 h-12 bg-muted rounded flex items-center justify-center">
+                <div
+                  key={course.id}
+                  className="flex items-center gap-2 hover:bg-muted/50 p-1 rounded-lg transition-colors"
+                >
+                  <div className="w-12 h-12 bg-muted rounded flex items-center justify-center flex-shrink-0">
                     <BookOpen className="w-6 h-6 text-muted-foreground" />
                   </div>
-                  <div>
-                    <p className="font-medium text-sm">{course.title}</p>
+                  <div className="flex-1">
+                    <p className="font-medium text-sm line-clamp-2">
+                      {course.title}
+                    </p>
                     <div className="flex items-center mt-1">
                       <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
                       <span className="text-xs ml-1">{course.rating}</span>
                     </div>
                   </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="ml-auto"
+                    onClick={() => handleCourseClick(course.id)}
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
                 </div>
               ))}
-              <Button variant="outline" className="w-full mt-2 text-sm">
-                View More Courses
-              </Button>
             </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No recommended courses found
+            </p>
           )}
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
-
