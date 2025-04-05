@@ -151,7 +151,7 @@ export default function TeacherSignupForm() {
         });
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.log("Error submitting form:", error);
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
@@ -281,7 +281,7 @@ export default function TeacherSignupForm() {
     <div className="space-y-8">
       <FormStepper steps={steps} currentStep={currentStep} />
 
-      <Card>
+      <Card className="overflow-hidden transition-all border-indigo-200 duration-300 hover:shadow-lg hover:border-indigo-400 dark:hover:shadow-gray-400 h-85">
         <CardContent className="pt-6">
           <form ref={formRef} className="space-y-6">
             {renderStepContent()}
@@ -299,6 +299,7 @@ export default function TeacherSignupForm() {
               {currentStep < steps.length - 1 ? (
                 <Button
                   type="button"
+                  className="bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                   onClick={handleNextStep}
                   disabled={
                     (currentStep === 0 && !formData.emailVerified) ||
@@ -316,6 +317,7 @@ export default function TeacherSignupForm() {
               ) : (
                 <Button
                   type="button"
+                  className="bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                   onClick={handleSubmit}
                   disabled={
                     isSubmitting ||

@@ -145,6 +145,7 @@ export default function EmailVerificationStep({
       {!verificationSent ? (
         <Button
           type="button"
+          className="bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
           onClick={handleSendCode}
           disabled={!formData.email}
         >
@@ -191,6 +192,7 @@ export default function EmailVerificationStep({
             <div className="flex justify-between">
               <Button
                 type="button"
+                className="bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 variant="outline"
                 onClick={() => {
                   setVerificationSent(false);
@@ -199,7 +201,7 @@ export default function EmailVerificationStep({
               >
                 Change Email
               </Button>
-              <Button disabled={isVerifying} onClick={()=>handleVerifyEmail()}>
+              <Button className="bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" disabled={isVerifying} onClick={()=>handleVerifyEmail()}>
                 {isVerifying ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

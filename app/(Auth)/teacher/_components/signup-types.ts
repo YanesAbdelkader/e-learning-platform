@@ -15,7 +15,7 @@ export interface TeacherFormData {
   picture: string
   subjects: string[]
   certifications: string[]
-  education: Array<{ year: string; place: string; certificate: string }>
+  education: string[]
   links: string[]
   bio: string
 }
