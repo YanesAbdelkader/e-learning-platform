@@ -1,4 +1,3 @@
-import { StaticImageData } from "next/image";
 
 export type Course = {
   id: number;
@@ -7,7 +6,7 @@ export type Course = {
   rating: number;
   students: number;
   price: string;
-  image: string | StaticImageData;
+  image: string ;
   category: { id: number; name: string; description?: string };
 };
 

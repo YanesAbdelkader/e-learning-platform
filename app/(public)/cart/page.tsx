@@ -8,8 +8,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useCartAndFavorites } from "@/hooks/use-Cart-Fav";
 import { Course } from "@/data/types";
-import { handleAPIcall } from "@/functions/custom";
 import CourseCard from "../_components/course-card-cart";
+import { fetchCoursesByIds } from "@/functions/custom";
 
 export default function CartPage() {
   const { cart, removeFromCart } = useCartAndFavorites();
@@ -19,15 +19,10 @@ export default function CartPage() {
   useEffect(() => {
     const fetchCartItems = async (courseIds: string[]) => {
       try {
-        const { data: response } = await handleAPIcall(
-          courseIds,
-          "",
-          "get-courses-by-id",
-          "GET"
-        );
-        setCourses(response?.data);
+        const coursesByIds = await fetchCoursesByIds(courseIds);
+        setCourses(coursesByIds);
       } catch (error) {
-        console.error("Error fetching cart items:", error);
+        console.log("Error fetching cart items:", error);
       } finally {
         setLoading(false);
       }
@@ -41,7 +36,7 @@ export default function CartPage() {
   }, [cart]);
 
   const calculateTotal = () => {
-    return courses.reduce((total, item) => total + item.price, 0);
+    return courses.reduce((total, item) => total + parseFloat(item.price), 0);
   };
 
   if (loading) {
@@ -78,7 +73,7 @@ export default function CartPage() {
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between font-bold text-lg">
                     <span>Total:</span>
-                    <span>${calculateTotal().toFixed(2)}</span>
+                    <span>{calculateTotal().toFixed(2)} DA</span>
                   </div>
                 </div>
 

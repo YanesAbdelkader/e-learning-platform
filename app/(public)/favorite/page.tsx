@@ -5,12 +5,12 @@ import Link from "next/link";
 import { BookmarkX } from "lucide-react";
 import { useCartAndFavorites } from "@/hooks/use-Cart-Fav";
 import { useEffect, useState } from "react";
-import { handleAPIcall } from "@/functions/custom";
 import { Course } from "@/data/types";
 import { CourseCard } from "../_components/course-card-fav";
+import { fetchCoursesByIds } from "@/functions/custom";
 
 export default function FavoritesPage() {
-  const { favorites, removeFromFavorites } = useCartAndFavorites();
+  const { favorites, toggleFavorite } = useCartAndFavorites();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -20,15 +20,9 @@ export default function FavoritesPage() {
         setLoading(false);
         return;
       }
-
       try {
-        const { data: response } = await handleAPIcall(
-          favorites,
-          "",
-          "get-courses-by-id",
-          "GET"
-        );
-        setCourses(response?.data);
+        const coursesByIds = await fetchCoursesByIds(favorites);
+        setCourses(coursesByIds);
       } catch (error) {
         console.error("Error fetching favorite courses:", error);
       } finally {
@@ -60,7 +54,7 @@ export default function FavoritesPage() {
               key={course.id}
               course={course}
               isFavorite={true}
-              onFavoriteToggle={() => removeFromFavorites(String(course.id))}
+              onFavoriteToggle={() => toggleFavorite(String(course.id))}
             />
           ))}
         </div>

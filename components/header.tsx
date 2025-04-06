@@ -22,7 +22,6 @@ export function Header() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
-
   const [picture, setPicture] = useState<string | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);

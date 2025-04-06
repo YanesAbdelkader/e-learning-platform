@@ -104,3 +104,87 @@ export async function checkAuthStatus() {
   }
   return { isLoggedIn: false };
 }
+
+export async function fetchfavorites() {
+  const loggedIn = await checkAuthStatus();
+  if (loggedIn.isLoggedIn) {
+    const { data: response, error } = await handleAPIcall(
+      "",
+      "",
+      "get-user-fav",
+      "GET"
+    );
+
+    if (error) {
+      console.log(error);
+      return [];
+    }
+    if (response?.data) {
+      return response?.data.course_ids;
+    }
+  } else {
+    return [];
+  }
+}
+
+export async function fetchCoursesByIds(courseIds: string[]) {
+  const { data: response, error } = await handleAPIcall(
+    { course_ids: courseIds },
+    "",
+    "get-courses-by-id",
+    "GET"
+  );
+
+  if (error) {
+    console.log(error);
+    return [];
+  }
+  if (response?.data) {
+    console.log(response?.data)
+    return response?.data.courses;
+  }
+}
+
+export async function addTofavorites(courseId: string) {
+  const loggedIn = await checkAuthStatus();
+  if (loggedIn.isLoggedIn) {
+    const { data: response, error } = await handleAPIcall(
+      "",
+      courseId,
+      "favorites",
+      "POST"
+    );
+
+    if (error) {
+      console.log(error);
+      return false;
+    }
+    if (response?.data) {
+      return true;
+    }
+  } else {
+    return false;
+  }
+}
+
+export async function removefromFavorites(courseId: string) {
+  const loggedIn = await checkAuthStatus();
+  if (loggedIn.isLoggedIn) {
+    const { data: response, error } = await handleAPIcall(
+      "",
+      courseId,
+      "favorites",
+      "DELETE"
+    );
+
+    if (error) {
+      console.log(error);
+      return false;
+    }
+    if (response?.data) {
+      return true;
+    }
+  } else {
+    return false;
+  }
+}
