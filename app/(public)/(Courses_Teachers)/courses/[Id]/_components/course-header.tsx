@@ -1,60 +1,42 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Heart } from "lucide-react"
-import { StarFilledIcon, StarIcon } from "@radix-ui/react-icons"
-import { toggleWishlist } from "../_actions/actions"
-import { useToast } from "@/hooks/use-toast"
+import { useState } from "react";
+import { Heart } from "lucide-react";
+import { StarFilledIcon, StarIcon } from "@radix-ui/react-icons";
+import { useCartAndFavorites } from "@/hooks/use-Cart-Fav";
 
 interface CourseHeaderProps {
-  title: string
-  rating: number
-  students: number
-  courseId: string
-  initialWishlistState?: boolean
+  title: string;
+  rating: number;
+  students: number;
+  courseId: string;
 }
 
-export default function CourseHeader({ 
-  title, 
-  rating, 
-  students, 
+export default function CourseHeader({
+  title,
+  rating,
+  students,
   courseId,
-  initialWishlistState = false 
 }: CourseHeaderProps) {
-  const [wishlist, setWishlist] = useState(initialWishlistState)
-  const [isPending, setIsPending] = useState(false)
-  const { toast } = useToast()
+  const { favorites, toggleFavorite } = useCartAndFavorites();
+  const [wishlist, setWishlist] = useState(
+    favorites.includes(courseId) ? true : false
+  );
+  const [isPending, setIsPending] = useState(false);
 
-  const roundedRating = Math.round(rating * 10) / 10
-  const fullStars = Math.floor(roundedRating)
-  const hasHalfStar = roundedRating % 1 >= 0.5
+  const roundedRating = Math.round(rating * 10) / 10;
+  const fullStars = Math.floor(roundedRating);
+  const hasHalfStar = roundedRating % 1 >= 0.5;
 
   const handleWishlistToggle = async () => {
-    if (isPending) return
-
-    setIsPending(true)
-    try {
-      const newWishlistState = await toggleWishlist(courseId, !wishlist)
-      setWishlist(newWishlistState)
-      
-      toast({
-        title: newWishlistState ? "Added to wishlist" : "Removed from wishlist",
-        description: newWishlistState 
-          ? `"${title}" is now in your wishlist` 
-          : `"${title}" was removed from your wishlist`,
-        variant: "default",
-      })
-    } catch (error) {
-      console.error("Failed to toggle wishlist:", error)
-      toast({
-        title: "Error",
-        description: "Could not update wishlist. Please try again.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsPending(false)
+    if (isPending) return;
+    setIsPending(true);
+    toggleFavorite(courseId);
+    if (favorites.includes(courseId)) {
+      setWishlist(true);
     }
-  }
+    setIsPending(false);
+  };
 
   return (
     <header className="flex flex-col sm:flex-row justify-between items-start gap-4">
@@ -62,13 +44,16 @@ export default function CourseHeader({
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
           {title}
         </h1>
-        
+
         <div className="flex flex-wrap items-center mt-2 gap-x-2 gap-y-1">
           <div className="flex items-center">
             <span className="font-bold mr-1 text-gray-900 dark:text-gray-100">
               {roundedRating}
             </span>
-            <div className="flex items-center" aria-label={`Rating: ${roundedRating} out of 5`}>
+            <div
+              className="flex items-center"
+              aria-label={`Rating: ${roundedRating} out of 5`}
+            >
               {[1, 2, 3, 4, 5].map((i) => (
                 <span key={i}>
                   {i <= fullStars ? (
@@ -90,11 +75,11 @@ export default function CourseHeader({
           </div>
         </div>
       </div>
-      
+
       <button
         className={`p-2 rounded-full transition-all duration-200 ${
-          wishlist 
-            ? "bg-red-50 dark:bg-red-900/30 text-red-500" 
+          wishlist
+            ? "bg-red-50 dark:bg-red-900/30 text-red-500"
             : "bg-white dark:bg-gray-800 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
         } shadow-sm border border-gray-200 dark:border-gray-700 ${
           isPending ? "opacity-50 cursor-not-allowed" : "hover:shadow-md"
@@ -107,5 +92,5 @@ export default function CourseHeader({
         <Heart className={`h-6 w-6 ${wishlist ? "fill-current" : ""}`} />
       </button>
     </header>
-  )
+  );
 }

@@ -46,7 +46,7 @@ export function CourseCard({
           {course.title}
         </h3>
         <p className="text-sm text-muted-foreground mb-2">
-          By {course.instructor.name}
+          By {course.instructor.name} {course.instructor.lastname}
         </p>
         <div className="flex items-center mb-2">
           <span className="font-bold mr-1">{course.rating}</span>
@@ -67,7 +67,7 @@ export function CourseCard({
       </CardContent>
       <CardFooter className="p-4 pt-0">
         <Button
-          className="w-full"
+          className="w-full bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
           variant={isInCart ? "outline" : "default"}
           onClick={() =>
             isInCart

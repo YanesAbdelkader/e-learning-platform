@@ -159,16 +159,15 @@ export function useCartAndFavorites() {
   // Toggle Favorites Handler
   // -----------------------------
   const toggleFavorite = useCallback(
-    async (courseId: string) => {
+    (courseId: string) => {
       if (favorites.includes(courseId)) {
-        await removeFromFavorites(courseId);
+        removeFromFavorites(courseId);
       } else {
-        await addToFavorites(courseId);
+        addToFavorites(courseId);
       }
     },
     [favorites, addToFavorites, removeFromFavorites]
   );
-
   // -----------------------------
   // Hook Return
   // -----------------------------
@@ -179,6 +178,7 @@ export function useCartAndFavorites() {
     favorites,
     loadingFavorites,
     error,
+    removeFromFavorites,
     toggleFavorite,
   };
 }

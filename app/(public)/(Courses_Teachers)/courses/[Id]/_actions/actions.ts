@@ -61,34 +61,6 @@ export async function getReviews(courseId: string) {
   }
 }
 
-export async function toggleWishlist(courseId: string, isWishlisted: boolean) {
-  console.log(
-    `${isWishlisted ? "Removed from" : "Added to"} wishlist: ${courseId}`
-  );
-  return !isWishlisted;
-}
-
-export async function submitReview(
-  courseId: string,
-  reviewData: { rating: number; comment: string }
-) {
-  const newReview = {
-    id: Date.now(),
-    name: "You",
-    avatar: "/placeholder.svg?height=40&width=40",
-    rating: reviewData.rating,
-    comment: reviewData.comment,
-    date: "Just now",
-  };
-
-  console.log(`Review submitted for course ${courseId}:`, newReview);
-  return newReview;
-}
-
-export async function addToCart(courseId: string) {
-  console.log(`Added to cart: ${courseId}`);
-  return true;
-}
 
 export async function buyNow(courseId: string) {
   const Id = { courseId: courseId };

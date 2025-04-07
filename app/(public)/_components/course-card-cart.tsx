@@ -9,26 +9,31 @@ type CourseCardProps = {
   course: Course;
   removeFromCart?: (id: string) => void;
 };
-export default function CourseCard({ course, removeFromCart }: CourseCardProps) {
+export default function CourseCard({
+  course,
+  removeFromCart,
+}: CourseCardProps) {
   return (
-    <Card  className="mb-4">
+    <Card className="mb-4">
       <CardContent className="p-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-shrink-0">
             <Image
-              src={course.image || "/placeholder.svg"}
+              src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${course.image}`}
               alt={course.title}
+              width={400}
+              height={200}
               className="w-full sm:w-32 h-auto rounded-md object-cover"
             />
           </div>
           <div className="flex-grow">
             <h3 className="font-semibold text-lg">{course.title}</h3>
             <p className="text-sm text-muted-foreground">
-              By {course.instructor}
+              By {course.instructor.name} {course.instructor.lastname}
             </p>
           </div>
           <div className="flex flex-col items-end justify-between">
-            <p className="text-lg font-bold">${course.price.toFixed(2)}</p>
+            <p className="text-lg font-bold">{course.price} DA</p>
             <Button
               variant="ghost"
               size="sm"

@@ -10,7 +10,7 @@ import { CourseCard } from "../_components/course-card-fav";
 import { fetchCoursesByIds } from "@/functions/custom";
 
 export default function FavoritesPage() {
-  const { favorites, toggleFavorite } = useCartAndFavorites();
+  const { favorites, removeFromFavorites } = useCartAndFavorites();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -54,7 +54,7 @@ export default function FavoritesPage() {
               key={course.id}
               course={course}
               isFavorite={true}
-              onFavoriteToggle={() => toggleFavorite(String(course.id))}
+              onFavoriteToggle={() => removeFromFavorites(String(course.id))}
             />
           ))}
         </div>

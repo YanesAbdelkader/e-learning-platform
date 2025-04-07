@@ -15,7 +15,6 @@ export default function CartPage() {
   const { cart, removeFromCart } = useCartAndFavorites();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const fetchCartItems = async (courseIds: string[]) => {
       try {
@@ -73,17 +72,15 @@ export default function CartPage() {
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between font-bold text-lg">
                     <span>Total:</span>
-                    <span>{calculateTotal().toFixed(2)} DA</span>
+                    <span>{calculateTotal()} DA</span>
                   </div>
                 </div>
 
                 <Separator className="my-4" />
 
-                <Button className="w-full">Checkout</Button>
-
-                <p className="text-xs text-center text-muted-foreground mt-4">
-                  30-Day Money-Back Guarantee
-                </p>
+                <Button className="w-full bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                  Checkout
+                </Button>
               </CardContent>
             </Card>
           </div>

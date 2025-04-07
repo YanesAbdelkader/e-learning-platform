@@ -16,7 +16,6 @@ export default async function CourseDetailPage({
 }) {
   const courseData = await getCourseDetails(params.Id);
   const relatedCourses = await getRelatedCourses(params.Id);
-
   return (
     <div className="container mx-auto px-4 py-10">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { addToCart, buyNow } from "../_actions/actions";
+import { buyNow } from "../_actions/actions";
 import Image from "next/image";
 import { Loader2, ShoppingCart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -17,9 +17,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { redirect } from "next/navigation";
+import { useCartAndFavorites } from "@/hooks/use-Cart-Fav";
 
 interface CourseSidebarProps {
-
   price: number;
   image: string;
   courseId: string;
@@ -34,13 +34,13 @@ export default function CourseSidebar({
 }: CourseSidebarProps) {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const { toast } = useToast();
+  const { addToCart } = useCartAndFavorites();
 
   const handleAddToCart = async () => {
     if (isAddingToCart) return;
-
     setIsAddingToCart(true);
     try {
-      await addToCart(courseId);
+      addToCart(courseId);
       toast({
         title: "Added to cart",
         description: `${title} has been added to your cart.`,
@@ -64,7 +64,6 @@ export default function CourseSidebar({
     if (isBuyingNow) return;
 
     const logedin = await checkAuthStatus();
-
     if (logedin.isLoggedIn) {
       setIsBuyingNow(true);
       try {
