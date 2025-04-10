@@ -29,11 +29,10 @@ export const handleAPIcall = async (
     };
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      const details = error.response?.data || {};
       const message = `Error! Status: ${error.response?.status} ${error.response?.statusText}`;
       return {
         data: null,
-        error: new Error(`${message} - Details: ${JSON.stringify(details)}`),
+        error: new Error(`${message}`),
       };
     } else {
       return {
@@ -140,7 +139,6 @@ export async function fetchCoursesByIds(courseIds: string[]) {
     return [];
   }
   if (response?.data) {
-    console.log(response?.data)
     return response?.data.courses;
   }
 }

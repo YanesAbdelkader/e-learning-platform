@@ -1,5 +1,4 @@
-"use client";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,10 +14,9 @@ export default function TeacherSidebar({
   subjects,
   recommendedCourses,
 }: TeacherSidebarProps) {
-  const router = useRouter();
 
   const handleCourseClick = (courseId: string) => {
-    router.push(`/courses/${courseId}`);
+    redirect(`/courses/${courseId}`);
   };
 
   return (
@@ -70,9 +68,7 @@ export default function TeacherSidebar({
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">
-              No recommended courses found
-            </p>
+            <p className="text-sm text-muted-foreground">No courses found</p>
           )}
         </CardContent>
       </Card>

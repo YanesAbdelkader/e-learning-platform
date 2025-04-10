@@ -16,18 +16,18 @@ export default function Teachers({ teachers }: { teachers: Teacher[] }) {
       {teachers.map((teacher) => (
         <Card
           key={teacher.id}
-          className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-indigo-400 dark:hover:shadow-gray-400 h-85"
+          className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-indigo-400 dark:hover:shadow-gray-400 h-full flex flex-col"
           onMouseEnter={() => setHoveredTeacher(teacher.id)}
           onMouseLeave={() => setHoveredTeacher(null)}
         >
-          {/* Image Section */}
-          <div className="aspect-square relative overflow-hidden">
+          {/* Fixed-size image container */}
+          <div className="w-full h-[400px] relative overflow-hidden">
             <Image
               src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${teacher.picture}`}
               alt={teacher.name}
-              width={400}
-              height={400}
-              className="object-cover transition-transform duration-300 hover:scale-110 w-full h-full"
+              width={300}
+              height={300}
+              className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
             />
             {hoveredTeacher === teacher.id && (
               <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -43,45 +43,47 @@ export default function Teachers({ teachers }: { teachers: Teacher[] }) {
             )}
           </div>
 
-          {/* Header Section */}
-          <CardHeader className="space-y-1">
-            <h3 className="font-bold text-lg">{`${teacher.name} ${teacher.lastname}`}</h3>
-            <p className="text-sm text-purple-600 font-medium">
-              {teacher.teacher_info.education}
-            </p>
-          </CardHeader>
+          {/* Card content with fixed spacing */}
+          <div className="p-4 flex flex-col flex-1">
+            <CardHeader className="p-0 pb-3">
+              <h3 className="font-bold text-lg line-clamp-1">{`${teacher.name} ${teacher.lastname}`}</h3>
+              <p className="text-sm text-purple-600 font-medium line-clamp-1">
+                {teacher.teacher_info.education}
+              </p>
+            </CardHeader>
 
-          {/* Content Section */}
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              {/* Rating */}
-              <div className="flex items-center gap-1">
-                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                <span className="font-bold">{teacher.teacher_info.rating?teacher.teacher_info.rating : 0}</span>
+            <CardContent className="p-0 flex flex-col flex-1">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-1">
+                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                  <span className="font-bold">
+                    {teacher.teacher_info.rating?.toFixed(1) || "N/A"}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <Users className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">
+                    {teacher.students || "N/A"}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <BookOpen className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">
+                    {teacher.course_count} Courses
+                  </span>
+                </div>
               </div>
 
-              {/* Students */}
-              <div className="flex items-center gap-1">
-                <Users className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">
-                  {teacher.students? teacher.students : "N/A"}
-                </span>
+              {/* Fixed height description */}
+              <div className="flex-1">
+                <p className="text-sm text-muted-foreground line-clamp-3 h-[60px]">
+                  {teacher.teacher_info.bio}
+                </p>
               </div>
-
-              {/* Courses */}
-              <div className="flex items-center gap-1">
-                <BookOpen className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">
-                  {teacher.course_count} Courses
-                </span>
-              </div>
-            </div>
-
-            {/* Description */}
-            <p className="text-sm text-muted-foreground line-clamp-3">
-              {teacher.teacher_info.bio}
-            </p>
-          </CardContent>
+            </CardContent>
+          </div>
         </Card>
       ))}
     </div>

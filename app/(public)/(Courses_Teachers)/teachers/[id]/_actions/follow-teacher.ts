@@ -1,8 +1,6 @@
 import { handleAPIcall } from "@/functions/custom";
 
-export async function followTeacher(
-  teacherId: string
-): Promise<{ success: boolean; message?: string }> {
+export async function followTeacher(teacherId: string) {
   try {
     const { data: response, error } = await handleAPIcall(
       null,
@@ -18,14 +16,7 @@ export async function followTeacher(
         message: error.message || "Failed to follow teacher",
       };
     }
-
-    if (!response) {
-      return {
-        success: false,
-        message: "No response received from server",
-      };
-    }
-
+    console.log("API response:", response);
     return {
       success: true,
       message: "Successfully followed teacher",
@@ -40,9 +31,7 @@ export async function followTeacher(
   }
 }
 
-export async function unfollowTeacher(
-  teacherId: string
-): Promise<{ success: boolean; message?: string }> {
+export async function unfollowTeacher(teacherId: string) {
   try {
     const { data: response, error } = await handleAPIcall(
       null,
@@ -58,14 +47,7 @@ export async function unfollowTeacher(
         message: error.message || "Failed to unfollow teacher",
       };
     }
-
-    if (!response) {
-      return {
-        success: false,
-        message: "No response received from server",
-      };
-    }
-
+    console.log("API response:", response);
     return {
       success: true,
       message: "Successfully unfollowed teacher",

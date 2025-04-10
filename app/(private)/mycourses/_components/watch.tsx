@@ -1,12 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  CheckCircle,
-  ChevronLeft,
-  Clock,
-  PlayCircle,
-} from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { CheckCircle, ChevronLeft, Clock, PlayCircle } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -38,6 +33,7 @@ interface Course {
   episodes: Episode[];
   instructor: string;
   level: string;
+  progress: number; 
 }
 
 interface VideoPageProps {
@@ -49,11 +45,9 @@ export default function VideoPage({ token, course }: VideoPageProps) {
   const [selectedEpisode, setSelectedEpisode] = useState<Episode | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize the selected episode when the course data is available
   useEffect(() => {
     if (course?.episodes?.length) {
       setIsLoading(false);
-      // Try to find the first incomplete episode, otherwise use the first episode
       const firstIncompleteEpisode = course.episodes.find(
         (episode) => !episode.completed
       );
@@ -61,19 +55,9 @@ export default function VideoPage({ token, course }: VideoPageProps) {
     }
   }, [course]);
 
-  // Memoize the progress calculation to avoid unnecessary recalculations
-  const progress = useMemo(() => {
-    if (!course?.episodes?.length) return 0;
-    const completedEpisodes = course.episodes.filter(
-      (episode) => episode.completed
-    ).length;
-    return Math.round((completedEpisodes / course.episodes.length) * 100);
-  }, [course]);
-
   // Handle episode selection
   const handleEpisodeSelect = useCallback((episode: Episode) => {
     setSelectedEpisode(episode);
-    // Scroll to the top of the page on mobile when selecting a new episode
     if (window.innerWidth < 1024) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -85,11 +69,11 @@ export default function VideoPage({ token, course }: VideoPageProps) {
 
   if (!course || !selectedEpisode) {
     return (
-      <div className="flex items-center justify-center h-[50vh]">
+      <div className="flex flex-col items-center justify-center h-[50vh] gap-2">
         <p className="text-muted-foreground">Course not found</p>
         <Link
           href="/mycourses"
-          className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-4 transition-colors"
+          className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
           <ChevronLeft className="mr-1 h-4 w-4" />
           <span>Back to My Courses</span>
@@ -111,12 +95,12 @@ export default function VideoPage({ token, course }: VideoPageProps) {
           />
         </div>
 
-        {/* Course episodes */}
+        {/* Course episodes sidebar */}
         <div className="lg:col-span-1">
           <CourseContent
             episodes={course.episodes}
             selectedEpisodeId={selectedEpisode.id}
-            progress={progress}
+            progress={course.progress} // Using progress from API
             onEpisodeSelect={handleEpisodeSelect}
           />
         </div>
@@ -134,10 +118,10 @@ function CourseHeader({ course }: { course: Course }) {
         className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-4 transition-colors"
       >
         <ChevronLeft className="mr-1 h-4 w-4" />
-        <span>Back Course</span>
+        <span>Back to Course</span>
       </Link>
       <h1 className="text-2xl font-bold mb-2">{course.title}</h1>
-      <div className="flex items-center gap-2 mb-2">
+      <div className="flex flex-wrap items-center gap-2 mb-2">
         <Badge variant="outline">{course.level}</Badge>
         <span className="text-sm text-muted-foreground">
           Instructor: {course.instructor}
@@ -178,7 +162,7 @@ function EpisodeDetails({
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="space-y-2">
             <CardTitle className="text-2xl">{episode.title}</CardTitle>
             <p className="text-muted-foreground">{episode.description}</p>

@@ -1,5 +1,4 @@
 "use client";
-import { checkAuthStatus, logout } from "@/functions/custom";
 import { useCartAndFavorites } from "@/hooks/use-Cart-Fav";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "next-themes";
@@ -16,9 +15,10 @@ import { UserDropdown } from "./Header/user-dropdown";
 import { AuthButtons } from "./Header/auth-button";
 import { Button } from "./ui/button";
 import { MobileMenu } from "./Header/mobile-menu";
+import { checkAuthStatus, logout } from "@/functions/custom";
 
 export function Header() {
-  const { favorites, cart } = useCartAndFavorites();
+  const { favorites, favoritesCount, cartCount, cart } = useCartAndFavorites();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
@@ -28,6 +28,7 @@ export function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Initialize auth status
   useEffect(() => {
     const initAuth = async () => {
       const cookiePicture = getCookie("picture");
@@ -40,13 +41,9 @@ export function Header() {
 
       try {
         const { isLoggedIn } = await checkAuthStatus();
-        if (isLoggedIn) {
-          setIsLoggedIn(true);
-        } else {
-          setIsLoggedIn(false);
-        }
+        setIsLoggedIn(isLoggedIn);
       } catch (error) {
-        console.error("Auth check failed:", error);
+        console.log("Auth check failed:", error);
         setIsLoggedIn(false);
       } finally {
         setIsLoading(false);
@@ -60,7 +57,7 @@ export function Header() {
     setLoading(true);
     try {
       const result = await logout();
-      if (result === true) {
+      if (result) {
         toast({
           title: "Logout Successful",
           description: "You have been logged out.",
@@ -68,17 +65,13 @@ export function Header() {
         setPicture(undefined);
         setIsLoggedIn(false);
       } else {
-        toast({
-          title: "Logout Failed",
-          description: "Something went wrong. Please try again.",
-          variant: "destructive",
-        });
+        throw new Error("Logout failed");
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast({
-        title: "Logout Error",
-        description: "An unexpected error occurred.",
+        title: "Logout Failed",
+        description: "Something went wrong. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -88,9 +81,7 @@ export function Header() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    const form = e.currentTarget as HTMLFormElement;
-    const searchTerm = form.search.value.trim();
-
+    const searchTerm = searchQuery.trim();
     if (searchTerm) {
       router.push(`/${searchTerm}`);
     }
@@ -101,12 +92,10 @@ export function Header() {
   }, [theme, setTheme]);
 
   const getProfileImageUrl = useCallback(() => {
-    if (picture && picture.startsWith("http")) {
-      return picture;
-    } else if (picture) {
-      return `${process.env.NEXT_PUBLIC_API_URL}/storage/${picture}`;
-    }
-    return "/placeholder.svg?height=32&width=32";
+    if (!picture) return "/placeholder.svg?height=32&width=32";
+    return picture.startsWith("http")
+      ? picture
+      : `${process.env.NEXT_PUBLIC_API_URL}/storage/${picture}`;
   }, [picture]);
 
   return (
@@ -115,10 +104,7 @@ export function Header() {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <Logo />
-            <nav
-              className="hidden md:ml-6 md:flex md:space-x-8"
-              aria-label="Main Navigation"
-            >
+            <nav className="hidden md:ml-6 md:flex md:space-x-8">
               <NavLink href="/courses">Courses</NavLink>
               <NavLink href="/teachers">Teachers</NavLink>
             </nav>
@@ -134,26 +120,23 @@ export function Header() {
             <Link
               href="/favorite"
               className="relative text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white"
-              aria-label={`Favorites (${favorites.length})`}
+              aria-label={`Favorites (${favoritesCount})`}
             >
               <Heart className="h-6 w-6" />
-              {favorites.length > 0 && <CountBadge count={favorites.length} />}
+              {favoritesCount > 0 && <CountBadge count={favoritesCount} />}
             </Link>
 
             <Link
               href="/cart"
               className="relative text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white"
-              aria-label={`Cart (${cart.length})`}
+              aria-label={`Cart (${cartCount})`}
             >
               <ShoppingCart className="h-6 w-6" />
-              {cart.length > 0 && <CountBadge count={cart.length} />}
+              {cartCount > 0 && <CountBadge count={cartCount} />}
             </Link>
 
             {isLoading ? (
-              <Loader2
-                className="h-8 w-8 animate-spin"
-                aria-label="Loading user profile"
-              />
+              <Loader2 className="h-8 w-8 animate-spin" />
             ) : isLoggedIn ? (
               <UserDropdown
                 profileImageUrl={getProfileImageUrl()}

@@ -3,9 +3,10 @@ import localFont from "next/font/local";
 import "../globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
-import Footer from "@/components/footer";
 import { Header } from "@/components/header";
+import Footer from "@/components/footer";
 
+// Custom fonts
 const geistSans = localFont({
   src: "../fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -17,24 +18,26 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
+// Page metadata
 export const metadata: Metadata = {
   title: "Bright Mind",
   description: "Your best place to learn online",
 };
 
+// Layout component
 export default function PublicLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Header />
-          <main>{children}</main>
+          <main className="flex-1">{children}</main>
           <Toaster />
           <Footer />
         </ThemeProvider>

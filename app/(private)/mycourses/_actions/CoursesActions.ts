@@ -10,13 +10,13 @@ export async function fetchCourses() {
       "GET"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
     }
     if (response) {
       return response.data;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }
 
@@ -29,13 +29,13 @@ export async function fetchCoursesById(courseId: string) {
       "GET"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
     }
     if (response) {
       return response.data;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }
 
@@ -48,12 +48,12 @@ export async function fetchCourse(courseId: string) {
       "GET"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
     }
     if (response) {
       return response.data;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }

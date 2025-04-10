@@ -16,7 +16,6 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">12</div>
-              <p className="text-xs text-muted-foreground">+2 since last month</p>
             </CardContent>
           </Card>
         </Suspense>
@@ -28,7 +27,6 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">48.5</div>
-              <p className="text-xs text-muted-foreground">+12.5 since last month</p>
             </CardContent>
           </Card>
         </Suspense>
@@ -40,7 +38,6 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">4</div>
-              <p className="text-xs text-muted-foreground">+1 since last month</p>
             </CardContent>
           </Card>
         </Suspense>

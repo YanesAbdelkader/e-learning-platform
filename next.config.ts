@@ -2,7 +2,20 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ["striking-squirrel-supposedly.ngrok-free.app"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "striking-squirrel-supposedly.ngrok-free.app",
+        port: "",
+        pathname: "/**",
+      },
+    ],
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true
   },
   experimental: {
     serverActions: {

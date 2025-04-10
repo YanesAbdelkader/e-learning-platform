@@ -21,12 +21,12 @@ export function TeacherCard({ teacher }: TeacherCardProps) {
 
   return (
     <Card
-      className="w-[350px] h-[450px] flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-indigo-400 dark:hover:shadow-gray-400"
+      className="w-[350px] h-[550px] flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-indigo-400 dark:hover:shadow-gray-400"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Image Container - Fixed Size */}
-      <div className="w-full h-[300px] relative overflow-hidden">
+      <div className="w-full h-[400px] relative overflow-hidden">
         <Image
           src={getImageUrl(teacher.picture)}
           alt={`${teacher.name} ${teacher.lastname}`}
@@ -64,7 +64,7 @@ export function TeacherCard({ teacher }: TeacherCardProps) {
             {teacher.teacher_info.education}
           </p>
         </CardHeader>
-        
+
         <CardContent className="p-0 space-y-3 flex-1 flex flex-col">
           {/* Stats Row */}
           <div className="flex items-center justify-between">

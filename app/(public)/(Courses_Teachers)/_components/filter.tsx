@@ -70,97 +70,7 @@ export default function FilterC({
 
         {/* Filters */}
         <div className="space-y-6">
-          {/* Level Selection */}
-          <div>
-            <h2 className="text-lg font-semibold dark:text-gray-100">Level</h2>
-            <Select value={selectedLevel} onValueChange={setSelectedLevel}>
-              <SelectTrigger className="w-full dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700">
-                <SelectValue placeholder="Select Level" />
-              </SelectTrigger>
-              <SelectContent className="dark:bg-gray-500 dark:text-gray-200">
-                <SelectItem value="all">All Levels</SelectItem>
-                <SelectItem value="beginner">Beginner</SelectItem>
-                <SelectItem value="intermediate">Intermediate</SelectItem>
-                <SelectItem value="advanced">Advanced</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Category Selection */}
-          <div className="space-y-6">
-            <h2 className="text-lg font-semibold dark:text-gray-100">
-              Category
-            </h2>
-            <Select
-              value={selectedCategory}
-              onValueChange={setSelectedCategory}
-            >
-              <SelectTrigger className="w-full dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700">
-                <SelectValue placeholder="Select Category" />
-              </SelectTrigger>
-              <SelectContent className="dark:bg-gray-500 dark:text-gray-200">
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id.toString()}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Rating Filter */}
-          <div>
-            <h2 className="text-lg font-semibold dark:text-gray-100">
-              Minimum Rating
-            </h2>
-            <Slider
-              min={0}
-              max={5}
-              step={0.1}
-              value={[rating]}
-              onValueChange={(value) => setRating(value[0])}
-              className="dark:bg-gray-700"
-            />
-            <div className="flex items-center justify-between mt-2">
-              <span className="text-sm dark:text-gray-300">0</span>
-              <div className="flex items-center space-x-1">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <Star
-                    key={index}
-                    className={`w-5 h-5 ${
-                      index < rating
-                        ? "fill-yellow-400 text-yellow-400"
-                        : "text-gray-300 dark:text-gray-500"
-                    }`}
-                  />
-                ))}
-                <span className="ml-2 dark:text-gray-300">
-                  {rating.toFixed(1)}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Price Range Filter */}
-          <div>
-            <h2 className="text-lg font-semibold dark:text-gray-100">
-              Price Range
-            </h2>
-            <Slider
-              min={0}
-              max={10000}
-              step={1}
-              value={[price]}
-              onValueChange={(value) => setPrice(value[0])}
-              className="dark:bg-gray-700"
-            />
-            <div className="flex justify-between mt-2 text-sm dark:text-gray-300">
-              <span>{price}DA</span>
-              <span>10000DA</span>
-            </div>
-          </div>
-
-          {/* Search By Courses/Teachers */}
+          {/* Search By Courses/Teachers - Moved to top */}
           <div>
             <h2 className="text-lg font-semibold dark:text-gray-100">
               Search By
@@ -209,6 +119,101 @@ export default function FilterC({
                 </Label>
               </div>
             </RadioGroup>
+          </div>
+
+          {/* Only show these filters when searching for courses */}
+          {searchType === "Courses" && (
+            <>
+              {/* Level Selection */}
+              <div>
+                <h2 className="text-lg font-semibold dark:text-gray-100">Level</h2>
+                <Select value={selectedLevel} onValueChange={setSelectedLevel}>
+                  <SelectTrigger className="w-full dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700">
+                    <SelectValue placeholder="Select Level" />
+                  </SelectTrigger>
+                  <SelectContent className="dark:bg-gray-500 dark:text-gray-200">
+                    <SelectItem value="all">All Levels</SelectItem>
+                    <SelectItem value="beginner">Beginner</SelectItem>
+                    <SelectItem value="intermediate">Intermediate</SelectItem>
+                    <SelectItem value="advanced">Advanced</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Category Selection */}
+              <div className="space-y-6">
+                <h2 className="text-lg font-semibold dark:text-gray-100">
+                  Category
+                </h2>
+                <Select
+                  value={selectedCategory}
+                  onValueChange={setSelectedCategory}
+                >
+                  <SelectTrigger className="w-full dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700">
+                    <SelectValue placeholder="Select Category" />
+                  </SelectTrigger>
+                  <SelectContent className="dark:bg-gray-500 dark:text-gray-200">
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id.toString()}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Price Range Filter (only for courses) */}
+              <div>
+                <h2 className="text-lg font-semibold dark:text-gray-100">
+                  Price Range
+                </h2>
+                <Slider
+                  min={0}
+                  max={10000}
+                  step={1}
+                  value={[price]}
+                  onValueChange={(value) => setPrice(value[0])}
+                  className="dark:bg-gray-700"
+                />
+                <div className="flex justify-between mt-2 text-sm dark:text-gray-300">
+                  <span>{price}DA</span>
+                  <span>10000DA</span>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Rating Filter (shown for both courses and teachers) */}
+          <div>
+            <h2 className="text-lg font-semibold dark:text-gray-100">
+              Minimum Rating
+            </h2>
+            <Slider
+              min={0}
+              max={5}
+              step={0.1}
+              value={[rating]}
+              onValueChange={(value) => setRating(value[0])}
+              className="dark:bg-gray-700"
+            />
+            <div className="flex items-center justify-between mt-2">
+              <span className="text-sm dark:text-gray-300">0</span>
+              <div className="flex items-center space-x-1">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <Star
+                    key={index}
+                    className={`w-5 h-5 ${
+                      index < rating
+                        ? "fill-yellow-400 text-yellow-400"
+                        : "text-gray-300 dark:text-gray-500"
+                    }`}
+                  />
+                ))}
+                <span className="ml-2 dark:text-gray-300">
+                  {rating.toFixed(1)}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

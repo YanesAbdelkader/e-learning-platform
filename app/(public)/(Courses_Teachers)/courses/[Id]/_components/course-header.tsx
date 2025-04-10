@@ -1,15 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Heart } from "lucide-react";
 import { StarFilledIcon, StarIcon } from "@radix-ui/react-icons";
 import { useCartAndFavorites } from "@/hooks/use-Cart-Fav";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { checkAuthStatus } from "@/functions/custom";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 interface CourseHeaderProps {
   title: string;
   rating: number;
   students: number;
   courseId: string;
+  isLoading?: boolean;
 }
 
 export default function CourseHeader({
@@ -17,29 +31,62 @@ export default function CourseHeader({
   rating,
   students,
   courseId,
+  isLoading = false,
 }: CourseHeaderProps) {
+  const router = useRouter();
   const { favorites, toggleFavorite } = useCartAndFavorites();
-  const [wishlist, setWishlist] = useState(
-    favorites.includes(courseId) ? true : false
-  );
+  const [isfaved, setIsfaved] = useState(false);
   const [isPending, setIsPending] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
 
+  // Calculate rating display
   const roundedRating = Math.round(rating * 10) / 10;
   const fullStars = Math.floor(roundedRating);
   const hasHalfStar = roundedRating % 1 >= 0.5;
 
-  const handleWishlistToggle = async () => {
-    if (isPending) return;
-    setIsPending(true);
-    toggleFavorite(courseId);
-    if (favorites.includes(courseId)) {
-      setWishlist(true);
+  // Sync fav state with favorites
+  useEffect(() => {
+    setIsfaved(favorites.includes(courseId));
+  }, [favorites, courseId]);
+
+  const handlefavToggle = async () => {
+    const { isLoggedIn } = await checkAuthStatus();
+
+    if (!isLoggedIn) {
+      setShowAuthDialog(true);
+      return;
     }
-    setIsPending(false);
+
+    if (isPending) return;
+
+    setIsPending(true);
+    try {
+      await toggleFavorite(courseId);
+    } finally {
+      setIsPending(false);
+    }
   };
 
+  const handleLoginRedirect = () => {
+    document.cookie = `lastVisitedPage=${window.location.pathname}; path=/; max-age=3600`;
+    router.push("/login");
+    router.refresh(); // Ensure the page updates after redirect
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+        <div className="flex-1 space-y-3">
+          <Skeleton className="h-8 w-3/4" />
+          <Skeleton className="h-5 w-1/2" />
+        </div>
+        <Skeleton className="h-10 w-10 rounded-full" />
+      </div>
+    );
+  }
+
   return (
-    <header className="flex flex-col sm:flex-row justify-between items-start gap-4">
+    <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
       <div className="flex-1">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
           {title}
@@ -77,20 +124,52 @@ export default function CourseHeader({
       </div>
 
       <button
-        className={`p-2 rounded-full transition-all duration-200 ${
-          wishlist
-            ? "bg-red-50 dark:bg-red-900/30 text-red-500"
-            : "bg-white dark:bg-gray-800 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-        } shadow-sm border border-gray-200 dark:border-gray-700 ${
+        className={cn(
+          "p-2 rounded-full transition-all duration-200",
+          "shadow-sm border border-gray-200 dark:border-gray-700",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500",
+          isfaved
+            ? "bg-red-50 dark:bg-red-900/30 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/40"
+            : "bg-white dark:bg-gray-800 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700",
           isPending ? "opacity-50 cursor-not-allowed" : "hover:shadow-md"
-        }`}
-        onClick={handleWishlistToggle}
+        )}
+        onClick={handlefavToggle}
         disabled={isPending}
-        aria-label={wishlist ? "Remove from wishlist" : "Add to wishlist"}
+        aria-label={isfaved ? "Remove from fav" : "Add to fav"}
         aria-busy={isPending}
       >
-        <Heart className={`h-6 w-6 ${wishlist ? "fill-current" : ""}`} />
+        <Heart
+          className={cn(
+            "h-6 w-6 transition-colors",
+            isfaved ? "fill-current" : "",
+            isPending ? "animate-pulse" : ""
+          )}
+        />
       </button>
-    </header>
+
+      <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-lg text-destructive">
+              Authentication Required
+            </DialogTitle>
+            <DialogDescription className="text-base">
+              You need to be logged in to add courses to your favorite.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAuthDialog(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleLoginRedirect}
+              className="bg-indigo-600 hover:bg-indigo-700 focus-visible:ring-indigo-500"
+            >
+              Go to Login
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }

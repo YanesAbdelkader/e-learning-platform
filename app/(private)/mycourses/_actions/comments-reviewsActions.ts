@@ -15,13 +15,12 @@ export async function fetchMockComments(courseId: string) {
     }
 
     if (response) {
-      console.log(response.data.comments);
-      return response.data.comments; // Ensure you're accessing the right property
+      return response.data.comments; 
     }
 
     return;
   } catch (error) {
-    console.error("Fetch Error:", error);
+    console.log("Fetch Error:", error);
     return;
   }
 }
@@ -35,14 +34,14 @@ export async function fetchMockReviews(courseId: string) {
       "GET"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
       return [];
     }
     if (response) {
       return response.data.reviews;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return [];
   }
 }
@@ -56,14 +55,14 @@ export async function fetchReplies(commentId: string) {
       "GET"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
       return [];
     }
     if (response) {
       return response.data.replies;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return [];
   }
 }
@@ -77,14 +76,14 @@ export async function commentSubmit(courseId: string, comment: string) {
       "POST"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
       return;
     }
     if (response) {
       return response.data;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return;
   }
 }
@@ -102,13 +101,13 @@ export async function replySubmit(
       "POST"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
     }
     if (response) {
       return response.data;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }
 
@@ -122,13 +121,13 @@ export async function reviewSubmit(courseId: string, formData: FormData) {
       "POST"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
     }
     if (response) {
       return response.data;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }
 
@@ -141,12 +140,12 @@ export async function DeleteReview(courseId: string, commentId: string) {
       "DELETE"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
     }
     if (response) {
       return response.data;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }

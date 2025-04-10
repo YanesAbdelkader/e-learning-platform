@@ -14,8 +14,8 @@ type CourseCardProps = {
 
 export default function CourseCard({ course }: CourseCardProps) {
   return (
-    <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-indigo-400 dark:hover:shadow-gray-400 h-85">
-      <div className="relative h-48 w-full overflow-hidden">
+    <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-indigo-400 dark:hover:shadow-gray-400 h-full flex flex-col">
+      <div className="relative h-48 w-full overflow-hidden flex-shrink-0">
         <Image
           src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${course.image}`}
           alt={`${course.title} course thumbnail`}
@@ -29,18 +29,20 @@ export default function CourseCard({ course }: CourseCardProps) {
           </Badge>
         )}
       </div>
-      <CardContent className="p-5 flex flex-col flex-grow">
-        <h3 className="font-semibold text-lg mb-2 line-clamp-2 hover:text-primary transition-colors">
-          {course.title}
-        </h3>
-        <p className="text-sm text-muted-foreground mb-3">
-          {`${course.instructor.name} ${course.instructor.lastname}`}
-        </p>
-        <div className="flex items-center mb-3">
-          <span className="font-semibold text-lg mr-2">{course.rating}</span>
-          <StarRating rating={course.rating} />
+      <CardContent className="p-5 flex flex-col flex-1">
+        <div className="flex flex-col flex-1">
+          <h3 className="font-semibold text-lg mb-2 line-clamp-2 hover:text-primary transition-colors">
+            {course.title}
+          </h3>
+          <p className="text-sm text-muted-foreground mb-3">
+            {`${course.instructor.name} ${course.instructor.lastname}`}
+          </p>
+          <div className="flex items-center mb-3">
+            <span className="font-semibold text-lg mr-2">{course.rating}</span>
+            <StarRating rating={course.rating} />
+          </div>
         </div>
-        <div className="flex items-center justify-between mt-auto pt-3 border-t border-border">
+        <div className="flex items-center justify-between pt-3 border-t border-border">
           <span className="font-bold text-xl">{course.price} DA</span>
           <Link href={`/courses/${course.id}`}>
             <Button

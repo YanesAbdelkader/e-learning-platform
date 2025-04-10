@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Star, Users, BookOpen } from "lucide-react";
 import { Teacher } from "../_types/teacher";
@@ -16,7 +16,7 @@ import {
 import { checkAuthStatus } from "@/functions/custom";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 interface TeacherHeaderProps {
   teacher: Teacher;
@@ -24,6 +24,7 @@ interface TeacherHeaderProps {
 
 export default function TeacherHeader({ teacher }: TeacherHeaderProps) {
   const { toast } = useToast();
+  const router = useRouter();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   async function handleFollowToggle() {
     if (!teacher) return;
@@ -33,9 +34,9 @@ export default function TeacherHeader({ teacher }: TeacherHeaderProps) {
         setShowAuthDialog(true);
         return;
       }
-
-      const action = teacher.isFollowing ? unfollowTeacher : followTeacher;
-      const { success, message } = await action(teacher.id);
+      const { success, message } = await (teacher.isFollowing
+        ? unfollowTeacher(teacher.id)
+        : followTeacher(teacher.id));
       if (success) {
         toast({
           title: "Success",
@@ -59,7 +60,7 @@ export default function TeacherHeader({ teacher }: TeacherHeaderProps) {
 
   function handleLoginRedirect() {
     document.cookie = `lastVisitedPage=${window.location.href}; path=/; max-age=3600`;
-    redirect("/login");
+    router.push("/login");
   }
 
   return (

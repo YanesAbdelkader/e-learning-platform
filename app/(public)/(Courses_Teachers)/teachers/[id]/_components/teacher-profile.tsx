@@ -1,3 +1,4 @@
+"use client"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TeacherHeader from "./teacher-header";
 import TeacherBio from "./teacher-bio";
@@ -31,9 +32,9 @@ export default function TeacherProfile({
         {/* Main Profile Section */}
         <div className="md:col-span-2 space-y-6">
           <TeacherHeader teacher={teacher} />
-
+          
           <Tabs defaultValue="bio" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-3">
+            <TabsList className="grid w-full grid-cols-3 gap-2">
               <TabsTrigger value="bio">Bio</TabsTrigger>
               <TabsTrigger value="certifications">Certifications</TabsTrigger>
               <TabsTrigger value="contact">Contact</TabsTrigger>
