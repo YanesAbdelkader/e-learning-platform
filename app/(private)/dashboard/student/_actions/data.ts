@@ -42,13 +42,13 @@ export async function fetchTransactions() {
       "GET"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
     }
     if (response) {
       return response.data.transactions;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }
 
@@ -62,14 +62,14 @@ export async function fetchIssues() {
     );
 
     if (error) {
-      console.error("API Error:", error);
+      console.log("API Error:", error);
     }
 
     if (response?.data?.issues) {
       return response.data.issues;
     }
   } catch (error) {
-    console.error("Unexpected error in fetchIssues:", error);
+    console.log("Unexpected error in fetchIssues:", error);
   }
 }
 export async function AddIssues(data: { title: string; content: string }) {
@@ -82,12 +82,12 @@ export async function AddIssues(data: { title: string; content: string }) {
     );
 
     if (error) {
-      console.error("API Error:", error);
+      console.log("API Error:", error);
       return { success: false, message: "API call failed" };
     }
 
     if (!response) {
-      console.error("Invalid API response:", response);
+      console.log("Invalid API response:", response);
       return { success: false, message: "Invalid API response" };
     }
 
@@ -97,7 +97,7 @@ export async function AddIssues(data: { title: string; content: string }) {
 
     return { success: false, message: "No success message in response" };
   } catch (error) {
-    console.error("Unexpected Error:", error);
+    console.log("Unexpected Error:", error);
     return { success: false, message: "An unexpected error occurred" };
   }
 }

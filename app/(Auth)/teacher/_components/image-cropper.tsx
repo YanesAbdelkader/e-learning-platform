@@ -50,7 +50,7 @@ export default function ImageCropper({ imageSrc, onCropComplete, onCancel }: Ima
       drawImage();
     };
     image.onerror = (error) => {
-      console.error("Failed to load image", error);
+      console.log("Failed to load image", error);
     };
   }, [imageSrc, drawImage]);
 

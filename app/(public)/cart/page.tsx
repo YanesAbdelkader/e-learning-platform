@@ -12,121 +12,99 @@ import CourseCard from "../_components/course-card-cart";
 import { fetchCoursesByIds } from "@/functions/custom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
+import { buyNow } from "./_actions/buyAction";
 
 export default function CartPage() {
-  const { cart, removeFromCart, clearCart } = useCartAndFavorites();
+  const { cart, removeFromCart, clearCart, cartCount } = useCartAndFavorites();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   useEffect(() => {
-    const fetchCartItems = async (courseIds: string[]) => {
+    const abortController = new AbortController();
+
+    const loadCartItems = async () => {
       try {
-        setError(null);
+        if (cart.length === 0) {
+          setCourses([]);
+          return;
+        }
+
         setLoading(true);
-        const coursesByIds = await fetchCoursesByIds(courseIds);
-        setCourses(coursesByIds);
+        setError(null);
+        const data = await fetchCoursesByIds(cart);
+        setCourses(data);
       } catch (err) {
-        console.log("Error fetching cart items:", err);
-        setError("Failed to load cart items. Please try again.");
+        setError("Failed to load cart items");
+        console.log("Cart load error:", err);
         toast({
           variant: "destructive",
-          title: "Error loading cart",
-          description: "There was a problem loading your cart items.",
+          title: "Error",
+          description: "Could not load your cart items",
         });
       } finally {
         setLoading(false);
       }
     };
 
-    if (cart.length > 0) {
-      fetchCartItems(cart);
-    } else {
-      setLoading(false);
-      setCourses([]);
-    }
+    loadCartItems();
+    return () => abortController.abort();
   }, [cart]);
 
   const total = useMemo(() => {
-    return courses.reduce((sum, item) => sum + parseFloat(item.price), 0);
+    return courses.reduce((sum, course) => {
+      const price = parseFloat(course.price);
+      return isNaN(price) ? sum : sum + price;
+    }, 0);
   }, [courses]);
 
   const handleCheckout = async () => {
+    if (courses.length === 0) return;
+
     try {
       setIsCheckingOut(true);
-      // Simulate checkout processing
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
+      await buyNow(cart);
       toast({
-        title: "Checkout successful!",
-        description: "Your courses are now available in your account.",
+        title: "Success!",
+        description: "Your courses have been purchased",
       });
       clearCart();
     } catch (err) {
       console.log(err);
       toast({
         variant: "destructive",
-        title: "Checkout failed",
-        description:
-          "There was a problem processing your order. Please try again.",
+        title: "Error",
+        description: "Checkout failed. Please try again.",
       });
     } finally {
       setIsCheckingOut(false);
     }
   };
 
-  const formatPrice = (
-    price: number | string,
-    currency: string = "DZD",
-    locale: string = "en-DZ"
-  ): string => {
-    const numericPrice = typeof price === "string" ? parseFloat(price) : price;
-
-    if (isNaN(numericPrice)) {
-      console.warn(`Invalid price value: ${price}`);
-      return "Price not available";
-    }
-
-    return new Intl.NumberFormat(locale, {
+  const formatPrice = (price: number | string) => {
+    const num = typeof price === "string" ? parseFloat(price) : price;
+    return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(numericPrice);
+      currency: "USD",
+    }).format(isNaN(num) ? 0 : num);
   };
 
-  if (loading) {
-    return <CartSkeleton />;
-  }
-
-  if (error) {
-    return (
-      <EmptyState
-        icon={<ShoppingCart className="h-12 w-12" />}
-        title="Error loading cart"
-        description={error}
-        action={
-          <Button variant="outline" onClick={() => window.location.reload()}>
-            Retry
-          </Button>
-        }
-      />
-    );
-  }
+  if (loading) return <CartSkeleton count={Math.min(cartCount, 3)} />;
+  if (error) return <ErrorState error={error} />;
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container py-8 px-4">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Your Shopping Cart</h1>
+        <h1 className="text-3xl font-bold">Your Cart</h1>
         {courses.length > 0 && (
           <Button
             variant="ghost"
             onClick={clearCart}
-            className="text-destructive hover:text-destructive/90"
             disabled={isCheckingOut}
+            className="text-destructive"
           >
-            Clear Cart
+            Clear All
           </Button>
         )}
       </div>
@@ -145,74 +123,55 @@ export default function CartPage() {
 
           <div className="lg:col-span-1">
             <Card className="sticky top-8">
-              <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
+              <CardContent className="p-6 space-y-4">
+                <h2 className="text-xl font-semibold">Order Summary</h2>
 
-                <div className="space-y-3 mb-4">
+                <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span>Subtotal ({courses.length} items):</span>
+                    <span>Subtotal ({courses.length} items)</span>
                     <span>{formatPrice(total)}</span>
                   </div>
-                  <div className="flex justify-between font-bold text-lg">
-                    <span>Total:</span>
+                  <div className="flex justify-between font-bold">
+                    <span>Total</span>
                     <span>{formatPrice(total)}</span>
                   </div>
                 </div>
 
-                <Separator className="my-4" />
+                <Separator />
 
                 <Button
-                  className="w-full py-6 bg-indigo-600 hover:bg-indigo-700 text-base font-medium"
+                  className="w-full bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  size="lg"
                   onClick={handleCheckout}
                   disabled={isCheckingOut}
                 >
                   {isCheckingOut ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    "Proceed to Checkout"
-                  )}
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : null}
+                  Checkout
                 </Button>
-
-                <p className="text-xs text-muted-foreground mt-4 text-center">
-                  You won&apos;t be charged until the next step
-                </p>
               </CardContent>
             </Card>
           </div>
         </div>
       ) : (
-        <EmptyState
-          icon={<ShoppingCart className="h-12 w-12" />}
-          title="Your cart is empty"
-          description="Looks like you haven't added any courses to your cart yet."
-          action={
-            <Link href="/courses">
-              <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-base font-medium">
-                <ArrowRight className="h-4 w-4" />
-                Browse Courses
-              </Button>
-            </Link>
-          }
-        />
+        <EmptyCart />
       )}
     </div>
   );
 }
 
-function CartSkeleton() {
+function CartSkeleton({ count = 3 }: { count?: number }) {
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="flex justify-between items-center mb-8">
+    <div className="space-y-8">
+      <div className="flex justify-between">
         <Skeleton className="h-9 w-64" />
         <Skeleton className="h-9 w-24" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-4">
-          {[...Array(3)].map((_, i) => (
+          {Array.from({ length: count }).map((_, i) => (
             <div key={i} className="flex gap-4 p-4 border rounded-lg">
               <Skeleton className="h-32 w-48 rounded-md" />
               <div className="flex-1 space-y-2">
@@ -229,7 +188,7 @@ function CartSkeleton() {
           <Card className="sticky top-8">
             <CardContent className="p-6 space-y-4">
               <Skeleton className="h-6 w-32" />
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <div className="flex justify-between">
                   <Skeleton className="h-4 w-24" />
                   <Skeleton className="h-4 w-20" />
@@ -239,9 +198,7 @@ function CartSkeleton() {
                   <Skeleton className="h-5 w-24" />
                 </div>
               </div>
-              <Skeleton className="h-[1px] w-full" />
               <Skeleton className="h-12 w-full rounded-md" />
-              <Skeleton className="h-3 w-full" />
             </CardContent>
           </Card>
         </div>
@@ -250,22 +207,44 @@ function CartSkeleton() {
   );
 }
 
-interface EmptyStateProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  action?: React.ReactNode;
-}
-
-function EmptyState({ icon, title, description, action }: EmptyStateProps) {
+function EmptyCart() {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
-      <div className="flex items-center justify-center w-20 h-20 rounded-full bg-muted mb-4">
-        {icon}
+      <div className="mb-4 p-4 bg-muted rounded-full">
+        <ShoppingCart className="h-12 w-12" />
       </div>
-      <h2 className="text-2xl font-semibold mb-2">{title}</h2>
-      <p className="text-muted-foreground mb-6 max-w-md">{description}</p>
-      {action}
+      <h2 className="text-2xl font-semibold mb-2">Your cart is empty</h2>
+      <p className="text-muted-foreground mb-6 max-w-md">
+        Looks like you haven&apos;t added any courses yet
+      </p>
+      <Button
+        asChild
+        className="bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      >
+        <Link href="/courses">
+          <ArrowRight className="mr-2 h-4 w-4" />
+          Browse Courses
+        </Link>
+      </Button>
+    </div>
+  );
+}
+
+function ErrorState({ error }: { error: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-16 text-center">
+      <div className="mb-4 p-4 bg-destructive/10 rounded-full">
+        <ShoppingCart className="h-12 w-12 text-destructive" />
+      </div>
+      <h2 className="text-2xl font-semibold mb-2">Error loading cart</h2>
+      <p className="text-muted-foreground mb-6 max-w-md">{error}</p>
+      <Button
+        variant="outline"
+        className="bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+        onClick={() => window.location.reload()}
+      >
+        Try Again
+      </Button>
     </div>
   );
 }

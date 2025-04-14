@@ -14,12 +14,12 @@ export async function fetchEpisodes(courseId: string) {
     );
 
     if (error) {
-      console.error("Error fetching episodes:", error);
+      console.log("Error fetching episodes:", error);
       return [];
     }
     return response?.data?.data ?? [];
   } catch (err) {
-    console.error("Fetch Episodes Error:", err);
+    console.log("Fetch Episodes Error:", err);
     return [];
   }
 }
@@ -51,7 +51,7 @@ export async function addEpisode(formData: FormData) {
     revalidatePath("/dashboard/episodes");
     return data;
   } catch (error) {
-    console.error("Error adding episode:", error);
+    console.log("Error adding episode:", error);
     throw error;
   }
 }
@@ -72,7 +72,7 @@ export const updateEpisode = async (
 
     return response?.data;
   } catch (err) {
-    console.error("Update Episode Error:", err);
+    console.log("Update Episode Error:", err);
     throw err;
   }
 };
@@ -95,7 +95,7 @@ export const deleteEpisode = async ({
     if (error) throw new Error("Failed to delete episode");
     return response.data;
   } catch (err) {
-    console.error("Delete Episode Error:", err);
+    console.log("Delete Episode Error:", err);
     throw err;
   }
 };
@@ -131,7 +131,7 @@ export async function handleSaveEpisode(episodeData: {
 
     return newEpisode;
   } catch (error) {
-    console.error("Error saving episode:", error);
+    console.log("Error saving episode:", error);
     throw error;
   }
 }
@@ -152,7 +152,7 @@ export const reorderEpisodes = async (
 
     return response?.data;
   } catch (err) {
-    console.error("Reorder Episodes Error:", err);
+    console.log("Reorder Episodes Error:", err);
     throw err;
   }
 };
@@ -180,7 +180,7 @@ export async function uploadFileChunks(formData: FormData) {
 
     return data;
   } catch (error) {
-    console.error("Error uploading file chunks:", error);
+    console.log("Error uploading file chunks:", error);
     throw error;
   }
 }

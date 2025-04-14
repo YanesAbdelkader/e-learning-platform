@@ -47,7 +47,7 @@ export default function CourseStatusDropdown({
         load();
       }
     } catch (error) {
-      console.error("Failed to update course status:", error);
+      console.log("Failed to update course status:", error);
       toast({
         title: "Error",
         description: "Failed to update course status",

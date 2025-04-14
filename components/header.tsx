@@ -68,7 +68,7 @@ export function Header() {
         throw new Error("Logout failed");
       }
     } catch (error) {
-      console.error(error);
+      console.log(error);
       toast({
         title: "Logout Failed",
         description: "Something went wrong. Please try again.",

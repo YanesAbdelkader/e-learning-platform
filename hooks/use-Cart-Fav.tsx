@@ -28,34 +28,33 @@ export function useCartAndFavorites(): CartAndFavorites {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [loadingFavorites, setLoadingFavorites] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Memoized counts to prevent unnecessary re-renders
+  // Memoized counts
   const cartCount = useMemo(() => cart.length, [cart]);
   const favoritesCount = useMemo(() => favorites.length, [favorites]);
 
-  // Load cart from localStorage
+  // Initialize cart from localStorage
   useEffect(() => {
-    const loadCart = () => {
+    if (isInitialized || typeof window === "undefined") return;
+
+    const storedCart = localStorage.getItem("cart");
+    if (storedCart) {
       try {
-        const storedCart = localStorage.getItem("cart");
-        setCart(storedCart ? JSON.parse(storedCart) : []);
+        setCart(JSON.parse(storedCart));
       } catch (err) {
-        console.error("Cart load error:", err);
-        toast({
-          variant: "destructive",
-          title: "Error loading cart",
-          description: "Your cart data couldn't be loaded.",
-        });
+        console.error("Error parsing cart:", err);
+        localStorage.removeItem("cart");
       }
-    };
+    }
+    setIsInitialized(true);
+  }, [isInitialized]);
 
-    loadCart();
-  }, []);
-
-  // Save cart to localStorage whenever it changes
+  // Sync cart to localStorage
   useEffect(() => {
+    if (!isInitialized || typeof window === "undefined") return;
     localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
+  }, [cart, isInitialized]);
 
   const addToCart = useCallback((courseId: string) => {
     setCart((prevCart) => {
@@ -75,91 +74,47 @@ export function useCartAndFavorites(): CartAndFavorites {
     });
   }, []);
 
+  const removeFromCart = useCallback((courseId: string) => {
+    setCart((prevCart) => prevCart.filter((id) => id !== courseId));
+  }, []);
+
   const clearCart = useCallback(() => {
     setCart([]);
-    toast({
-      title: "Cart cleared",
-      description: "All courses have been removed from your cart.",
-    });
   }, []);
 
-  const removeFromCart = useCallback((courseId: string) => {
-    setCart((prevCart) => {
-      const updatedCart = prevCart.filter((id) => id !== courseId);
-      toast({
-        title: "Removed from cart",
-        description: "The course has been removed from your cart.",
-      });
-      return updatedCart;
-    });
-  }, []);
-
-  // Fetch favorites on mount
+  // Favorites logic
   useEffect(() => {
-    const initializeFavorites = async () => {
+    const loadFavorites = async () => {
       try {
         const courseIds = await fetchfavorites();
         setFavorites(courseIds);
       } catch (err) {
-        console.error("Failed to fetch favorites:", err);
-        toast({
-          variant: "destructive",
-          title: "Error loading favorites",
-          description: "Couldn't load your favorite courses. Please try again.",
-        });
+        console.error("Failed to load favorites:", err);
         setError("Failed to load favorites");
       } finally {
         setLoadingFavorites(false);
       }
     };
-
-    initializeFavorites();
+    loadFavorites();
   }, []);
 
-  const addToFavorites = useCallback(
-    async (courseId: string) => {
-      if (favorites.includes(courseId)) return;
-
-      try {
-        const added = await addTofavorites(courseId);
-        if (added) {
-          setFavorites((prev) => [...prev, courseId]);
-          toast({
-            title: "Added to favorites",
-            description: "The course has been added to your favorites.",
-          });
-        }
-      } catch (err) {
-        console.error("Add to favorites failed:", err);
-        toast({
-          variant: "destructive",
-          title: "Error adding favorite",
-          description:
-            "Couldn't add this course to favorites. Please try again.",
-        });
-      }
-    },
-    [favorites]
-  );
+  const addToFavorites = useCallback(async (courseId: string) => {
+    try {
+      await addTofavorites(courseId);
+      setFavorites((prev) => [...prev, courseId]);
+    } catch (err) {
+      console.error("Failed to add favorite:", err);
+      throw err;
+    }
+  }, []);
 
   const removeFromFavorites = useCallback(async (courseId: string) => {
     try {
-      const removed = await removefromFavorites(courseId);
-      if (removed) {
-        setFavorites((prev) => prev.filter((id) => id !== courseId));
-        toast({
-          title: "Removed from favorites",
-          description: "The course has been removed from your favorites.",
-        });
-      }
+      await removefromFavorites(courseId);
+      setFavorites((prev) => prev.filter((id) => id !== courseId));
     } catch (err) {
-      console.error("Remove from favorites failed:", err);
-      toast({
-        variant: "destructive",
-        title: "Error removing favorite",
-        description:
-          "Couldn't remove this course from favorites. Please try again.",
-      });
+      console.error("Failed to remove favorite:", err);
+      throw err;
     }
   }, []);
 

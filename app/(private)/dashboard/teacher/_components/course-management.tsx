@@ -74,7 +74,7 @@ export function CourseManagement() {
       setCourses(Array.isArray(coursesData) ? coursesData : []);
       setCategories(Array.isArray(categoriesData) ? categoriesData : []);
     } catch (error) {
-      console.error("Error loading data:", error);
+      console.log("Error loading data:", error);
       setCourses([]);
       setCategories([]);
     } finally {

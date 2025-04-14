@@ -26,13 +26,13 @@ export async function fetchCourses() {
       "GET"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
     }
     if (response) {
       return response.data.courses;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }
 
@@ -45,12 +45,12 @@ export async function fetchCategories() {
       "GET"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
       return [];
     }
     return response?.data?.categories ?? [];
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return [];
   }
 }
@@ -65,14 +65,14 @@ export async function addCourse(prevState: unknown, formData: FormData) {
       "POST"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
       return { error: "Failed to create course." };
     }
     if (response) {
       return { success: true, message: "create course successful" };
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return { error: "An unexpected error occurred." };
   }
 }
@@ -89,7 +89,7 @@ export async function updateCourse(prevState: unknown, formData: FormData) {
     );
 
     if (error) {
-      console.error("🚨 API Error:", error);
+      console.log("🚨 API Error:", error);
       return { error: "Failed to update course." };
     }
 
@@ -97,7 +97,7 @@ export async function updateCourse(prevState: unknown, formData: FormData) {
       return { success: true, message: "Update course successful" };
     }
   } catch (error) {
-    console.error("🔥 Unexpected error in updateCourse:", error);
+    console.log("🔥 Unexpected error in updateCourse:", error);
     return { error: "An unexpected error occurred." };
   }
 }
@@ -111,14 +111,14 @@ export async function deleteCourse(courseId: string) {
       "DELETE"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
       return { error: "Failed to delete course." };
     }
     if (response) {
       return { success: true, message: "Delete course successful" };
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return { error: "An unexpected error occurred." };
   }
 }
@@ -135,14 +135,14 @@ export async function updateCourseStatus(courseId: string, status: boolean) {
       "POST"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
       return { error: "Failed to Update course." };
     }
     if (response) {
       return { success: true, message: "Update course status successful" };
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return { error: "An unexpected error occurred." };
   }
 }

@@ -27,7 +27,7 @@ export default function TeacherManagment() {
       const data = await fetchTeachers();
       setTeachers(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error("Error loading data:", error);
+      console.log("Error loading data:", error);
       setTeachers([]);
     } finally {
       setLoading(false);

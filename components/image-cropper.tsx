@@ -80,7 +80,7 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
         onCropFinish(croppedImage);
       }
     } catch (e) {
-      console.error(e);
+      console.log(e);
     }
   }, [croppedAreaPixels, getCroppedImg, imageSrc, onCropFinish]);
 

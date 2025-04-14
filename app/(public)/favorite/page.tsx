@@ -34,7 +34,7 @@ export default function FavoritesPage() {
         const coursesData = await fetchCoursesByIds(favorites);
         setCourses(coursesData);
       } catch (err) {
-        console.error("Error fetching favorite courses:", err);
+        console.log("Error fetching favorite courses:", err);
         setError("Failed to load favorite courses. Please try again.");
       } finally {
         setIsLoading(false);

@@ -30,7 +30,7 @@ export default function CoursesPage() {
         setCourses(coursesData);
         setCategories([{ id: "all", name: "All Categories", description: "" }, ...categoriesData]);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.log("Error fetching data:", error);
       } finally {
         setLoading(false);
       }

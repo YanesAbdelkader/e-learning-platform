@@ -11,13 +11,13 @@ export async function fetchCategory() {
       "GET"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
     }
     if (response) {
       return response.data.categories;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }
 
@@ -31,14 +31,14 @@ export async function addCategory(prevState: unknown, formData: FormData) {
       "POST"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
       return { error: "Failed to create category." };
     }
     if (response) {
       return { success: true, message: "create category successful" };
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return { error: "An unexpected error occurred." };
   }
 }
@@ -57,7 +57,7 @@ export async function updateCategory(prevState: unknown, formData: FormData) {
     );
 
     if (error) {
-      console.error("🚨 API Error:", error);
+      console.log("🚨 API Error:", error);
       return { error: "Failed to update category." };
     }
 
@@ -65,7 +65,7 @@ export async function updateCategory(prevState: unknown, formData: FormData) {
       return { success: true, message: "Update category successful" };
     }
   } catch (error) {
-    console.error("🔥 Unexpected error in updateCategory:", error);
+    console.log("🔥 Unexpected error in updateCategory:", error);
     return { error: "An unexpected error occurred." };
   }
 }
@@ -79,14 +79,14 @@ export async function deleteCategory(categoryId: string) {
       "DELETE"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
       return { error: "Failed to delete category." };
     }
     if (response) {
       return { success: true, message: "Delete category successful" };
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return { error: "An unexpected error occurred." };
   }
 }

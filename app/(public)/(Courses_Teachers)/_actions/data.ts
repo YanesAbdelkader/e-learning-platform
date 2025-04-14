@@ -11,13 +11,13 @@ export async function getCategories() {
       "GET"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
     }
     if (response) {
       return response.data.categories;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }
 
@@ -30,13 +30,13 @@ export async function getCourses() {
       "GET"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
     }
     if (response) {
       return response.data.courses;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }
 
@@ -49,13 +49,13 @@ export async function getTeachers() {
       "GET"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
     }
     if (response) {
       return response.data.teachers;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }
 
@@ -71,12 +71,12 @@ export async function getSearchResult(keyWord: string) {
       "POST"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
     }
     if (response) {
       return response.data;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }

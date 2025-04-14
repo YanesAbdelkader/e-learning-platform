@@ -13,6 +13,7 @@ export async function fetchCourses() {
       console.log(error);
     }
     if (response) {
+      console.log(response.data)
       return response.data;
     }
   } catch (error) {

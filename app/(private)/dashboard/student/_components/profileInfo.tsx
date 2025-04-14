@@ -142,7 +142,7 @@ export default function ProfileInfo() {
         });
       }
     } catch (error) {
-      console.error(error);
+      console.log(error);
       toast({
         title: "Error",
         description: "An unexpected error occurred",

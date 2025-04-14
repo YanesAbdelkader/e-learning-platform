@@ -57,7 +57,7 @@ export async function sendVerificationCode(
       return { success: true, message: "Verification code sent", error: "" };
     }
   } catch (error) {
-    console.error("Unexpected Error:", error);
+    console.log("Unexpected Error:", error);
     return {
       success: false,
       error: "Something went wrong. Please try again.",
@@ -106,7 +106,7 @@ export async function verifyEmail(prevState: unknown, formData: FormData) {
       };
     }
   } catch (error) {
-    console.error("Unexpected Error:", error);
+    console.log("Unexpected Error:", error);
     return {
       success: false,
       error: "Something went wrong. Please try again.",
@@ -142,7 +142,7 @@ export async function registerTeacher(formData: FormData) {
   });
 
   if (!validatedFields.success) {
-    console.error("Validation Error:", validatedFields.error);
+    console.log("Validation Error:", validatedFields.error);
     return { success: false, error: "Invalid form data", message: "" };
   }
 
@@ -188,7 +188,7 @@ export async function registerTeacher(formData: FormData) {
       return { success: false, error: "Registration failed!", message: "" };
     }
   } catch (error) {
-    console.error("Unexpected Error:", error);
+    console.log("Unexpected Error:", error);
     return {
       success: false,
       error: "Something went wrong. Please try again.",

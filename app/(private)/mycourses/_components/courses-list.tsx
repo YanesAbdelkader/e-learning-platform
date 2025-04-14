@@ -38,7 +38,7 @@ export function CoursesList({ filter = "all" }: CoursesListProps) {
       const flattenedData = Array.isArray(data) ? data.flat() : [];
       setCourses(flattenedData);
     } catch (error) {
-      console.error("Error loading data:", error);
+      console.log("Error loading data:", error);
       setCourses([]);
     } finally {
       setLoading(false);

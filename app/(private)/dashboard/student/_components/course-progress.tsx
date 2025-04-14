@@ -26,7 +26,7 @@ export function CourseProgress() {
         const data = await fetchCourseProgress();
         setCourses(data);
       } catch (error) {
-        console.error("Failed to fetch course progress:", error);
+        console.log("Failed to fetch course progress:", error);
       } finally {
         setLoading(false);
       }

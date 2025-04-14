@@ -49,7 +49,7 @@ export function Comments({ courseId }: { courseId: string }) {
         setNewComment("");
       }
     } catch (err) {
-      console.error("Error submitting comment:", err);
+      console.log("Error submitting comment:", err);
     } finally {
       setIsSubmittingComment(false);
     }
@@ -61,7 +61,7 @@ export function Comments({ courseId }: { courseId: string }) {
       const replies = await fetchReplies(commentId);
       setRepliesMap((prev) => ({ ...prev, [commentId]: replies || [] }));
     } catch (error) {
-      console.error("Failed to fetch replies:", error);
+      console.log("Failed to fetch replies:", error);
     } finally {
       setLoadingReplies((prev) => ({ ...prev, [commentId]: false }));
     }
@@ -88,7 +88,7 @@ export function Comments({ courseId }: { courseId: string }) {
         setReplyingTo(null);
       }
     } catch (err) {
-      console.error("Error submitting reply:", err);
+      console.log("Error submitting reply:", err);
       setReplyError("Failed to submit reply. Please try again.");
     } finally {
       setIsSubmittingReply(false);

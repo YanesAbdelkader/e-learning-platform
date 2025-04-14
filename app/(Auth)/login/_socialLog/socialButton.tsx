@@ -51,9 +51,8 @@ export function SocialButton({
                 title: result.title,
                 description: result.description,
               });
-
               resolve({ success: true, token });
-              router.push(result.path);
+              router.push(result?.path);
             }
           }
         } catch (error) {

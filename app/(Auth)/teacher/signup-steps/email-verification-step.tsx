@@ -68,7 +68,7 @@ export default function EmailVerificationStep({
         });
       }
     } catch (error) {
-      console.error("Error sending verification code:", error);
+      console.log("Error sending verification code:", error);
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
@@ -116,7 +116,7 @@ export default function EmailVerificationStep({
         });
       }
     } catch (error) {
-      console.error("Error verifying email:", error);
+      console.log("Error verifying email:", error);
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",

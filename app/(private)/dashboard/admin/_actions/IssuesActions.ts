@@ -11,14 +11,14 @@ export async function fetchIssues() {
     );
 
     if (error) {
-      console.error("API Error:", error);
+      console.log("API Error:", error);
     }
 
     if (response?.data?.issues) {
       return response.data.issues;
     }
   } catch (error) {
-    console.error("Unexpected error in fetchIssues:", error);
+    console.log("Unexpected error in fetchIssues:", error);
   }
 }
 export async function updateIssues(id: number, status: string) {
@@ -31,13 +31,13 @@ export async function updateIssues(id: number, status: string) {
     );
 
     if (error) {
-      console.error("API Error:", error);
+      console.log("API Error:", error);
     }
 
     if (response?.data?.issues) {
       return { success: true };
     }
   } catch (error) {
-    console.error("Unexpected error in fetchIssues:", error);
+    console.log("Unexpected error in fetchIssues:", error);
   }
 }

@@ -10,13 +10,13 @@ export async function fetchCourses() {
       "GET"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
     }
     if (response) {
       return response.data;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }
 
@@ -32,14 +32,14 @@ export async function updateCourseStatus(courseId: string, status: boolean) {
       "POST"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
       return { error: "Failed to Update course." };
     }
     if (response) {
       return { success: true, message: "Update course status successful" };
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return { error: "An unexpected error occurred." };
   }
 }

@@ -41,17 +41,8 @@ export default function CourseSidebar({
     setIsAddingToCart(true);
     try {
       addToCart(courseId);
-      toast({
-        title: "Added to cart",
-        description: `${title} has been added to your cart.`,
-      });
     } catch (error) {
-      console.error("Failed to add to cart:", error);
-      toast({
-        title: "Error",
-        description: "Failed to add course to cart. Please try again.",
-        variant: "destructive",
-      });
+      console.log("Failed to add to cart:", error);
     } finally {
       setIsAddingToCart(false);
     }

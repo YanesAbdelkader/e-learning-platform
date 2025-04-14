@@ -22,7 +22,7 @@ export async function sendVerificationCode(prevState: unknown, email: string) {
       return { success: true, message: "Verification code sent", error: "" };
     }
   } catch (error) {
-    console.error("Unexpected Error:", error);
+    console.log("Unexpected Error:", error);
     return {
       success: false,
       error: "Something went wrong. Please try again.",
@@ -62,7 +62,7 @@ export async function verifyEmail(
       };
     }
   } catch (error) {
-    console.error("Unexpected Error:", error);
+    console.log("Unexpected Error:", error);
     return {
       success: false,
       error: "Something went wrong. Please try again.",
@@ -113,7 +113,7 @@ export async function signupAction(prevState: unknown, data: FormData) {
       };
     }
   } catch (err) {
-    console.error("Unexpected Error:", err);
+    console.log("Unexpected Error:", err);
     return {
       title: "SignUp failed",
       description: "Something went wrong. Please try again.",

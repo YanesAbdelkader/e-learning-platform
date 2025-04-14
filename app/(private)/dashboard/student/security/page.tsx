@@ -13,7 +13,7 @@ export default async function SecuritySettingsPage() {
       </div>
     );
   } catch (error) {
-    console.error("Failed to load 2FA status:", error);
+    console.log("Failed to load 2FA status:", error);
     return (
       <div className="space-y-6">
         <h1 className="text-2xl font-bold">Security Settings</h1>

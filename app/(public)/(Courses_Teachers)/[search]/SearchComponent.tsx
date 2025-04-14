@@ -34,7 +34,7 @@ export default function SearchComponent({
       const data = await getSearchResult(keyWord);
       setResult(data || { Courses: [], Teachers: [] });
     } catch (err) {
-      console.error("Error fetching search results:", err);
+      console.log("Error fetching search results:", err);
       setResult({ Courses: [], Teachers: [] });
     } finally {
       setIsLoading(false);

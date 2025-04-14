@@ -36,14 +36,13 @@ export default function EpisodeManagement() {
       const result = await fetchEpisodes(courseId);
       setEpisodes(result);
     } catch (err) {
-      console.error(err);
+      console.log(err);
       setError("Failed to load episodes.");
     } finally {
       setIsLoading(false);
     }
   }, [courseId]);
 
-  // Load episodes on component mount
   useEffect(() => {
     loadEpisodes();
   }, [loadEpisodes]);

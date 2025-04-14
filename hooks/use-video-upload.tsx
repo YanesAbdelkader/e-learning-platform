@@ -178,7 +178,7 @@ export function useVideoUpload({
 
         return fileUrl
       } catch (error) {
-        console.error("Upload failed:", error)
+        console.log("Upload failed:", error)
         const errorMessage = error instanceof Error ? error.message : String(error)
         setUploadError(`Upload failed: ${errorMessage}`)
 

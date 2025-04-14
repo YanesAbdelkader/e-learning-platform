@@ -40,7 +40,7 @@ export function Reviews({ courseId }: { courseId: string }) {
         });
       }
     } catch (err) {
-      console.error("Error submitting review:", err);
+      console.log("Error submitting review:", err);
       toast({
         title: "Error",
         description: "Failed to submit review. Please try again.",

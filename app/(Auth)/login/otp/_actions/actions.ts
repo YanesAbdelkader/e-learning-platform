@@ -73,7 +73,7 @@ export async function otpAction(formData: OTPFormData): Promise<ActionResult> {
       variant: "destructive",
     };
   } catch (error) {
-    console.error("OTP Verification Error:", error);
+    console.log("OTP Verification Error:", error);
     return {
       title: "Server Error",
       description: "An unexpected error occurred. Please try again.",

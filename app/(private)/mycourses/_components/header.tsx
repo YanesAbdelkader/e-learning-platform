@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { logout } from "@/functions/custom";
 import { redirect } from "next/navigation";
 import { getCookie } from "typescript-cookie";
-import { House, LogOut, Moon, Sun, TvMinimalPlay } from "lucide-react";
+import { House, LogOut, Moon, Sun, LayoutDashboard } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -72,8 +72,8 @@ export function Header() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link href="/mycourses" className="flex items-center gap-1">
-                  <TvMinimalPlay /> My Courses
+                <Link href="/dashboard" className="flex items-center gap-1">
+                  <LayoutDashboard /> Dashboard
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>

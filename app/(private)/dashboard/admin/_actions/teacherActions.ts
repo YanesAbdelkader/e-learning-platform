@@ -11,13 +11,13 @@ export async function fetchTeachers() {
       "GET"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
     }
     if (response) {
       return response.data.teachers;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }
 
@@ -30,13 +30,13 @@ export async function fetchTeacherInfo(id: string) {
       "GET"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
     }
     if (response) {
       return response.data;
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }
 
@@ -50,14 +50,14 @@ export async function verifyTeacher(id: string, verify: boolean) {
       "POST"
     );
     if (error) {
-      console.error(error);
+      console.log(error);
       return { error: "Failed to verify teacher." };
     }
     if (response) {
       return { success: true, message: "Teacher verification updated." };
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return { error: "An unexpected error occurred." };
   }
 }

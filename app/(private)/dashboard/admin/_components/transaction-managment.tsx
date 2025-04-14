@@ -30,7 +30,7 @@ export default function TransactionManagment() {
         setTransactions(transaction);
         setTotalAmount(Number(total_amount));
       } catch (error) {
-        console.error("Error loading data:", error);
+        console.log("Error loading data:", error);
         setTransactions([]);
         setTotalAmount(0);
       } finally {

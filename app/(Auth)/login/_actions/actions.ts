@@ -19,7 +19,7 @@ const AUTH_COOKIE_CONFIG = {
 };
 
 const OTP_COOKIE_CONFIG = {
-  httpOnly: false, // Needs to be accessible by client for OTP flow
+  httpOnly: false, 
   sameSite: "strict" as const,
   maxAge: 600, // 10 minutes
   secure: process.env.NODE_ENV === "production",
@@ -100,7 +100,7 @@ export async function loginAction(data: LoginData): Promise<ActionResult> {
       variant: "destructive",
     };
   } catch (err) {
-    console.error("Login error:", err);
+    console.log("Login error:", err);
     return {
       title: "Login failed",
       description:
@@ -126,7 +126,6 @@ export async function socialLoginAction(token: string): Promise<ActionResult> {
     (await cookieStore).set("token", token, AUTH_COOKIE_CONFIG);
     await getUserData();
 
-    // Get redirect path
     const prevPage = (await cookieStore).get("prevPage")?.value;
     const lastVisitedPage = (await cookieStore).get("lastVisitedPage")?.value;
 
@@ -140,7 +139,7 @@ export async function socialLoginAction(token: string): Promise<ActionResult> {
       path: prevPage || lastVisitedPage || "/dashboard",
     };
   } catch (err) {
-    console.error("Social login error:", err);
+    console.log("Social login error:", err);
     return {
       title: "Login failed",
       description: err instanceof Error ? err.message : "Social login failed",

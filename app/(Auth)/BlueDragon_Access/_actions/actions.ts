@@ -46,7 +46,7 @@ export async function loginAction(_: unknown, data: LoginData) {
       variant: "destructive",
     };
   } catch (err) {
-    console.error("Unexpected Error:", err);
+    console.log("Unexpected Error:", err);
     return {
       title: "Login failed",
       description: "Something went wrong. Please try again.",

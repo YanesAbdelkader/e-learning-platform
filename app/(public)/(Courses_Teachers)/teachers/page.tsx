@@ -27,7 +27,7 @@ export default function TeachersPage() {
         setTeachers(teachersData);
         setCategories(categoriesData);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.log("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
@@ -37,10 +37,7 @@ export default function TeachersPage() {
   }, []);
 
   const filteredTeachers = useMemo(() => {
-    return teachers.filter(
-      (teacher) =>
-        teacher.teacher_info.rating >= rating
-    );
+    return teachers.filter((teacher) => teacher.teacher_info.rating >= rating);
   }, [teachers, rating]);
 
   const handleSearchTypeChange = (type: SearchType) => {
