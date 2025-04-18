@@ -1,4 +1,4 @@
-# AZ-learning Platform - your best choice to learn online
+# Bright Mind Platform - your best choice to learn online
 
 #This is my graduation project to obtain a senior technical certificate in web and mobile development
 
